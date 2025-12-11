@@ -20,7 +20,11 @@ use crossterm::{
 		read,
 	},
 	execute,
-	terminal::size,
+	terminal::{
+		size,
+		enable_raw_mode,
+		disable_raw_mode,
+	},
 	cursor,
 };
 
@@ -67,16 +71,20 @@ fn handle_mouse(event : MouseEvent) -> (u16, u16, bool) {
 }
 
 
-pub fn init() {
+pub fn init() -> io::Result<()> {
 	let mut stdout = io::stdout();
 	execute!(stdout, crossterm::event::EnableBracketedPaste).unwrap();
 	execute!(stdout, crossterm::event::EnableFocusChange).unwrap();
 	execute!(stdout, crossterm::event::EnableMouseCapture).unwrap();
+	enable_raw_mode()?;
+	Ok(())
 }
 
-pub fn uninit() { // Initializes the end of all functions
+pub fn uninit() -> io::Result<()> { // Initializes the end of all functions
 	let mut stdout = io::stdout();
 	execute!(stdout, crossterm::event::EnableBracketedPaste).unwrap();
 	execute!(stdout, crossterm::event::EnableFocusChange).unwrap();
 	execute!(stdout, crossterm::event::EnableMouseCapture).unwrap();
+	disable_raw_mode()?;
+	Ok(())
 }
