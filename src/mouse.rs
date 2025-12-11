@@ -40,7 +40,14 @@ impl Mouse {
 	}
 }
 
-fn init() {
+pub fn init() {
+	let mut stdout = io::stdout();
+	execute!(stdout, crossterm::event::EnableBracketedPaste).unwrap();
+	execute!(stdout, crossterm::event::EnableFocusChange).unwrap();
+	execute!(stdout, crossterm::event::EnableMouseCapture).unwrap();
+}
+
+pub fn uninit() { // Initializes the end of all functions
 	let mut stdout = io::stdout();
 	execute!(stdout, crossterm::event::EnableBracketedPaste).unwrap();
 	execute!(stdout, crossterm::event::EnableFocusChange).unwrap();
