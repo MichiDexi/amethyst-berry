@@ -21,24 +21,26 @@ pub struct Mouse {
 	pub lclick : bool
 }
 
-impl Mouse {
-	pub fn update(&mut self) -> io::Result<()> {
-		if poll(Duration::from_millis(100))? {
-			println!("{:?}", read()?);
-			match read()? {
-				Event::FocusGained => println!("FocusGained"),
-				Event::FocusLost => println!("FocusLost"),
-				Event::Key(event) => println!("{:?}", event),
-				Event::Mouse(event) => println!("{:?}", event),
-				Event::Paste(data) => println!("Pasted {:?}", data),
-				Event::Resize(width, height) => println!("New size {}x{}", width, height),
-			}
-		}
-		Ok(())
-		// self.x = 
-		// self.y = 
-	}
+pub struct Window {
+	pub focused : bool,
+	pub width : u16,
+	pub height : u16,
 }
+
+pub fn update(mouse : &mut Mouse, window : &mut Window) -> io::Result<()> {
+	if poll(Duration::from_millis(100))? {
+		// println!("{:?}", read()?);
+		match read()? {
+			Event::FocusGained => window.focused = true,
+			Event::FocusLost => window.focused = false,
+			Event::Mouse(event) => println!("{:?}", event),
+			Event::Resize(width, height) => {window.width = width; window.height = height},
+			_ => {}
+		}
+	}
+	Ok(())
+}
+
 
 pub fn init() {
 	let mut stdout = io::stdout();

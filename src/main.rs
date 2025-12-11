@@ -1,7 +1,8 @@
-mod mouse;
+mod input;
 
 fn main() {
-	mouse::init();
-    let mut a : mouse::Mouse = mouse::Mouse { x : 0, y : 0, lclick : false };
-    loop { let _ = a.update(); }
+	input::init();
+    let mut a : input::Mouse = input::Mouse { x : 0, y : 0, lclick : false };
+    let mut b : input::Window = input::Window { focused : false, width : 0, height : 0 };
+    loop { let _ = input::update(&mut a, &mut b); }
 }
