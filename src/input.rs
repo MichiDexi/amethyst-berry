@@ -1,19 +1,29 @@
-use std::{time::Duration, io};
-use std::io::{Write, stdout};
-use crossterm::event::{
-	EnableBracketedPaste,
-	EnableFocusChange,
-	EnableMouseCapture,
-	Event,
-	poll,
-	read,
+use std::{
+	time::Duration,
+	io::{
+		Write,
+		stdout,
+		self
+	},
 };
-use crossterm::{execute, style::Print};
 use crossterm::{
+	event::{
+		EnableBracketedPaste,
+		EnableFocusChange,
+		EnableMouseCapture,
+		Event,
+		KeyCode,
+		MouseEvent,
+		MouseEventKind,
+		MouseButton,
+		poll,
+		read,
+	},
+	execute,
 	terminal::size,
 	cursor,
-	event::KeyCode
 };
+
 
 pub struct Mouse {
 	pub x : u16,
@@ -33,12 +43,27 @@ pub fn update(mouse : &mut Mouse, window : &mut Window) -> io::Result<()> {
 		match read()? {
 			Event::FocusGained => window.focused = true,
 			Event::FocusLost => window.focused = false,
-			Event::Mouse(event) => println!("{:?}", event),
+			Event::Mouse(event) => {
+				let mouse_input : (u16, u16, bool) = handle_mouse(event);
+				mouse.x = mouse_input.0;
+				mouse.y = mouse_input.1;
+				mouse.lclick = mouse_input.2;
+			},
 			Event::Resize(width, height) => {window.width = width; window.height = height},
 			_ => {}
 		}
 	}
 	Ok(())
+}
+
+fn handle_mouse(event : MouseEvent) -> (u16, u16, bool) {
+	let pressed = matches!(
+		event.kind,
+		MouseEventKind::Down(MouseButton::Left)
+		| MouseEventKind::Drag(MouseButton::Left)
+	);
+
+	(event.column, event.row, pressed)
 }
 
 
