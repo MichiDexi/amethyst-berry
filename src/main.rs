@@ -1,5 +1,6 @@
 mod mouse;
 
 fn main() {
-    println!("Hello, world!");
+    let mut a : mouse::Mouse = mouse::Mouse { x : 0, y : 0, lclick : false };
+    loop { let _ = a.update(); }
 }
