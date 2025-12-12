@@ -1,9 +1,10 @@
 use crossterm::{
-	ExecutableCommand, execute,
-	cursor::{DisableBlinking, EnableBlinking, MoveTo, RestorePosition, SavePosition}
+	execute,
+	cursor::MoveTo,
 };
-use std::io;
-use std::io::{stdout, Write, Stdout};
+use std::io::{stdout, Write};
+
+use crate::utils;
 
 pub struct Box {
 	// Size and position
@@ -16,12 +17,14 @@ pub struct Box {
 	// Extra options
 	pub invert_on_hover : bool,
 	pub color : u8,
+	pub line_type : u8,
 
 	// Event polling
 	pub hovered : bool,
 	pub clicked : bool,
 	pub rclicked : bool,
 }
+
 
 impl Box {
 	pub fn draw(&self) {
@@ -30,7 +33,7 @@ impl Box {
 		// Top
 		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
 		write!(out, "┌").unwrap();
-		repeat(&mut out, '─', self.width-2);
+		utils::repeat(&mut out, '─', self.width-2);
 		write!(out, "┐").unwrap();
 
 		// Middle
@@ -44,7 +47,7 @@ impl Box {
 		// Bottom
 		execute!(out, MoveTo(self.x, self.y + self.height - 1)).unwrap();
 		write!(out, "└").unwrap();
-		repeat(&mut out, '─', self.width-2);
+		utils::repeat(&mut out, '─', self.width-2);
 		write!(out, "┘").unwrap();
 
 		stdout().flush().unwrap();
@@ -55,7 +58,7 @@ impl Box {
 		let hovered = mouse.0 >= self.x &&
 			mouse.0 < self.x + self.width &&
 			mouse.1 >= self.y &&
-			mouse.1 >= self.y + self.height;
+			mouse.1 < self.y + self.height;
 
 		self.hovered = hovered;
 
@@ -67,11 +70,5 @@ impl Box {
 		
 		self.clicked = false;
 		self.rclicked = false;
-	}
-}
-
-fn repeat(out : &mut Stdout, c : char, n : u16) {
-	for _ in 0..n {
-		write!(out, "{c}").unwrap();
 	}
 }
