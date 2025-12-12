@@ -14,6 +14,7 @@ use std::{
 };
 
 mod input;
+mod mapdata;
 
 
 fn main() {
