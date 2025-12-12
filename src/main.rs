@@ -1,8 +1,6 @@
 use crossterm::{
-	terminal::size,
 	execute,
 	cursor,
-	event::KeyCode
 };
 use std::{
 	// env, <- Will be important later
@@ -10,34 +8,36 @@ use std::{
 		stdout,
 		Write
 	},
-	thread::sleep
 };
+use std::{thread, time};
 
 mod input;
+mod interface;
 
 
 fn main() {
-	let _ = input::init();
-	let mut a : input::Mouse = input::Mouse { x : 0, y : 0, lclick : false, rclick : false };
-	let mut b : input::Window = input::Window { focused : false, width : 0, height : 0 };
-	loop {
-		let _ = input::update(&mut a, &mut b);
-		let mut stdout = stdout();
-		if a.lclick {
-			execute!(stdout, cursor::MoveTo(a.x, a.y)).unwrap();
-			let _ = write!(stdout, "O");
-			if a.x == 0 && a.y == 0 {
-				break;
-			}
-		}
-		if a.rclick {
-			execute!(stdout, cursor::MoveTo(a.x, a.y)).unwrap();
-			let _ = write!(stdout, " ");
-			if a.x == 0 && a.y == 0 {
-				break;
-			}
-		}
-		let _ = stdout.flush();
-	}
+	input::init().unwrap();
+	let mut mouse : input::Mouse = input::Mouse { x : 0, y : 0, lclick : false, rclick : false };
+	let mut window : input::Window = input::Window { focused : false, width : 0, height : 0 };
+
+	let mut testbox : interface::Box =
+	interface::Box {
+		x : 10, y : 10,
+		width : 5, height : 5,
+
+		text : "".to_string(),
+		invert_on_hover : false,
+		hovered : false,
+		clicked : false,
+		rclicked : false,
+		color : 0
+	};
+
+	testbox.draw();
+	thread::sleep(time::Duration::from_millis(1000));
+	
+
+
+	
 	let _ = input::uninit();
 }
