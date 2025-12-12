@@ -17,7 +17,7 @@ mod input;
 
 
 fn main() {
-	input::init();
+	let _ = input::init();
 	let mut a : input::Mouse = input::Mouse { x : 0, y : 0, lclick : false };
 	let mut b : input::Window = input::Window { focused : false, width : 0, height : 0 };
 	loop {
@@ -26,7 +26,11 @@ fn main() {
 		if a.lclick {
 			execute!(stdout, cursor::MoveTo(a.x, a.y)).unwrap();
 			let _ = write!(stdout, "a");
+			if a.x == 0 && a.y == 0 {
+				break;
+			}
 		}
 		let _ = stdout.flush();
 	}
+	let _ = input::uninit();
 }

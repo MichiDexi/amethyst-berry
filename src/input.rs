@@ -19,13 +19,14 @@ use crossterm::{
 		poll,
 		read,
 	},
-	execute,
 	terminal::{
 		size,
 		enable_raw_mode,
 		disable_raw_mode,
+		SetTitle,
 	},
 	cursor,
+	execute,
 };
 
 
@@ -73,18 +74,21 @@ fn handle_mouse(event : MouseEvent) -> (u16, u16, bool) {
 
 pub fn init() -> io::Result<()> {
 	let mut stdout = io::stdout();
+	execute!(stdout, crossterm::terminal::EnterAlternateScreen).unwrap();
 	execute!(stdout, crossterm::event::EnableBracketedPaste).unwrap();
 	execute!(stdout, crossterm::event::EnableFocusChange).unwrap();
 	execute!(stdout, crossterm::event::EnableMouseCapture).unwrap();
+	execute!(stdout, SetTitle("Amethyst berry tool"))?;
 	enable_raw_mode()?;
 	Ok(())
 }
 
 pub fn uninit() -> io::Result<()> { // Initializes the end of all functions
 	let mut stdout = io::stdout();
-	execute!(stdout, crossterm::event::EnableBracketedPaste).unwrap();
-	execute!(stdout, crossterm::event::EnableFocusChange).unwrap();
-	execute!(stdout, crossterm::event::EnableMouseCapture).unwrap();
+	execute!(stdout, crossterm::terminal::LeaveAlternateScreen).unwrap();
+	execute!(stdout, crossterm::event::DisableBracketedPaste).unwrap();
+	execute!(stdout, crossterm::event::DisableFocusChange).unwrap();
+	execute!(stdout, crossterm::event::DisableMouseCapture).unwrap();
 	disable_raw_mode()?;
 	Ok(())
 }
