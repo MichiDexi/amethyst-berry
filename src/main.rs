@@ -20,33 +20,24 @@ fn main() {
 	let mut mouse : input::Mouse = input::Mouse { x : 0, y : 0, lclick : false, rclick : false };
 	let mut window : input::Window = input::Window { focused : false, width : 0, height : 0 };
 
-	let mut testobj : interface::progressbar::ProgressBar =
-	interface::progressbar::ProgressBar {
+	let mut testobj : interface::splitbox::SplitBox =
+	interface::splitbox::SplitBox {
 		x : 10, y : 10,
-		size : 40,
+		width : 41, height : 21,
 
-		progress_full : 0,
-		percentage_show : 0,
-		progress_max : 1000,
+		text : "".to_string(),
 		
+		color : 0,
 		line_type : 0,
-		color : utils::Color {
-			color : 0,
-			bright : false
-		},
-
-		charset : ['<', '=', ' ', '>'],
+		
+		horizontal : vec!(5, 10, 15),
+		vertical : vec!(10, 20, 30),
 	};
 
-	for _ in 0..1000 {
+	for _ in 0..10 {
 		testobj.draw();
-		thread::sleep(time::Duration::from_millis(5));
-		testobj.progress_full += 1;
+		thread::sleep(time::Duration::from_millis(100));
 	}
-
-	
-
-
 	
 	let _ = input::uninit();
 }
