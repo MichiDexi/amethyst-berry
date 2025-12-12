@@ -1,4 +1,4 @@
-use std::io::{
+pub use std::io::{
 	Stdout,
 	Write,
 	stdout,
@@ -8,8 +8,8 @@ use std::io::{
 // Color structs
 
 pub struct Color {
-	color : u8,
-	bright : bool
+	pub color : u8,
+	pub bright : bool
 }
 
 impl Color {
@@ -23,9 +23,9 @@ impl Color {
 }
 
 pub struct TrueColor {
-	red : u8,
-	green : u8,
-	blue : u8,
+	pub red : u8,
+	pub green : u8,
+	pub blue : u8,
 }
 
 impl TrueColor {
@@ -44,14 +44,14 @@ impl TrueColor {
 
 // Unicode characters
 
-const NORMAL : [char; 11] =    ['─', '│', '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼'];
-const THICK : [char; 11] =     ['━', '┃', '┏', '┓', '┗', '┛', '┣', '┫', '┳', '┻', '╋'];
-const DOT3 : [char; 2] =       ['┄', '┆'];
-const DOT3_THICK : [char; 2] = ['┅', '┇'];
-const DOT4 : [char; 2] =       ['┈', '┊'];
-const DOT4_THICK : [char; 2] = ['┉', '┋'];
-const MLINE : [char; 9] =      ['═', '║', '╔', '╗', '╚', '╝', '╠', '╣', '╬'];
-const SHADING : [char; 6] =    ['░', '▒', '▓', '█', '▄', '▀'];
+pub const NORMAL : [char; 11] =    ['─', '│', '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼'];
+pub const THICK : [char; 11] =     ['━', '┃', '┏', '┓', '┗', '┛', '┣', '┫', '┳', '┻', '╋'];
+pub const DOT3 : [char; 2] =       ['┄', '┆'];
+pub const DOT3_THICK : [char; 2] = ['┅', '┇'];
+pub const DOT4 : [char; 2] =       ['┈', '┊'];
+pub const DOT4_THICK : [char; 2] = ['┉', '┋'];
+pub const MLINE : [char; 9] =      ['═', '║', '╔', '╗', '╚', '╝', '╠', '╣', '╬'];
+pub const SHADING : [char; 6] =    ['░', '▒', '▓', '█', '▄', '▀'];
 
 pub fn repeat(out : &mut Stdout, c : char, n : u16) {
 	for _ in 0..n {
