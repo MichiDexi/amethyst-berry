@@ -9,7 +9,12 @@ pub use std::io::{
 
 pub struct Color {
 	pub color : u8,
-	pub bright : bool
+	pub bright : bool,
+
+	pub truecolor : bool,
+	pub red : u8,
+	pub green : u8,
+	pub blue : u8,
 }
 
 impl Color {
@@ -17,26 +22,30 @@ impl Color {
 		self.color = c;
 	}
 
-	pub fn write_color(&self, background : bool) {
-		
+	pub fn write_color(&self, out : &mut Stdout, background : bool) {
+		let mut layer = match background {
+			true => 4,
+			false => 3,
+		};
+		if self.bright {
+			layer += 60; // Convert to bright
+			
+		}
+		write!(out, "\x1b[{}{}m", layer, self.color);
 	}
-}
 
-pub struct TrueColor {
-	pub red : u8,
-	pub green : u8,
-	pub blue : u8,
-}
-
-impl TrueColor {
-	pub fn set_color(&mut self, r : u8, g : u8, b : u8) {
+	pub fn set_truecolor(&mut self, r : u8, g : u8, b : u8) {
 		self.red = r;
 		self.green = g;
 		self.blue = b;
 	}
 
-	pub fn write_color(&self, background : bool) {
-		
+	pub fn write_truecolor(&self, out : &mut Stdout, background : bool) {
+		let layer = match background {
+			true => 4,
+			false => 3,
+		};
+		write!(out, "\x1b[{}8;2;{};{};{}m", layer, self.red, self.green, self.blue);
 	}
 }
 

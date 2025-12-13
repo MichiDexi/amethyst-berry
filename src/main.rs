@@ -16,22 +16,21 @@ use std::{
 };
 
 pub mod interface;
-pub mod input;
-pub mod utils;
+pub mod helpers;
 
 const TARGET_FPS : f32 = 30.0;
 
 fn main() {
-	input::init().unwrap();
+	helpers::input::init().unwrap();
 	let framerate : Duration = Duration::from_secs_f32(1.0 / TARGET_FPS);
 
-	let mut mouse : input::Mouse = input::Mouse { x : 0, y : 0, lclick : false, rclick : false, lclickheld : false, rclickheld : false };
-	let mut window : input::Window = input::Window { focused : false, width : 0, height : 0 };
+	let mut mouse : helpers::input::Mouse = helpers::input::Mouse { x : 0, y : 0, lclick : false, rclick : false, lclickheld : false, rclickheld : false };
+	let mut window : helpers::input::Window = helpers::input::Window { focused : false, width : 0, height : 0 };
 
 	let mut testobj : interface::textbox::Box =
 	interface::textbox::Box {
-		x : 10, y : 10,
-		width : 41, height : 21,
+		x : 20, y : 10,
+		width : 21, height : 11,
 
 		text : "".to_string(),
 		
@@ -51,13 +50,23 @@ fn main() {
 
 		text : "This button will stop the program".to_string(),
 
-		color : utils::Color {
+		color : helpers::utils::Color {
 			color : 0,
 			bright : false,
+
+			truecolor : false,
+			red : 0,
+			green : 0,
+			blue : 0,
 		},
-		bg_color : utils::Color {
+		bg_color : helpers::utils::Color {
 			color : 0,
 			bright : false,
+			
+			truecolor : false,
+			red : 0,
+			green : 0,
+			blue : 0,
 		},
 	};
 
@@ -71,7 +80,7 @@ fn main() {
 
 		let mut out = stdout();
 
-		input::update(&mut mouse, &mut window).unwrap();
+		helpers::input::update(&mut mouse, &mut window).unwrap();
 		testobj.update(&mouse);
 		if mouse.lclick {
 			
@@ -85,14 +94,14 @@ fn main() {
 		}
 
 		c += 1;
-		if c == 5 {
+		if c == 10 {
 			label.y -= 1;
 		}
-		if c == 10 {
+		if c == 20 {
 			label.y += 1;
 			c = 0;
 		}
-		execute!(out, crossterm::terminal::Clear).unwrap();
+		print!("\x1b[2J");
 		label.draw();
 		testobj.draw();
 		stdout().flush().unwrap();
@@ -104,5 +113,5 @@ fn main() {
 		}
 	}
 	
-	input::uninit().unwrap();
+	helpers::input::uninit().unwrap();
 }
