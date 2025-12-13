@@ -37,7 +37,9 @@ pub struct Mouse {
 	pub x : u16,
 	pub y : u16,
 	pub lclick : bool,
+	pub lclickheld : bool,
 	pub rclick : bool,
+	pub rclickheld : bool,
 }
 
 pub struct Window {
@@ -47,18 +49,11 @@ pub struct Window {
 }
 
 pub fn update(mouse : &mut Mouse, window : &mut Window) -> io::Result<()> {
-	if poll(Duration::from_millis(100))? {
-		// println!("{:?}", read()?);
+	while poll(Duration::from_millis(0))? {
 		match read()? {
 			Event::FocusGained => window.focused = true,
 			Event::FocusLost => window.focused = false,
-			Event::Mouse(event) => {
-				let mouse_input : (u16, u16, bool, bool) = handle_mouse(event);
-				mouse.x = mouse_input.0;
-				mouse.y = mouse_input.1;
-				mouse.lclick = mouse_input.2;
-				mouse.rclick = mouse_input.3;
-			},
+			Event::Mouse(event) => { handle_mouse(event, mouse); },
 			Event::Resize(width, height) => {window.width = width; window.height = height},
 			_ => {}
 		}
@@ -66,20 +61,23 @@ pub fn update(mouse : &mut Mouse, window : &mut Window) -> io::Result<()> {
 	Ok(())
 }
 
-fn handle_mouse(event : MouseEvent) -> (u16, u16, bool, bool) {
-	let lpressed = matches!(
-		event.kind,
-		MouseEventKind::Down(MouseButton::Left)
-		| MouseEventKind::Drag(MouseButton::Left)
-	);
+fn handle_mouse(event : MouseEvent, mouse : &mut Mouse) {
 
-	let rpressed = matches!(
-		event.kind,
-		MouseEventKind::Down(MouseButton::Right)
-		| MouseEventKind::Drag(MouseButton::Right)
-	);
+	mouse.lclick = false;
+	mouse.rclick = false;
 
-	(event.column, event.row, lpressed, rpressed)
+	mouse.x = event.column;
+	mouse.y = event.row;
+
+	match event.kind {
+		MouseEventKind::Down(MouseButton::Left)  => mouse.lclick     = true,
+		MouseEventKind::Drag(MouseButton::Left)  => mouse.lclickheld = true,
+		MouseEventKind::Up(MouseButton::Left)    => mouse.lclickheld = false,
+		MouseEventKind::Down(MouseButton::Right) => mouse.rclick     = true,
+		MouseEventKind::Drag(MouseButton::Right) => mouse.rclickheld = true,
+		MouseEventKind::Up(MouseButton::Right)   => mouse.rclickheld = false,
+		_ => {}
+	}
 }
 
 
