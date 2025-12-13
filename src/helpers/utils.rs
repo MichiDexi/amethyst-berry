@@ -8,6 +8,8 @@ pub use std::io::{
 // Color structs
 
 pub struct Color {
+	pub color_enabled : bool,
+
 	pub color : u8,
 	pub bright : bool,
 
@@ -18,34 +20,25 @@ pub struct Color {
 }
 
 impl Color {
-	pub fn set_color(&mut self, c : u8) {
-		self.color = c;
-	}
-
 	pub fn write_color(&self, out : &mut Stdout, background : bool) {
+		if !self.color_enabled {
+			return;
+		}
+	
 		let mut layer = match background {
 			true => 4,
 			false => 3,
 		};
-		if self.bright {
-			layer += 60; // Convert to bright
-			
+		
+		if self.truecolor {
+			write!(out, "\x1b[{}8;2;{};{};{}m", layer, self.red, self.green, self.blue).unwrap();
 		}
-		write!(out, "\x1b[{}{}m", layer, self.color);
-	}
-
-	pub fn set_truecolor(&mut self, r : u8, g : u8, b : u8) {
-		self.red = r;
-		self.green = g;
-		self.blue = b;
-	}
-
-	pub fn write_truecolor(&self, out : &mut Stdout, background : bool) {
-		let layer = match background {
-			true => 4,
-			false => 3,
-		};
-		write!(out, "\x1b[{}8;2;{};{};{}m", layer, self.red, self.green, self.blue);
+		else {
+			if self.bright {
+				layer += 60; // Convert to bright
+			}
+			write!(out, "\x1b[{}{}m", layer, self.color).unwrap();
+		}
 	}
 }
 
