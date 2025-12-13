@@ -72,3 +72,23 @@ pub fn get_char(ctype : u8, index : u8) -> char {
 		_ => NORMAL[index as usize],
 	}
 }
+
+
+
+// Other character shenanigans
+
+pub fn shorten_text(text : &str, length : u16) -> String {
+	if text.len() > length as usize {
+		let mut output = text[0..length as usize - 3].to_string();
+		output += "...";
+		output
+		// I used this earlier:
+		// output = (*(&text[0_usize..length as usize-3_usize].to_string()).clone()).to_string();
+		// It works, don't ask why
+	}
+	else {
+		text.to_string()
+		// This used to be '(&text).clone()' at one point
+		// This function has the silliest history ever
+	}
+}

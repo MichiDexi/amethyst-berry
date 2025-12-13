@@ -44,23 +44,58 @@ fn main() {
 		invert_on_hover : false,
 	};
 
-	testobj.draw();
+	let mut label : interface::label::Label =
+	interface::label::Label {
+		x : 13, y : 9,
+		size : 33,
+
+		text : "This button will stop the program".to_string(),
+
+		color : utils::Color {
+			color : 0,
+			bright : false,
+		},
+		bg_color : utils::Color {
+			color : 0,
+			bright : false,
+		},
+	};
+
+	
+	
+
+	let mut c : u16 = 0;
 
 	loop {
 		let now = Instant::now(); // Get frame time
 
+		let mut out = stdout();
+
 		input::update(&mut mouse, &mut window).unwrap();
 		testobj.update(&mouse);
 		if mouse.lclick {
-			let mut out = stdout();
+			
 			execute!(out, crossterm::cursor::MoveTo(0, 0)).unwrap();
 			write!(out, "{}, {}", mouse.x, mouse.y).unwrap();
-			stdout().flush().unwrap();
+			
 		}
 		
 		if testobj.clicked {
 			break;
 		}
+
+		c += 1;
+		if c == 5 {
+			label.y -= 1;
+		}
+		if c == 10 {
+			label.y += 1;
+			c = 0;
+		}
+		execute!(out, crossterm::terminal::Clear).unwrap();
+		label.draw();
+		testobj.draw();
+		stdout().flush().unwrap();
 		
 		// Frame time management for consistent framerate
 		let frame_duration = Instant::now().duration_since(now);
