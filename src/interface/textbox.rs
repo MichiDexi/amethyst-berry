@@ -4,8 +4,8 @@ use crossterm::{
 };
 use std::io::{stdout, Write};
 
-use crate::utils;
-use crate::input;
+use crate::helpers::utils;
+use crate::helpers::input;
 
 pub struct Box {
 	// Size and position

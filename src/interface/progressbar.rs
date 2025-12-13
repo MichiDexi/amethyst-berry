@@ -4,7 +4,7 @@ use crossterm::{
 };
 use std::io::{stdout, Write};
 
-use crate::utils;
+use crate::helpers::utils;
 
 pub struct ProgressBar {
 	// Size and position
