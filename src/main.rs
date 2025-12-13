@@ -44,31 +44,10 @@ fn main() {
 	};
 
 	let mut label : interface::label::Label =
-	interface::label::Label {
-		x : 13, y : 9,
-		size : 33,
+	interface::label::Label::new(14, 9, 33, "This button will stop the program");
 
-		text : "This button will stop the program".to_string(),
-
-		color : helpers::utils::Color {
-			color : 0,
-			bright : false,
-
-			truecolor : false,
-			red : 0,
-			green : 0,
-			blue : 0,
-		},
-		bg_color : helpers::utils::Color {
-			color : 0,
-			bright : false,
-			
-			truecolor : false,
-			red : 0,
-			green : 0,
-			blue : 0,
-		},
-	};
+	let mut bar : interface::progressbar::ProgressBar =
+	interface::progressbar::ProgressBar::new(10, 21, 41, 0, 100, ['<', '=', ' ', '>']);
 
 	
 	
@@ -94,16 +73,19 @@ fn main() {
 		}
 
 		c += 1;
-		if c == 10 {
-			label.y -= 1;
-		}
-		if c == 20 {
-			label.y += 1;
-			c = 0;
+		if c.is_multiple_of(10) {
+			if c.is_multiple_of(20) {
+				label.y += 1;
+			}
+			else {
+				label.y -= 1;
+			}
+			bar.progress_full += 3;
 		}
 		print!("\x1b[2J");
 		label.draw();
 		testobj.draw();
+		bar.draw();
 		stdout().flush().unwrap();
 		
 		// Frame time management for consistent framerate
