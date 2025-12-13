@@ -6,22 +6,30 @@ use std::{
 	// env, <- Will be important later
 	io::{
 		stdout,
-		Write
+		Write,
 	},
+	thread::sleep,
+	time::{
+		Duration,
+		Instant
+	}
 };
-use std::{thread, time};
 
-pub mod input;
 pub mod interface;
+pub mod input;
 pub mod utils;
+
+const TARGET_FPS : f32 = 30.0;
 
 fn main() {
 	input::init().unwrap();
-	let mut mouse : input::Mouse = input::Mouse { x : 0, y : 0, lclick : false, rclick : false };
+	let framerate : Duration = Duration::from_secs_f32(1.0 / TARGET_FPS);
+
+	let mut mouse : input::Mouse = input::Mouse { x : 0, y : 0, lclick : false, rclick : false, lclickheld : false, rclickheld : false };
 	let mut window : input::Window = input::Window { focused : false, width : 0, height : 0 };
 
-	let mut testobj : interface::splitbox::SplitBox =
-	interface::splitbox::SplitBox {
+	let mut testobj : interface::textbox::Box =
+	interface::textbox::Box {
 		x : 10, y : 10,
 		width : 41, height : 21,
 
@@ -29,15 +37,37 @@ fn main() {
 		
 		color : 0,
 		line_type : 0,
-		
-		horizontal : vec!(5, 10, 15),
-		vertical : vec!(10, 20, 30),
+
+		clicked : false,
+		rclicked : false,
+		hovered : false,
+		invert_on_hover : false,
 	};
 
-	for _ in 0..10 {
-		testobj.draw();
-		thread::sleep(time::Duration::from_millis(100));
+	testobj.draw();
+
+	loop {
+		let now = Instant::now(); // Get frame time
+
+		input::update(&mut mouse, &mut window).unwrap();
+		testobj.update(&mouse);
+		if mouse.lclick {
+			let mut out = stdout();
+			execute!(out, crossterm::cursor::MoveTo(0, 0)).unwrap();
+			write!(out, "{}, {}", mouse.x, mouse.y).unwrap();
+			stdout().flush().unwrap();
+		}
+		
+		if testobj.clicked {
+			break;
+		}
+		
+		// Frame time management for consistent framerate
+		let frame_duration = Instant::now().duration_since(now);
+		if frame_duration < framerate {
+			sleep(framerate - frame_duration);
+		}
 	}
 	
-	let _ = input::uninit();
+	input::uninit().unwrap();
 }

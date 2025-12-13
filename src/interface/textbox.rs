@@ -5,6 +5,7 @@ use crossterm::{
 use std::io::{stdout, Write};
 
 use crate::utils;
+use crate::input;
 
 pub struct Box {
 	// Size and position
@@ -53,18 +54,18 @@ impl Box {
 		stdout().flush().unwrap();
 	}
 
-	pub fn update(&mut self, mouse : (u16, u16, bool, bool)) {
+	pub fn update(&mut self, mouse : &input::Mouse) {
 
-		let hovered = mouse.0 >= self.x &&
-			mouse.0 < self.x + self.width &&
-			mouse.1 >= self.y &&
-			mouse.1 < self.y + self.height;
+		let hovered = mouse.x >= self.x &&
+			mouse.x < self.x + self.width &&
+			mouse.y >= self.y &&
+			mouse.y < self.y + self.height;
 
 		self.hovered = hovered;
 
 		if hovered {
-			self.clicked = mouse.2;
-			self.rclicked = mouse.3;
+			self.clicked = mouse.lclick;
+			self.rclicked = mouse.rclick;
 			return;
 		}
 		
