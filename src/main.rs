@@ -29,18 +29,23 @@ fn main() {
 	let mut input : helpers::input::InputHandler = helpers::input::InputHandler::new();
 
 	// Initialize variables that persist between menu switches
+	let mut out = stdout();
 	let mut menu = abt::menus::Menu::Main;
+	let mut mainmenu = menus::mainmenu::MainMenu::init(&mut out);
 	
 	// Loop and use the program:
 	// Switch between menus and interact with the filesystem
 	loop {
 		// Set frame up
 		let now : Instant = Instant::now();
-		let mut out = stdout();
 		input.update().unwrap();
 
 		// The actual frame
-		abt_loop(&mut menu, &input, &mut out);
+		match menu {
+			abt::menus::Menu::Main => mainmenu.tick(&input, &mut out),
+			abt::menus::Menu::Out => break,
+			_ => {}
+		}
 		if menu == abt::menus::Menu::Out {
 			break;
 		}
@@ -56,16 +61,4 @@ fn main() {
 	// The loop has been exited, undo initialization of
 	// InputHandler and screen extras
 	helpers::input::uninit().unwrap();
-}
-
-fn abt_loop(
-	menu : &mut abt::menus::Menu,
-	input : &helpers::input::InputHandler,
-	out : &mut Stdout
-) {
-
-	match menu {
-		// abt::menus::Menu::Main => menus::mainmenu::tick(input, out),
-		_ => {}
-	}
 }
