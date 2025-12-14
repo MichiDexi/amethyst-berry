@@ -3,9 +3,10 @@ use crossterm::{
 	execute,
 	cursor::MoveTo,
 };
-use std::io::{stdout, Write};
+use std::io::{stdout, Write, Stdout};
 
 use crate::helpers::utils;
+use crate::helpers::input;
 
 pub struct ProgressBar {
 	// Size and position
@@ -27,6 +28,9 @@ pub struct ProgressBar {
 		2 - Unfilled part of the progress bar
 		3 - Right of the progress bar
 	*/
+	
+	// Event polling
+	pub hovered : bool,
 }
 
 
@@ -139,27 +143,29 @@ impl ProgressBar {
 					green : 0,
 					blue : 0,
 				},
-			]
+			],
+			hovered : false,
 		}
+		
+		
 	}
 
-	pub fn draw(&self) {
-		let mut out = stdout();
+	pub fn draw(&self, out : &mut Stdout) {
 
 		// Left of the bar
 		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
-		self.colorset[0].write_color(&mut out, false);
-		self.bgcolorset[0].write_color(&mut out, true);
+		self.colorset[0].write_color(out, false);
+		self.bgcolorset[0].write_color(out, true);
 		write!(out, "{}", self.charset[0]).unwrap();
 
 		// Unfilled part
-		self.colorset[2].write_color(&mut out, false);
-		self.bgcolorset[2].write_color(&mut out, true);
-		utils::repeat(&mut out, self.charset[2], self.size);
+		self.colorset[2].write_color(out, false);
+		self.bgcolorset[2].write_color(out, true);
+		utils::repeat(out, self.charset[2], self.size);
 
 		// Right of the bar
-		self.colorset[3].write_color(&mut out, false);
-		self.bgcolorset[3].write_color(&mut out, true);
+		self.colorset[3].write_color(out, false);
+		self.bgcolorset[3].write_color(out, true);
 		write!(out, "{}", self.charset[3]).unwrap();
 
 		// Calculation
@@ -168,12 +174,20 @@ impl ProgressBar {
 
 		// Fill bar
 		execute!(out, crossterm::cursor::MoveTo(self.x +1, self.y)).unwrap();
-		self.colorset[1].write_color(&mut out, false);
-		self.bgcolorset[1].write_color(&mut out, true);
-		utils::repeat(&mut out, self.charset[1], bars_full_amount);
+		self.colorset[1].write_color(out, false);
+		self.bgcolorset[1].write_color(out, true);
+		utils::repeat(out, self.charset[1], bars_full_amount);
 
 		write!(out, "\x1b[0m").unwrap();
 
 		stdout().flush().unwrap();
+	}
+
+	pub fn update(&mut self, mouse : &input::Mouse) {
+		self.hovered = utils::check_collision(
+			self.x, self.y,
+			self.size, 1,
+			mouse.x, mouse.y
+		);
 	}
 }

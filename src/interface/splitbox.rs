@@ -2,36 +2,68 @@ use crossterm::{
 	execute,
 	cursor::MoveTo,
 };
-use std::io::{stdout, Write};
+use std::io::{stdout, Write, Stdout};
 
 use crate::helpers::utils;
+use crate::helpers::input;
 
 pub struct SplitBox {
 	// Size and position
 	pub x : u16, pub y : u16,
 	pub width : u16, pub height : u16,
 
-	// Contents of the box
-	pub text : String,
-
 	// Extra options
-	pub color : u8,
+	pub color : utils::Color,
 	pub line_type : u8,
 
 	// Splits
 	pub horizontal : Vec<u16>,
 	pub vertical : Vec<u16>,
+
+	// Event polling
+	pub hovered : u8,
 }
 
 
 impl SplitBox {
-	pub fn draw(&self) {
-		let mut out = stdout();
+
+	pub fn new(
+		nx : u16, ny : u16,
+		nwidth : u16, nheight : u16,
+
+		style : u8
+	) -> Self {
+
+		SplitBox {
+			x : nx, y : ny,
+			width : nwidth, height : nheight,
+
+			color : utils::Color {
+				color_enabled : false,
+				color : 0,
+				bright : false,
+
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			line_type : style,
+
+			horizontal : vec!(nheight >> 1),
+			vertical : vec!(nwidth >> 1),
+
+			hovered : 255,
+		}
+	}
+
+	pub fn draw(&self, out : &mut Stdout) {
 
 		// Top
 		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
 		write!(out, "{}", utils::get_char(self.line_type, 2)).unwrap();
-		utils::repeat(&mut out, utils::get_char(self.line_type, 0), self.width-2);
+		utils::repeat(out, utils::get_char(self.line_type, 0), self.width-2);
 		write!(out, "{}", utils::get_char(self.line_type, 3)).unwrap();
 
 		// Middle
@@ -45,7 +77,7 @@ impl SplitBox {
 		// Bottom
 		execute!(out, MoveTo(self.x, self.y + self.height - 1)).unwrap();
 		write!(out, "{}", utils::get_char(self.line_type, 4)).unwrap();
-		utils::repeat(&mut out, utils::get_char(self.line_type, 0), self.width-2);
+		utils::repeat(out, utils::get_char(self.line_type, 0), self.width-2);
 		write!(out, "{}", utils::get_char(self.line_type, 5)).unwrap();
 
 
@@ -77,7 +109,38 @@ impl SplitBox {
 			execute!(out, MoveTo(self.x + self.width - 1, self.y + line)).unwrap();
 			write!(out, "{}", utils::get_char(self.line_type, 7)).unwrap();
 		}
+	}
 
-		stdout().flush().unwrap();
+	pub fn update(&mut self, mouse : &input::Mouse) {
+
+		let mut last_column : u16 = 0;
+		let mut last_row : u16;
+		let mut id : u8 = 0;
+
+		let mut vertical = self.vertical.clone();
+		vertical.push(self.height);
+		let mut horizontal = self.vertical.clone();
+		horizontal.push(self.width);
+
+		for column in vertical.clone() {
+			last_row = 0;
+			for row in horizontal.clone() {
+				if utils::check_collision(
+					last_column+self.x,
+					last_row+self.y,
+					column - last_column,
+					row - last_row,
+					mouse.x, mouse.y
+				) {
+					self.hovered = id;
+					return;
+				}
+				
+				id += 1;
+				last_row = row;
+			}
+			last_column = column;
+		}
+		self.hovered = 255;
 	}
 }
