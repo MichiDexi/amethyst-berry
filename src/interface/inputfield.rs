@@ -20,7 +20,7 @@ pub use std::io::{
 use crate::helpers::utils;
 use crate::helpers::input;
 
-pub struct Label {
+pub struct InputField {
 	// Size and position
 	pub x : u16, pub y : u16,
 	pub size : u16,
@@ -36,9 +36,9 @@ pub struct Label {
 }
 
 
-impl Label {
+impl InputField {
 	pub fn new(nx : u16, ny : u16, nsize : u16, ntext : &str) -> Self {
-		Label {
+		InputField {
 			x : nx,
 			y : ny,
 			size : nsize,
@@ -69,6 +69,7 @@ impl Label {
 			},
 			
 			hovered : false,
+			cursor : 0
 		}
 	}
 	

@@ -1,6 +1,5 @@
 use crossterm::{
 	execute,
-	cursor::MoveTo,
 };
 pub use std::io::{
 	Stdout,
@@ -76,11 +75,11 @@ impl Label {
 		stdout().flush().unwrap();
 	}
 
-	pub fn update(&mut self, mouse : &input::Mouse) {
+	pub fn update(&mut self, input : &input::InputHandler) {
 		self.hovered = utils::check_collision(
 			self.x, self.y,
 			self.size, 1,
-			mouse.x, mouse.y
+			input.mouse.x, input.mouse.y
 		);
 	}
 }

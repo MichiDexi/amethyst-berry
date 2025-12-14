@@ -1,6 +1,5 @@
 use crossterm::{
 	execute,
-	cursor::MoveTo,
 };
 use std::io::{stdout, Write, Stdout};
 
@@ -88,28 +87,28 @@ impl List {
 		stdout().flush().unwrap();
 	}
 
-	pub fn update(&mut self, mouse : &input::Mouse) {
+	pub fn update(&mut self, input : &input::InputHandler) {
 	
 		if utils::check_collision(
 			self.x, self.y,
 			self.width, self.height,
-			mouse.x, mouse.y
+			input.mouse.x, input.mouse.y
 		) { // This is true when the mouse is hovering something
-			self.hovered = mouse.y + self.index - self.y + 1; // +1 because 0 is nothing, 1 is the first etc.
+			self.hovered = input.mouse.y + self.index - self.y + 1; // +1 because 0 is nothing, 1 is the first etc.
 		}
 
-		if mouse.scroll == 0 {
+		if input.mouse.scroll == 0 {
 			return;
 		}
 
-		if (self.index as i32 - mouse.scroll as i32) < 0 {
+		if (self.index as i32 - input.mouse.scroll as i32) < 0 {
 			self.index = 0;
 		}
-		else if self.index as i32 - mouse.scroll as i32 >= self.items.len() as i32 - self.height as i32 {
+		else if self.index as i32 - input.mouse.scroll as i32 >= self.items.len() as i32 - self.height as i32 {
 			self.index = self.items.len() as u16 - self.height;
 		}
 		else {
-			match mouse.scroll {
+			match input.mouse.scroll {
 				1 => self.index -= 1,
 				-1 => self.index += 1,
 				_ => {}

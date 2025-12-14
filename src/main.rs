@@ -89,7 +89,7 @@ fn main() {
 		list.update(&input);
 		slider.update(&input);
 		
-		if mouse.lclick {
+		if input.mouse.lclick {
 			if textbox.hovered {
 				break;
 			}

@@ -95,12 +95,12 @@ impl Box {
 		stdout().flush().unwrap();
 	}
 
-	pub fn update(&mut self, mouse : &input::Mouse) {
+	pub fn update(&mut self, input : &input::InputHandler) {
 
 		self.hovered = utils::check_collision(
 			self.x, self.y,
 			self.width, self.height,
-			mouse.x, mouse.y
+			input.mouse.x, input.mouse.y
 		);
 	}
 }
