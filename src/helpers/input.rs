@@ -27,6 +27,9 @@ use crossterm::{
 };
 
 
+// Keyboard config
+const REPEAT_DELAY : Duration = Duration::from_millis(250); // Wait before first repeat
+const REPEAT_RATE : Duration = Duration::from_millis(50);   // Interval between repeats
 
 pub struct Mouse { // Has all the mouse attributes
 	pub x : u16,
@@ -101,7 +104,8 @@ impl InputHandler {
 	}
 
 	pub fn update(&mut self) -> io::Result<()> { // This polls inputs
-	
+
+		let now = Instant::now();
 		self.mouse.scroll = 0;
 		self.keyboard.just_pressed.clear();
 		
@@ -115,26 +119,38 @@ impl InputHandler {
 					if matches!(kind, KeyEventKind::Press | KeyEventKind::Repeat) {
 						if !self.keyboard.pressed.contains(&code) {
 							self.keyboard.just_pressed.insert(code);
+							self.keyboard.last_press_time.insert(code, Instant::now());
 						}
 						self.keyboard.pressed.insert(code);
-						self.keyboard.last_press_time.insert(code, Instant::now());
 					}
 				}
 				_ => {}
 			}
 		}
 
-		// ~ Duration calculation thingy ~
-		// I've no idea what it does, I just copy pasted
-		// random stuff from my previous project
-		let now = Instant::now();
+		// handle repeats
+		for key in self.keyboard.pressed.iter() {
+		    if let Some(&last_time) = self.keyboard.last_press_time.get(key) {
+		        let elapsed = now.duration_since(last_time);
+		        if elapsed >= REPEAT_DELAY {
+		            // calculate how many repeats have passed
+		            let repeats = ((elapsed - REPEAT_DELAY).as_millis() / REPEAT_RATE.as_millis()) as usize;
+		            if repeats > 0 {
+		                self.keyboard.just_pressed.insert(*key);       // trigger repeat
+		                self.keyboard.last_press_time.insert(*key, now); // reset timer
+		            }
+		        }
+		    }
+		}
+		
+		// remove keys that have been released
+		let key_timeout = Duration::from_millis(100); // adjust as needed
 		self.keyboard.pressed.retain(|k| {
-			if let Some(&t) = self.keyboard.last_press_time.get(k) {
-				now.duration_since(t) < Duration::from_millis(150)
-			}
-			else {
-				false
-			}
+		    if let Some(&t) = self.keyboard.last_press_time.get(k) {
+		        now.duration_since(t) < key_timeout
+		    } else {
+		        false
+		    }
 		});
 		
 		Ok(())
