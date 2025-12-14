@@ -24,10 +24,10 @@ fn main() {
 	helpers::input::init().unwrap();
 	let framerate : Duration = Duration::from_secs_f32(1.0 / TARGET_FPS);
 
-	let mut mouse : helpers::input::Mouse = helpers::input::Mouse::new();
-	let mut window : helpers::input::Window = helpers::input::Window::new();
+	let mut input : helpers::input::InputHandler = helpers::input::InputHandler::new();
 
-	let mut textbox : interface::textbox::Box = interface::textbox::Box::new(20, 10, 21, 11, 0);
+	let mut textbox : interface::textbox::Box =
+	interface::textbox::Box::new(20, 10, 21, 11, 0);
 
 	let mut label : interface::label::Label =
 	interface::label::Label::new(14, 9, 33, "This button will stop the program");
@@ -82,12 +82,12 @@ fn main() {
 
 		let mut out = stdout();
 
-		helpers::input::update(&mut mouse, &mut window).unwrap();
+		input.update().unwrap();
 		
-		textbox.update(&mouse);
-		table.update(&mouse);
-		list.update(&mouse);
-		slider.update(&mouse);
+		textbox.update(&input);
+		table.update(&input);
+		list.update(&input);
+		slider.update(&input);
 		
 		if mouse.lclick {
 			if textbox.hovered {
