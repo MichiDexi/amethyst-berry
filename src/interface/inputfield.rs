@@ -1,0 +1,128 @@
+use crossterm::{
+	execute,
+	cursor::MoveTo,
+	event::{
+		read,
+		poll,
+		Event,
+		KeyCode,
+		KeyEventKind,
+		KeyEvent,
+	},
+};
+pub use std::io::{
+	Stdout,
+	Write,
+	stdout,
+	self,
+};
+
+use crate::helpers::utils;
+use crate::helpers::input;
+
+pub struct Label {
+	// Size and position
+	pub x : u16, pub y : u16,
+	pub size : u16,
+	pub text : String,
+
+	// Extra options
+	pub color : utils::Color,
+	pub bgcolor : utils::Color,
+
+	// Event polling
+	pub hovered : bool,
+	pub cursor : u16,
+}
+
+
+impl Label {
+	pub fn new(nx : u16, ny : u16, nsize : u16, ntext : &str) -> Self {
+		Label {
+			x : nx,
+			y : ny,
+			size : nsize,
+			text : ntext.to_string(),
+
+			color : utils::Color {
+				color_enabled : true,
+			
+				color : 0,
+				bright : false,
+				
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			bgcolor : utils::Color {
+				color_enabled : true,
+						
+				color : 7,
+				bright : false,
+							
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+			
+			hovered : false,
+		}
+	}
+	
+	pub fn draw(&self, out : &mut Stdout) {
+
+		self.color.write_color(out, false);
+		self.bgcolor.write_color(out, true);
+
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		write!(out, "{}", utils::shorten_text(&self.text, self.size)).unwrap();
+
+		write!(out, "\x1b[0m").unwrap();
+
+		stdout().flush().unwrap();
+	}
+
+	pub fn update(&mut self, input : &input::InputHandler) {
+		self.hovered = utils::check_collision(
+			self.x, self.y,
+			self.size, 1,
+			input.mouse.x, input.mouse.y
+		);
+
+		if self.hovered {
+			// Cursor Movement
+			if input.keyboard.is_pressed(KeyCode::Left) && self.cursor != 0 {
+				self.cursor -= 1;
+			}
+			if input.keyboard.is_pressed(KeyCode::Right) && self.cursor != self.text.len() as u16 {
+				self.cursor += 1;
+			}
+
+			// Special keys
+			if input.keyboard.is_pressed(KeyCode::Backspace) && self.cursor != 0 {
+				self.text.remove((self.cursor - 1) as usize);
+				self.cursor -= 1;
+			}
+			if input.keyboard.is_pressed(KeyCode::Delete) && self.cursor != self.text.len() as u16 {
+				self.text.remove((self.cursor) as usize);
+			}
+
+			for key in input.keyboard.just_pressed.iter() {
+				if let KeyCode::Char(c) = key {
+					self.text.insert(self.cursor as usize, *c);
+					self.cursor += 1;
+				}
+			}
+		}
+	}
+
+	fn key_to_char(key: &KeyCode) -> Option<char> {
+		match key {
+			KeyCode::Char(c) => Some(*c), // Keycode inputs -> normal letters/numbers
+			_ => None,
+		}
+	}
+}

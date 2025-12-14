@@ -1,17 +1,16 @@
 use std::{
-	time::Duration,
-	io::{
-		Write,
-		stdout,
-		self
+	time::{
+		Duration,
+		Instant,
 	},
+	io,
+	collections::HashSet,
 };
 use crossterm::{
 	event::{
-		EnableBracketedPaste,
-		EnableFocusChange,
-		EnableMouseCapture,
 		Event,
+		KeyEventKind,
+		KeyEvent,
 		KeyCode,
 		MouseEvent,
 		MouseEventKind,
@@ -20,94 +19,153 @@ use crossterm::{
 		read,
 	},
 	terminal::{
-		size,
 		enable_raw_mode,
 		disable_raw_mode,
 		SetTitle,
-	},
-	cursor::{
-		Hide,
-		Show,
 	},
 	execute,
 };
 
 
-pub struct Mouse {
+
+pub struct Mouse { // Has all the mouse attributes
 	pub x : u16,
 	pub y : u16,
 	pub lclick : bool,
 	pub lclickheld : bool,
 	pub rclick : bool,
 	pub rclickheld : bool,
-	pub scroll : i8,
+	pub scroll : i8, // 1 for up, -1 for down (I think)
 }
 
-impl Mouse {
-	pub fn new() -> Self {
-		Mouse {
-			x : 0, y : 0,
-			lclick : false, lclickheld : false,
-			rclick : false, rclickheld : false,
-			scroll : 0
-		}
-	}
+pub struct Keyboard {
+	pub pressed : HashSet<KeyCode>, // What is pressed currently
+	pub just_pressed : HashSet<KeyCode>, // What was pressed this frame
+	pub last_press_time : std::collections::HashMap<KeyCode, Instant>,
+	// Length of press (used to calculate stuff)
 }
 
-pub struct Window {
+pub struct Window { // Most of these don't even get updated, so I don't know why I made this at all
 	pub focused : bool,
 	pub width : u16,
 	pub height : u16,
 }
 
-impl Window {
-	pub fn new() -> Self {
-		let termsize = crossterm::terminal::size().unwrap();
-		Window {
-			focused : false, 
-			width : termsize.0,
-			height : termsize.1,
-		}
+
+// This is the only struct that has actual functions!
+// But those functions are more like abstractions...
+// Skill issue on my end :(
+// I'll remove this one soon maybe, or not, possibly
+impl Keyboard {
+	pub fn is_pressed(&self, key: KeyCode) -> bool {
+		self.pressed.contains(&key)
+	}
+
+	pub fn just_pressed(&self, key: KeyCode) -> bool {
+		self.just_pressed.contains(&key)
 	}
 }
 
-pub fn update(mouse : &mut Mouse, window : &mut Window) -> io::Result<()> {
-	mouse.scroll = 0;
-	while poll(Duration::from_millis(0))? {
-		match read()? {
-			Event::FocusGained => window.focused = true,
-			Event::FocusLost => window.focused = false,
-			Event::Mouse(event) => { handle_mouse(event, mouse); },
-			Event::Resize(width, height) => {window.width = width; window.height = height},
+
+// I bundled all the structs into one because I'm to lazy to initialize all of them separately
+pub struct InputHandler {
+	pub mouse : Mouse,
+	pub keyboard : Keyboard,
+	pub window : Window,
+}
+
+impl InputHandler {
+	pub fn new() -> Self { // Told you I was too lazy to initialize all of them :P
+		let termsize = crossterm::terminal::size().unwrap();
+		Self {
+			mouse : Mouse {
+				x : 0,
+				y : 0,
+				lclick : false,
+				lclickheld : false,
+				rclick : false,
+				rclickheld : false,
+				scroll : 0
+			},
+			keyboard : Keyboard {
+				pressed : HashSet::new(),
+				just_pressed : HashSet::new(),
+				last_press_time : std::collections::HashMap::new(),
+			},
+			window : Window {
+				focused : true, 
+				width : termsize.0,
+				height : termsize.1,
+			}
+		}
+	}
+
+	pub fn update(&mut self) -> io::Result<()> { // This polls inputs
+	
+		self.mouse.scroll = 0;
+		self.keyboard.just_pressed.clear();
+		
+		while poll(Duration::from_millis(0))? {
+			match read()? {
+				Event::FocusGained => self.window.focused = true,
+				Event::FocusLost => self.window.focused = false,
+				Event::Mouse(event) => { Self::handle_mouse(event, &mut self.mouse); },
+				Event::Resize(width, height) => {self.window.width = width; self.window.height = height},
+				Event::Key(KeyEvent { code, kind, .. }) => {
+					if matches!(kind, KeyEventKind::Press | KeyEventKind::Repeat) {
+						if !self.keyboard.pressed.contains(&code) {
+							self.keyboard.just_pressed.insert(code);
+						}
+						self.keyboard.pressed.insert(code);
+						self.keyboard.last_press_time.insert(code, Instant::now());
+					}
+				}
+				_ => {}
+			}
+		}
+
+		// ~ Duration calculation thingy ~
+		// I've no idea what it does, I just copy pasted
+		// random stuff from my previous project
+		let now = Instant::now();
+		self.keyboard.pressed.retain(|k| {
+			if let Some(&t) = self.keyboard.last_press_time.get(k) {
+				now.duration_since(t) < Duration::from_millis(150)
+			}
+			else {
+				false
+			}
+		});
+		
+		Ok(())
+	}
+
+	// I wonder what 'handle_mouse' does...
+	// I think it might use the 'mouse' struct, I'm not sure...
+	fn handle_mouse(event : MouseEvent, mouse : &mut Mouse) {
+	
+		mouse.lclick = false;
+		mouse.rclick = false;
+		
+		mouse.x = event.column;
+		mouse.y = event.row;
+	
+		match event.kind {
+			MouseEventKind::Down(MouseButton::Left)  => mouse.lclick     = true,
+			MouseEventKind::Drag(MouseButton::Left)  => mouse.lclickheld = true,
+			MouseEventKind::Up(MouseButton::Left)    => mouse.lclickheld = false,
+			MouseEventKind::Down(MouseButton::Right) => mouse.rclick     = true,
+			MouseEventKind::Drag(MouseButton::Right) => mouse.rclickheld = true,
+			MouseEventKind::Up(MouseButton::Right)   => mouse.rclickheld = false,
+			MouseEventKind::ScrollUp => mouse.scroll = 1,
+			MouseEventKind::ScrollDown => mouse.scroll = -1,
 			_ => {}
 		}
 	}
-	Ok(())
-}
-
-fn handle_mouse(event : MouseEvent, mouse : &mut Mouse) {
-
-	mouse.lclick = false;
-	mouse.rclick = false;
-	
-
-	mouse.x = event.column;
-	mouse.y = event.row;
-
-	match event.kind {
-		MouseEventKind::Down(MouseButton::Left)  => mouse.lclick     = true,
-		MouseEventKind::Drag(MouseButton::Left)  => mouse.lclickheld = true,
-		MouseEventKind::Up(MouseButton::Left)    => mouse.lclickheld = false,
-		MouseEventKind::Down(MouseButton::Right) => mouse.rclick     = true,
-		MouseEventKind::Drag(MouseButton::Right) => mouse.rclickheld = true,
-		MouseEventKind::Up(MouseButton::Right)   => mouse.rclickheld = false,
-		MouseEventKind::ScrollUp => mouse.scroll = 1,
-		MouseEventKind::ScrollDown => mouse.scroll = -1,
-		_ => {}
-	}
 }
 
 
+// Imagine doing stuff manually lmao
 pub fn init() -> io::Result<()> {
 	let mut stdout = io::stdout();
 	execute!(stdout, crossterm::terminal::EnterAlternateScreen).unwrap();
@@ -120,7 +178,7 @@ pub fn init() -> io::Result<()> {
 	Ok(())
 }
 
-pub fn uninit() -> io::Result<()> { // Initializes the end of all functions
+pub fn uninit() -> io::Result<()> { // De-initializes the end of all functions
 	let mut stdout = io::stdout();
 	execute!(stdout, crossterm::terminal::LeaveAlternateScreen).unwrap();
 	execute!(stdout, crossterm::cursor::Show).unwrap();
