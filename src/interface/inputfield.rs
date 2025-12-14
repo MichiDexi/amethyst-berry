@@ -1,13 +1,7 @@
 use crossterm::{
 	execute,
-	cursor::MoveTo,
 	event::{
-		read,
-		poll,
-		Event,
 		KeyCode,
-		KeyEventKind,
-		KeyEvent,
 	},
 };
 pub use std::io::{
@@ -37,12 +31,12 @@ pub struct InputField {
 
 
 impl InputField {
-	pub fn new(nx : u16, ny : u16, nsize : u16, ntext : &str) -> Self {
+	pub fn new(nx : u16, ny : u16, nsize : u16) -> Self {
 		InputField {
 			x : nx,
 			y : ny,
 			size : nsize,
-			text : ntext.to_string(),
+			text : "".to_string(),
 
 			color : utils::Color {
 				color_enabled : true,
@@ -79,6 +73,8 @@ impl InputField {
 		self.bgcolor.write_color(out, true);
 
 		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.size);
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
 		write!(out, "{}", utils::shorten_text(&self.text, self.size)).unwrap();
 
 		write!(out, "\x1b[0m").unwrap();
@@ -95,19 +91,19 @@ impl InputField {
 
 		if self.hovered {
 			// Cursor Movement
-			if input.keyboard.is_pressed(KeyCode::Left) && self.cursor != 0 {
+			if input.keyboard.just_pressed(KeyCode::Left) && self.cursor != 0 {
 				self.cursor -= 1;
 			}
-			if input.keyboard.is_pressed(KeyCode::Right) && self.cursor != self.text.len() as u16 {
+			if input.keyboard.just_pressed(KeyCode::Right) && self.cursor != self.text.len() as u16 {
 				self.cursor += 1;
 			}
 
 			// Special keys
-			if input.keyboard.is_pressed(KeyCode::Backspace) && self.cursor != 0 {
+			if input.keyboard.just_pressed(KeyCode::Backspace) && self.cursor != 0 {
 				self.text.remove((self.cursor - 1) as usize);
 				self.cursor -= 1;
 			}
-			if input.keyboard.is_pressed(KeyCode::Delete) && self.cursor != self.text.len() as u16 {
+			if input.keyboard.just_pressed(KeyCode::Delete) && self.cursor != self.text.len() as u16 {
 				self.text.remove((self.cursor) as usize);
 			}
 
@@ -117,13 +113,6 @@ impl InputField {
 					self.cursor += 1;
 				}
 			}
-		}
-	}
-
-	fn key_to_char(key: &KeyCode) -> Option<char> {
-		match key {
-			KeyCode::Char(c) => Some(*c), // Keycode inputs -> normal letters/numbers
-			_ => None,
 		}
 	}
 }

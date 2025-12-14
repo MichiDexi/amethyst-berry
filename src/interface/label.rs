@@ -68,6 +68,8 @@ impl Label {
 		self.bgcolor.write_color(out, true);
 
 		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.size);
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
 		write!(out, "{}", utils::shorten_text(&self.text, self.size)).unwrap();
 
 		write!(out, "\x1b[0m").unwrap();
