@@ -105,6 +105,8 @@ impl InputHandler {
 
 	pub fn update(&mut self) -> io::Result<()> { // This polls inputs
 
+		self.mouse.lclick = false;
+		self.mouse.rclick = false;
 		let now = Instant::now();
 		self.mouse.scroll = 0;
 		self.keyboard.just_pressed.clear();
@@ -160,8 +162,7 @@ impl InputHandler {
 	// I think it might use the 'mouse' struct, I'm not sure...
 	fn handle_mouse(event : MouseEvent, mouse : &mut Mouse) {
 	
-		mouse.lclick = false;
-		mouse.rclick = false;
+
 		
 		mouse.x = event.column;
 		mouse.y = event.row;

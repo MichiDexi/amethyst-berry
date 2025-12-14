@@ -5,3 +5,4 @@ pub mod label;
 pub mod list;
 pub mod slider;
 pub mod inputfield;
+pub mod checkbox;

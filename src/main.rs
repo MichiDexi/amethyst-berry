@@ -43,9 +43,12 @@ fn main() {
 	
 	let mut slider : interface::slider::Slider =
 	interface::slider::Slider::new(80, 30, 10);
-		
+			
 	let mut inputfield : interface::inputfield::InputField =
 	interface::inputfield::InputField::new(80, 33, 20);
+				
+	let mut checkbox : interface::checkbox::CheckBox =
+	interface::checkbox::CheckBox::new(100, 10);
 
 	list.items.push("a".to_string());
 	list.items.push("b".to_string());
@@ -92,12 +95,16 @@ fn main() {
 		list.update(&input);
 		slider.update(&input);
 		inputfield.update(&input);
+		checkbox.update(&input);
 		
 		if input.mouse.lclick {
 			if textbox.hovered {
 				break;
 			}
 		}
+
+
+		
 
 		
 
@@ -112,8 +119,10 @@ fn main() {
 			bar.progress_full += 3;
 		}
 		write!(out, "\x1b[2J").unwrap();
-		execute!(out, crossterm::cursor::MoveTo(0, 0)).unwrap();
-		write!(out, "{}", table.hovered).unwrap();
+		if input.mouse.lclick {
+			execute!(out, crossterm::cursor::MoveTo(0, 0)).unwrap();
+		    println!("Mouse click! {} {}", input.mouse.x, input.mouse.y);
+		}
 		label.draw(&mut out);
 		textbox.draw(&mut out);
 		bar.draw(&mut out);
@@ -121,6 +130,7 @@ fn main() {
 		list.draw(&mut out);
 		slider.draw(&mut out);
 		inputfield.draw(&mut out);
+		checkbox.draw(&mut out);
 		stdout().flush().unwrap();
 		
 		// Frame time management for consistent framerate
