@@ -2,7 +2,10 @@ use crossterm::{
 	execute,
 	cursor::MoveTo,
 };
-use std::io::{stdout, Write, Stdout};
+use std::io::{
+	Write,
+	Stdout
+};
 
 use crate::helpers::utils;
 use crate::helpers::input;
@@ -111,7 +114,7 @@ impl SplitBox {
 		}
 	}
 
-	pub fn update(&mut self, mouse : &input::Mouse) {
+	pub fn update(&mut self, input : &input::InputHandler) {
 
 		let mut last_column : u16 = 0;
 		let mut last_row : u16;
@@ -130,7 +133,7 @@ impl SplitBox {
 					last_row+self.y,
 					column - last_column,
 					row - last_row,
-					mouse.x, mouse.y
+					input.mouse.x, input.mouse.y
 				) {
 					self.hovered = id;
 					return;

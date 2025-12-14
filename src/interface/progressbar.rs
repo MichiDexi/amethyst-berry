@@ -1,7 +1,5 @@
-use std::cmp::{min, max};
 use crossterm::{
 	execute,
-	cursor::MoveTo,
 };
 use std::io::{stdout, Write, Stdout};
 
@@ -148,11 +146,11 @@ impl ProgressBar {
 		stdout().flush().unwrap();
 	}
 
-	pub fn update(&mut self, mouse : &input::Mouse) {
+	pub fn update(&mut self, input : &input::InputHandler) {
 		self.hovered = utils::check_collision(
 			self.x, self.y,
 			self.size, 1,
-			mouse.x, mouse.y
+			input.mouse.x, input.mouse.y
 		);
 	}
 }

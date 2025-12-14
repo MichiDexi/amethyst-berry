@@ -1,6 +1,5 @@
 use crossterm::{
 	execute,
-	cursor::MoveTo,
 };
 use std::io::{stdout, Write, Stdout};
 
@@ -123,15 +122,15 @@ impl Slider {
 		stdout().flush().unwrap();
 	}
 
-	pub fn update(&mut self, mouse : &input::Mouse) {
+	pub fn update(&mut self, input : &input::InputHandler) {
 		self.hovered = utils::check_collision(
 			self.x, self.y,
 			self.size, 1,
-			mouse.x, mouse.y
+			input.mouse.x, input.mouse.y
 		);
 
-		if self.hovered && mouse.lclickheld {
-			self.selected = (mouse.x - self.x) as u8;
+		if self.hovered && input.mouse.lclickheld {
+			self.selected = (input.mouse.x - self.x) as u8;
 		}
 	}
 }
