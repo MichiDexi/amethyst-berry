@@ -41,6 +41,9 @@ fn main() {
 	let mut list : interface::list::List =
 	interface::list::List::new(60, 2, 20, 10);
 
+	let mut slider : interface::slider::Slider =
+	interface::slider::Slider::new(80, 30, 10);
+
 	list.items.push("a".to_string());
 	list.items.push("b".to_string());
 	list.items.push("c".to_string());
@@ -84,6 +87,7 @@ fn main() {
 		textbox.update(&mouse);
 		table.update(&mouse);
 		list.update(&mouse);
+		slider.update(&mouse);
 		
 		if mouse.lclick {
 			if textbox.hovered {
@@ -111,6 +115,7 @@ fn main() {
 		bar.draw(&mut out);
 		table.draw(&mut out);
 		list.draw(&mut out);
+		slider.draw(&mut out);
 		stdout().flush().unwrap();
 		
 		// Frame time management for consistent framerate
