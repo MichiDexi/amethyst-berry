@@ -2,7 +2,7 @@ use crossterm::{
 	execute,
 	cursor::MoveTo,
 };
-use std::io::{stdout, Write};
+use std::io::{stdout, Write, Stdout};
 
 use crate::helpers::utils;
 use crate::helpers::input;
@@ -12,29 +12,68 @@ pub struct Box {
 	pub x : u16, pub y : u16,
 	pub width : u16, pub height : u16,
 
-	// Contents of the box
-	pub text : String,
-
 	// Extra options
-	pub invert_on_hover : bool,
-	pub color : u8,
+	pub color : utils::Color,
+	pub color_hovered : utils::Color,
 	pub line_type : u8,
 
 	// Event polling
 	pub hovered : bool,
-	pub clicked : bool,
-	pub rclicked : bool,
 }
 
 
 impl Box {
-	pub fn draw(&self) {
-		let mut out = stdout();
+	pub fn new(
+		nx : u16, ny : u16,
+		nwidth : u16, nheight : u16,
+		style : u8
+	) -> Self {
+		Box {
+			x : nx, y : ny,
+			width : nwidth, height : nheight,
+			
+			color : utils::Color {
+				color_enabled : true,
+				color : 7,
+				bright : false,
+
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			color_hovered : utils::Color {
+				color_enabled : true,
+				color : 3,
+				bright : false,
+
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			line_type : style,
+
+			hovered : false,
+		}
+	}
+	
+	pub fn draw(&self, out : &mut Stdout) {
+
+		if self.hovered {
+			self.color_hovered.write_color(out, false);
+		}
+		else {
+			self.color.write_color(out, false);
+		}
+		
 
 		// Top
 		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
 		write!(out, "{}", utils::get_char(self.line_type, 2)).unwrap();
-		utils::repeat(&mut out, utils::get_char(self.line_type, 0), self.width-2);
+		utils::repeat(out, utils::get_char(self.line_type, 0), self.width-2);
 		write!(out, "{}", utils::get_char(self.line_type, 3)).unwrap();
 
 		// Middle
@@ -48,28 +87,20 @@ impl Box {
 		// Bottom
 		execute!(out, MoveTo(self.x, self.y + self.height - 1)).unwrap();
 		write!(out, "{}", utils::get_char(self.line_type, 4)).unwrap();
-		utils::repeat(&mut out, utils::get_char(self.line_type, 0), self.width-2);
+		utils::repeat(out, utils::get_char(self.line_type, 0), self.width-2);
 		write!(out, "{}", utils::get_char(self.line_type, 5)).unwrap();
+
+		write!(out, "\x1b[0m").unwrap();
 
 		stdout().flush().unwrap();
 	}
 
 	pub fn update(&mut self, mouse : &input::Mouse) {
 
-		let hovered = mouse.x >= self.x &&
-			mouse.x < self.x + self.width &&
-			mouse.y >= self.y &&
-			mouse.y < self.y + self.height;
-
-		self.hovered = hovered;
-
-		if hovered {
-			self.clicked = mouse.lclick;
-			self.rclicked = mouse.rclick;
-			return;
-		}
-		
-		self.clicked = false;
-		self.rclicked = false;
+		self.hovered = utils::check_collision(
+			self.x, self.y,
+			self.width, self.height,
+			mouse.x, mouse.y
+		);
 	}
 }

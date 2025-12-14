@@ -94,3 +94,19 @@ pub fn shorten_text(text : &str, length : u16) -> String {
 		// This function has the silliest history ever
 	}
 }
+
+
+
+// Check collision
+
+pub fn check_collision(
+	x : u16, y : u16,
+	width : u16, height : u16,
+	mx : u16, my : u16
+) -> bool {
+
+	mx >= x && // mx is to the right of the left side
+	mx < x + width && // mx is to the left of the right side
+	my >= y && // my is below the upper side
+	my < y + height // mx is above the lower side (inside the box, is colliding)
+}

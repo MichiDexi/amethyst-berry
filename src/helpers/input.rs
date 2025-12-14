@@ -40,6 +40,18 @@ pub struct Mouse {
 	pub lclickheld : bool,
 	pub rclick : bool,
 	pub rclickheld : bool,
+	pub scroll : i8,
+}
+
+impl Mouse {
+	pub fn new() -> Self {
+		Mouse {
+			x : 0, y : 0,
+			lclick : false, lclickheld : false,
+			rclick : false, rclickheld : false,
+			scroll : 0
+		}
+	}
 }
 
 pub struct Window {
@@ -48,7 +60,19 @@ pub struct Window {
 	pub height : u16,
 }
 
+impl Window {
+	pub fn new() -> Self {
+		let termsize = crossterm::terminal::size().unwrap();
+		Window {
+			focused : false, 
+			width : termsize.0,
+			height : termsize.1,
+		}
+	}
+}
+
 pub fn update(mouse : &mut Mouse, window : &mut Window) -> io::Result<()> {
+	mouse.scroll = 0;
 	while poll(Duration::from_millis(0))? {
 		match read()? {
 			Event::FocusGained => window.focused = true,
@@ -65,6 +89,7 @@ fn handle_mouse(event : MouseEvent, mouse : &mut Mouse) {
 
 	mouse.lclick = false;
 	mouse.rclick = false;
+	
 
 	mouse.x = event.column;
 	mouse.y = event.row;
@@ -76,6 +101,8 @@ fn handle_mouse(event : MouseEvent, mouse : &mut Mouse) {
 		MouseEventKind::Down(MouseButton::Right) => mouse.rclick     = true,
 		MouseEventKind::Drag(MouseButton::Right) => mouse.rclickheld = true,
 		MouseEventKind::Up(MouseButton::Right)   => mouse.rclickheld = false,
+		MouseEventKind::ScrollUp => mouse.scroll = 1,
+		MouseEventKind::ScrollDown => mouse.scroll = -1,
 		_ => {}
 	}
 }

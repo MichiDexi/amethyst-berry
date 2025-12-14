@@ -2,9 +2,15 @@ use crossterm::{
 	execute,
 	cursor::MoveTo,
 };
-use std::io::{stdout, Write};
+pub use std::io::{
+	Stdout,
+	Write,
+	stdout,
+	self,
+};
 
 use crate::helpers::utils;
+use crate::helpers::input;
 
 pub struct Label {
 	// Size and position
@@ -15,6 +21,9 @@ pub struct Label {
 	// Extra options
 	pub color : utils::Color,
 	pub bgcolor : utils::Color,
+
+	// Event polling
+	pub hovered : bool,
 }
 
 
@@ -49,14 +58,15 @@ impl Label {
 				green : 0,
 				blue : 0,
 			},
+			
+			hovered : false,
 		}
 	}
 	
-	pub fn draw(&self) {
-		let mut out = stdout();
+	pub fn draw(&self, out : &mut Stdout) {
 
-		self.color.write_color(&mut out, false);
-		self.bgcolor.write_color(&mut out, true);
+		self.color.write_color(out, false);
+		self.bgcolor.write_color(out, true);
 
 		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
 		write!(out, "{}", utils::shorten_text(&self.text, self.size)).unwrap();
@@ -64,5 +74,13 @@ impl Label {
 		write!(out, "\x1b[0m").unwrap();
 
 		stdout().flush().unwrap();
+	}
+
+	pub fn update(&mut self, mouse : &input::Mouse) {
+		self.hovered = utils::check_collision(
+			self.x, self.y,
+			self.size, 1,
+			mouse.x, mouse.y
+		);
 	}
 }
