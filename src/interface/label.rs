@@ -10,6 +10,7 @@ pub use std::io::{
 
 use crate::helpers::utils;
 use crate::helpers::input;
+use crate::interface::traits;
 
 pub struct Label {
 	// Size and position
@@ -26,13 +27,13 @@ pub struct Label {
 }
 
 
-impl Label {
-	pub fn new(nx : u16, ny : u16, nsize : u16, ntext : &str) -> Self {
+impl traits::UserInterface for Label {
+	fn new(nx : u16, ny : u16) -> Self {
 		Label {
 			x : nx,
 			y : ny,
-			size : nsize,
-			text : ntext.to_string(),
+			size : 10,
+			text : "".to_string(),
 
 			color : utils::Color {
 				color_enabled : true,
@@ -62,7 +63,7 @@ impl Label {
 		}
 	}
 	
-	pub fn draw(&self, out : &mut Stdout) {
+	fn draw(&self, out : &mut Stdout) {
 
 		self.color.write_color(out, false);
 		self.bgcolor.write_color(out, true);
@@ -77,14 +78,14 @@ impl Label {
 		stdout().flush().unwrap();
 	}
 
-	pub fn clear(&self, out : &mut Stdout) {
+	fn clear(&self, out : &mut Stdout) {
 		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
 		utils::repeat(out, ' ', self.size);
 
 		stdout().flush().unwrap();
 	}
 
-	pub fn update(&mut self, input : &input::InputHandler) {
+	fn update(&mut self, input : &input::InputHandler) {
 		self.hovered = utils::check_collision(
 			self.x, self.y,
 			self.size, 1,

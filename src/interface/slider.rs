@@ -5,6 +5,7 @@ use std::io::{stdout, Write, Stdout};
 
 use crate::helpers::utils;
 use crate::helpers::input;
+use crate::interface::traits;
 
 pub struct Slider {
 	// Size and position
@@ -22,14 +23,11 @@ pub struct Slider {
 }
 
 
-impl Slider {
-	pub fn new(
-		nx : u16, ny : u16,
-		nsize : u16
-	) -> Self {
+impl traits::UserInterface for Slider {
+	fn new(nx : u16, ny : u16) -> Self {
 		Slider {
 			x : nx, y : ny,
-			size : nsize,
+			size : 10,
 			
 			colorset : [
 				utils::Color {
@@ -94,7 +92,7 @@ impl Slider {
 		}
 	}
 	
-	pub fn draw(&self, out : &mut Stdout) {
+	fn draw(&self, out : &mut Stdout) {
 	
 		self.color_bg.write_color(out, true);
 
@@ -122,7 +120,15 @@ impl Slider {
 		stdout().flush().unwrap();
 	}
 
-	pub fn update(&mut self, input : &input::InputHandler) {
+	fn clear(&self, out : &mut Stdout) {
+		// Left of the bar
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.size+2);
+
+		stdout().flush().unwrap();
+	}
+	
+	fn update(&mut self, input : &input::InputHandler) {
 		self.hovered = utils::check_collision(
 			self.x, self.y,
 			self.size, 1,
