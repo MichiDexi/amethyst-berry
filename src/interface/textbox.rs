@@ -95,6 +95,26 @@ impl Box {
 		stdout().flush().unwrap();
 	}
 
+	pub fn clear(&self, out : &mut Stdout) {
+		// Top
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.width);
+
+		// Middle
+		for i in 0..self.height-2 {
+			execute!(out, MoveTo(self.x, self.y + i + 1)).unwrap();
+			write!(out, " ").unwrap();
+			execute!(out, MoveTo(self.x + self.width - 1, self.y + i + 1)).unwrap();
+			write!(out, " ").unwrap();
+		}
+
+		// Bottom
+		execute!(out, MoveTo(self.x, self.y + self.height - 1)).unwrap();
+		utils::repeat(out, ' ', self.width);
+
+		stdout().flush().unwrap();
+	}
+	
 	pub fn update(&mut self, input : &input::InputHandler) {
 
 		self.hovered = utils::check_collision(

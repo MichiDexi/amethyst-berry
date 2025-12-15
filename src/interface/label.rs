@@ -77,6 +77,13 @@ impl Label {
 		stdout().flush().unwrap();
 	}
 
+	pub fn clear(&self, out : &mut Stdout) {
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.size);
+
+		stdout().flush().unwrap();
+	}
+
 	pub fn update(&mut self, input : &input::InputHandler) {
 		self.hovered = utils::check_collision(
 			self.x, self.y,
