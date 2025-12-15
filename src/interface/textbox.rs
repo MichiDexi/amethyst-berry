@@ -90,7 +90,7 @@ impl traits::UserInterface for Box {
 }
 
 impl Box {
-	fn new(nx : u16, ny : u16, nwidth : u16, nheight : u16) -> Self {
+	pub fn new(nx : u16, ny : u16, nwidth : u16, nheight : u16) -> Self {
 		Box {
 			x : nx, y : ny,
 			width : nwidth, height : nheight,
