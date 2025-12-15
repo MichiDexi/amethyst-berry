@@ -22,14 +22,7 @@ use crate::{
 
 
 pub struct MainMenu {
-	maps : label::Label,
-	mods : label::Label,
-	wiki : label::Label,
-	launch : label::Label,
-	speedruns : label::Label,
-	mapcreation : label::Label,
-	achievements : label::Label,
-	challenges : label::Label,
+	labels : Vec<label::Label>,
 	tier : textbox::Box,
 	selection : Selector
 }
@@ -60,14 +53,14 @@ impl MainMenu {
 		let selector : Selector = Selector::Maps;
 		
 		let obj = Self {
-			maps : maps_label,
-			mods : mods_label,
-			wiki : wiki_label,
-			launch : launch_label,
-			speedruns : speedruns_label,
-			mapcreation : mapcreation_label,
-			achievements : achievements_label,
-			challenges : challenges_label,
+			labels : vec!(maps_label,
+			mods_label,
+			wiki_label,
+			launch_label,
+			speedruns_label,
+			mapcreation_label,
+			achievements_label,
+			challenges_label),
 			tier : tier_label,
 			selection : selector,
 		};
@@ -199,6 +192,15 @@ impl MainMenu {
 			self.tier.clear(out);
 			self.tier.y = 2;
 			self.tier.draw(out);
+		}
+		
+		for label in self.labels.iter_mut() {
+		    elem.update(input);
+		    if elem.hovered() {
+		        elem.draw_hover(out);
+		    } else {
+		        elem.draw_normal(out);
+		    }
 		}
 	}
 }

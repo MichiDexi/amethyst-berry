@@ -31,40 +31,6 @@ pub struct List {
 }
 
 impl traits::UserInterface for List {
-	fn new(nx : u16, ny : u16, nsize : u16) -> Self {
-		List {
-			x : nx, y : ny,
-			width : nsize, height : nsize,
-
-			items : vec!(),
-			
-			color : utils::Color {
-				color_enabled : true,
-				color : 7,
-				bright : false,
-
-				truecolor : false,
-				red : 0,
-				green : 0,
-				blue : 0,
-			},
-
-			color_hovered : utils::Color {
-				color_enabled : true,
-				color : 6,
-				bright : false,
-
-				truecolor : false,
-				red : 0,
-				green : 0,
-				blue : 0,
-			},
-
-			hovered : 0,
-			index : 0,
-		}
-	}
-	
 	fn draw(&self, out : &mut Stdout) {
 
 		for i in 0..self.height {
@@ -120,6 +86,42 @@ impl traits::UserInterface for List {
 				-1 => self.index += 1,
 				_ => {}
 			}
+		}
+	}
+}
+
+impl List {
+	fn new(nx : u16, ny : u16, nwidth : u16, nheight : u16) -> Self {
+		List {
+			x : nx, y : ny,
+			width : nwidth, height : nheight,
+
+			items : vec!(),
+			
+			color : utils::Color {
+				color_enabled : true,
+				color : 7,
+				bright : false,
+
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			color_hovered : utils::Color {
+				color_enabled : true,
+				color : 6,
+				bright : false,
+
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			hovered : 0,
+			index : 0,
 		}
 	}
 }

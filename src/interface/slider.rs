@@ -24,6 +24,56 @@ pub struct Slider {
 
 
 impl traits::UserInterface for Slider {
+	fn draw(&self, out : &mut Stdout) {
+	
+		self.color_bg.write_color(out, true);
+
+		// Left of the bar
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		self.colorset[0].write_color(out, false);
+		
+		write!(out, "{}", self.charset[0]).unwrap();
+
+		// Background
+		self.colorset[2].write_color(out, false);
+		utils::repeat(out, self.charset[2], self.size);
+
+		// Right of the bar
+		self.colorset[3].write_color(out, false);
+		write!(out, "{}", self.charset[3]).unwrap();
+
+		// Selector
+		execute!(out, crossterm::cursor::MoveTo(self.x +1 +self.selected as u16, self.y)).unwrap();
+		self.colorset[1].write_color(out, false);
+		write!(out, "{}", self.charset[1]).unwrap();
+
+		write!(out, "\x1b[0m").unwrap();
+
+		stdout().flush().unwrap();
+	}
+
+	fn clear(&self, out : &mut Stdout) {
+		// Left of the bar
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.size+2);
+
+		stdout().flush().unwrap();
+	}
+	
+	fn update(&mut self, input : &input::InputHandler) {
+		self.hovered = utils::check_collision(
+			self.x, self.y,
+			self.size, 1,
+			input.mouse.x, input.mouse.y
+		);
+
+		if self.hovered && input.mouse.lclickheld {
+			self.selected = (input.mouse.x - self.x) as u8;
+		}
+	}
+}
+
+impl Slider {
 	fn new(nx : u16, ny : u16, nsize : u16) -> Self {
 		Slider {
 			x : nx, y : ny,
@@ -72,8 +122,6 @@ impl traits::UserInterface for Slider {
 				},
 			],
 
-
-
 			color_bg : utils::Color {
 				color_enabled : false,
 				color : 0,
@@ -89,54 +137,6 @@ impl traits::UserInterface for Slider {
 
 			hovered : false,
 			selected : 0
-		}
-	}
-	
-	fn draw(&self, out : &mut Stdout) {
-	
-		self.color_bg.write_color(out, true);
-
-		// Left of the bar
-		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
-		self.colorset[0].write_color(out, false);
-		
-		write!(out, "{}", self.charset[0]).unwrap();
-
-		// Background
-		self.colorset[2].write_color(out, false);
-		utils::repeat(out, self.charset[2], self.size);
-
-		// Right of the bar
-		self.colorset[3].write_color(out, false);
-		write!(out, "{}", self.charset[3]).unwrap();
-
-		// Selector
-		execute!(out, crossterm::cursor::MoveTo(self.x +1 +self.selected as u16, self.y)).unwrap();
-		self.colorset[1].write_color(out, false);
-		write!(out, "{}", self.charset[1]).unwrap();
-
-		write!(out, "\x1b[0m").unwrap();
-
-		stdout().flush().unwrap();
-	}
-
-	fn clear(&self, out : &mut Stdout) {
-		// Left of the bar
-		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
-		utils::repeat(out, ' ', self.size+2);
-
-		stdout().flush().unwrap();
-	}
-	
-	fn update(&mut self, input : &input::InputHandler) {
-		self.hovered = utils::check_collision(
-			self.x, self.y,
-			self.size, 1,
-			input.mouse.x, input.mouse.y
-		);
-
-		if self.hovered && input.mouse.lclickheld {
-			self.selected = (input.mouse.x - self.x) as u8;
 		}
 	}
 }
