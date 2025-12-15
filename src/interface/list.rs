@@ -1,10 +1,15 @@
+use std::io::{
+	Write,
+	Stdout,
+};
 use crossterm::{
 	execute,
 };
-use std::io::{stdout, Write, Stdout};
 
 use crate::helpers::utils;
 use crate::helpers::input;
+use crate::interface::traits;
+
 
 pub struct List {
 	// Size and position
@@ -25,15 +30,11 @@ pub struct List {
 	index : u16,
 }
 
-
-impl List {
-	pub fn new(
-		nx : u16, ny : u16,
-		nwidth : u16, nheight : u16
-	) -> Self {
+impl traits::UserInterface for List {
+	fn new(nx : u16, ny : u16, nsize : u16) -> Self {
 		List {
 			x : nx, y : ny,
-			width : nwidth, height : nheight,
+			width : nsize, height : nsize,
 
 			items : vec!(),
 			
@@ -64,7 +65,7 @@ impl List {
 		}
 	}
 	
-	pub fn draw(&self, out : &mut Stdout) {
+	fn draw(&self, out : &mut Stdout) {
 
 		for i in 0..self.height {
 			if self.index+i >= self.items.len() as u16 {
@@ -83,11 +84,17 @@ impl List {
 		}
 
 		write!(out, "\x1b[0m").unwrap();
-
-		stdout().flush().unwrap();
 	}
 
-	pub fn update(&mut self, input : &input::InputHandler) {
+	fn clear(&self, out : &mut Stdout) {
+
+		for i in 0..self.height {
+			execute!(out, crossterm::cursor::MoveTo(self.x, self.y+i)).unwrap();
+			utils::repeat(out, ' ', self.width);
+		}
+	}
+	
+	fn update(&mut self, input : &input::InputHandler) {
 	
 		if utils::check_collision(
 			self.x, self.y,

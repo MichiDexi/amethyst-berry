@@ -28,11 +28,11 @@ pub struct Label {
 
 
 impl traits::UserInterface for Label {
-	fn new(nx : u16, ny : u16) -> Self {
+	fn new(nx : u16, ny : u16, nsize : u16) -> Self {
 		Label {
 			x : nx,
 			y : ny,
-			size : 10,
+			size : nsize,
 			text : "".to_string(),
 
 			color : utils::Color {
