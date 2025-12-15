@@ -42,7 +42,7 @@ fn main() {
 
 		// The actual frame
 		match menu {
-			abt::menus::Menu::Main => mainmenu.tick(&input, &mut out),
+			abt::menus::Menu::Main => mainmenu.tick(&input, &mut out, &mut menu),
 			abt::menus::Menu::Out => break,
 			_ => {}
 		}

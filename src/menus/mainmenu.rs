@@ -16,13 +16,22 @@ use crate::{
 	interface::{
 		label,
 		textbox,
+		traits
 	},
 	helpers::input,
+	abt::menus,
 };
 
 
 pub struct MainMenu {
-	labels : Vec<label::Label>,
+	maps : label::Label,
+	mods : label::Label,
+	wiki : label::Label,
+	launch : label::Label,
+	speedruns : label::Label,
+	mapcreation : label::Label,
+	achievements : label::Label,
+	challenges : label::Label,
 	tier : textbox::Box,
 	selection : Selector
 }
@@ -41,26 +50,26 @@ enum Selector {
 
 impl MainMenu {
 	pub fn init(out : &mut Stdout) -> Self {
-		let maps_label : label::Label = label::Label::new(2, 3, 10, "Maps");
-		let mods_label : label::Label = label::Label::new(2, 5, 10, "Mods");
-		let wiki_label : label::Label = label::Label::new(2, 7, 10, "Wiki");
-		let launch_label : label::Label = label::Label::new(2, 9, 10, "Launch");
-		let speedruns_label : label::Label = label::Label::new(2, 11, 10, "Speedruns");
-		let mapcreation_label : label::Label = label::Label::new(2, 13, 10, "Create map");
-		let achievements_label : label::Label = label::Label::new(2, 15, 10, "Achievement");
-		let challenges_label : label::Label = label::Label::new(2, 17, 10, "Challenges");
-		let tier_label : textbox::Box = textbox::Box::new(15, 3, 7, 7, 1);
+		let maps_label : label::Label = label::Label::new(2, 3, 12, "Maps");
+		let mods_label : label::Label = label::Label::new(2, 5, 12, "Mods");
+		let wiki_label : label::Label = label::Label::new(2, 7, 12, "Wiki");
+		let launch_label : label::Label = label::Label::new(2, 9, 12, "Launch");
+		let speedruns_label : label::Label = label::Label::new(2, 11, 12, "Speedruns");
+		let mapcreation_label : label::Label = label::Label::new(2, 13, 12, "Create map");
+		let achievements_label : label::Label = label::Label::new(2, 15, 12, "Achievement");
+		let challenges_label : label::Label = label::Label::new(2, 17, 12, "Challenges");
+		let tier_label : textbox::Box = textbox::Box::new(15, 3, 7, 7);
 		let selector : Selector = Selector::Maps;
 		
 		let obj = Self {
-			labels : vec!(maps_label,
-			mods_label,
-			wiki_label,
-			launch_label,
-			speedruns_label,
-			mapcreation_label,
-			achievements_label,
-			challenges_label),
+			maps : maps_label,
+			mods : mods_label,
+			wiki : wiki_label,
+			launch : launch_label,
+			speedruns : speedruns_label,
+			mapcreation : mapcreation_label,
+			achievements : achievements_label,
+			challenges : challenges_label,
 			tier : tier_label,
 			selection : selector,
 		};
@@ -72,135 +81,65 @@ impl MainMenu {
 
 	fn init_draw(&self, out : &mut Stdout) {
 		write!(out, "\x1b[2J").unwrap();
-		self.maps.draw(out);
-		self.mods.draw(out);
-		self.wiki.draw(out);
-		self.launch.draw(out);
-		self.speedruns.draw(out);
-		self.mapcreation.draw(out);
-		self.achievements.draw(out);
-		self.challenges.draw(out);
-		self.tier.draw(out);
+		traits::UserInterface::draw(&self.maps, out);
+		traits::UserInterface::draw(&self.mods, out);
+		traits::UserInterface::draw(&self.wiki, out);
+		traits::UserInterface::draw(&self.launch, out);
+		traits::UserInterface::draw(&self.speedruns, out);
+		traits::UserInterface::draw(&self.mapcreation, out);
+		traits::UserInterface::draw(&self.achievements, out);
+		traits::UserInterface::draw(&self.challenges, out);
+		traits::UserInterface::draw(&self.tier, out);
 	}
 
-	pub fn tick(&mut self, input : &input::InputHandler, out : &mut Stdout) {
+	pub fn tick(&mut self, input : &input::InputHandler, out : &mut Stdout, menu : &mut menus::Menu) {
 
+		// Label vector
+		// Needed to make "Label loop" work
+		let mut labels : Vec<&mut label::Label> =
+		vec!(
+			&mut self.maps, &mut self.mods,
+			&mut self.wiki, &mut self.launch,
+			&mut self.speedruns,
+			&mut self.mapcreation,
+			&mut self.achievements,
+			&mut self.challenges
+		);
 
-		self.maps.update(input);
-		if self.maps.hovered {
-			self.maps.clear(out);
-			self.maps.x = 3;
-			self.maps.draw(out);
-		}
-		else {
-			self.maps.clear(out);
-			self.maps.x = 2;
-			self.maps.draw(out);
-		}
+		// Label loop
+		for label in labels.iter_mut() {
+			let prev_state : bool = label.hovered; // Before updating to current input
+			traits::UserInterface::update(*label, input);
+			let redraw_requested : bool = label.hovered != prev_state; // If input has changed, you should redraw
 
-		self.mods.update(input);
-		if self.mods.hovered {
-			self.mods.clear(out);
-			self.mods.x = 3;
-			self.mods.draw(out);
-		}
-		else {
-			self.mods.clear(out);
-			self.mods.x = 2;
-			self.mods.draw(out);
-		}
-
-		self.wiki.update(input);
-		if self.wiki.hovered {
-			self.wiki.clear(out);
-			self.wiki.x = 3;
-			self.wiki.draw(out);
-		}
-		else {
-			self.wiki.clear(out);
-			self.wiki.x = 2;
-			self.wiki.draw(out);
+			if redraw_requested {
+				traits::UserInterface::clear(*label, out); // Clear previous label
+			}
+			if label.hovered {
+				label.x = 3; // Move the label if hovered
+			}
+			else {
+				label.x = 2; // Put the label back if not
+			}
+			if redraw_requested {
+				traits::UserInterface::draw(*label, out); // Add new label
+			}
 		}
 
-		self.launch.update(input);
-		if self.launch.hovered {
-			self.launch.clear(out);
-			self.launch.x = 3;
-			self.launch.draw(out);
+		let prev_state : bool = self.tier.hovered; // Before updating to current input
+		traits::UserInterface::update(&mut self.tier, input);
+		let redraw_requested : bool = self.tier.hovered != prev_state; // If input has changed, you should redraw
+
+		if redraw_requested {
+			traits::UserInterface::clear(&self.tier, out);
 		}
-		else {
-			self.launch.clear(out);
-			self.launch.x = 2;
-			self.launch.draw(out);
+		self.tier.color.color_enabled = self.tier.hovered;
+		if redraw_requested {
+			traits::UserInterface::draw(&self.tier, out);
 		}
 
-		self.speedruns.update(input);
-		if self.speedruns.hovered {
-			self.speedruns.clear(out);
-			self.speedruns.x = 3;
-			self.speedruns.draw(out);
-		}
-		else {
-			self.speedruns.clear(out);
-			self.speedruns.x = 2;
-			self.speedruns.draw(out);
-		}
-
-		self.mapcreation.update(input);
-		if self.mapcreation.hovered {
-			self.mapcreation.clear(out);
-			self.mapcreation.x = 3;
-			self.mapcreation.draw(out);
-		}
-		else {
-			self.mapcreation.clear(out);
-			self.mapcreation.x = 2;
-			self.mapcreation.draw(out);
-		}
-
-		self.achievements.update(input);
-		if self.achievements.hovered {
-			self.achievements.clear(out);
-			self.achievements.x = 3;
-			self.achievements.draw(out);
-		}
-		else {
-			self.achievements.clear(out);
-			self.achievements.x = 2;
-			self.achievements.draw(out);
-		}
-
-		self.challenges.update(input);
-		if self.challenges.hovered {
-			self.challenges.clear(out);
-			self.challenges.x = 3;
-			self.challenges.draw(out);
-		}
-		else {
-			self.challenges.clear(out);
-			self.challenges.x = 2;
-			self.challenges.draw(out);
-		}
-
-		self.tier.update(input);
-		if self.tier.hovered {
-			self.tier.clear(out);
-			self.tier.y = 3;
-			self.tier.draw(out);
-		}
-		else {
-			self.tier.clear(out);
-			self.tier.y = 2;
-			self.tier.draw(out);
-		}
-		
-		for label in self.labels.iter_mut() {
-		    elem.update(input);
-		    if elem.hovered() {
-		        elem.draw_hover(out);
-		    } else {
-		        elem.draw_normal(out);
-		    }
+		if self.tier.hovered && input.mouse.lclick {
+			*menu = menus::Menu::Out;
 		}
 	}
 }
