@@ -10,6 +10,7 @@ pub use std::io::{
 
 use crate::helpers::utils;
 use crate::helpers::input;
+use crate::interface::traits;
 
 pub struct CheckBox {
 	// Size and position
@@ -26,8 +27,8 @@ pub struct CheckBox {
 }
 
 
-impl CheckBox {
-	pub fn new(nx : u16, ny : u16) -> Self {
+impl traits::UserInterface for CheckBox {
+	fn new(nx : u16, ny : u16) -> Self {
 		CheckBox {
 			x : nx,
 			y : ny,
@@ -63,7 +64,7 @@ impl CheckBox {
 		}
 	}
 	
-	pub fn draw(&self, out : &mut Stdout) {
+	fn draw(&self, out : &mut Stdout) {
 
 		self.color.write_color(out, false);
 		self.bgcolor.write_color(out, true);
@@ -84,7 +85,14 @@ impl CheckBox {
 		stdout().flush().unwrap();
 	}
 
-	pub fn update(&mut self, input : &input::InputHandler) {
+	fn clear(&self, out : &mut Stdout) {
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, self.charset[0], 3);
+
+		stdout().flush().unwrap();
+	}
+
+	fn update(&mut self, input : &input::InputHandler) {
 		self.hovered = utils::check_collision(
 			self.x, self.y,
 			3, 1,
