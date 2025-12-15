@@ -13,6 +13,7 @@ pub use std::io::{
 
 use crate::helpers::utils;
 use crate::helpers::input;
+use crate::interface::traits;
 
 pub struct InputField {
 	// Size and position
@@ -30,12 +31,12 @@ pub struct InputField {
 }
 
 
-impl InputField {
-	pub fn new(nx : u16, ny : u16, nsize : u16) -> Self {
+impl traits::UserInterface for InputField {
+	fn new(nx : u16, ny : u16, ntext : u16) -> Self {
 		InputField {
 			x : nx,
 			y : ny,
-			size : nsize,
+			size : ntext,
 			text : "".to_string(),
 
 			color : utils::Color {
@@ -67,8 +68,7 @@ impl InputField {
 		}
 	}
 	
-	pub fn draw(&self, out : &mut Stdout) {
-
+	fn draw(&self, out : &mut Stdout) {
 		self.color.write_color(out, false);
 		self.bgcolor.write_color(out, true);
 
@@ -81,8 +81,15 @@ impl InputField {
 
 		stdout().flush().unwrap();
 	}
+	
+	fn clear(&self, out : &mut Stdout) {
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.size);
 
-	pub fn update(&mut self, input : &input::InputHandler) {
+		stdout().flush().unwrap();
+	}
+	
+	fn update(&mut self, input : &input::InputHandler) {
 		self.hovered = utils::check_collision(
 			self.x, self.y,
 			self.size, 1,

@@ -24,10 +24,10 @@ pub struct Slider {
 
 
 impl traits::UserInterface for Slider {
-	fn new(nx : u16, ny : u16) -> Self {
+	fn new(nx : u16, ny : u16, nsize : u16) -> Self {
 		Slider {
 			x : nx, y : ny,
-			size : 10,
+			size : nsize,
 			
 			colorset : [
 				utils::Color {

@@ -9,6 +9,7 @@ use std::io::{
 
 use crate::helpers::utils;
 use crate::helpers::input;
+use crate::interface::traits;
 
 pub struct SplitBox {
 	// Size and position
@@ -28,18 +29,12 @@ pub struct SplitBox {
 }
 
 
-impl SplitBox {
-
-	pub fn new(
-		nx : u16, ny : u16,
-		nwidth : u16, nheight : u16,
-
-		style : u8
-	) -> Self {
+impl traits::UserInterface for SplitBox {
+	fn new(nx : u16, ny : u16, nsize : u16) -> Self {
 
 		SplitBox {
 			x : nx, y : ny,
-			width : nwidth, height : nheight,
+			width : nsize, height : nsize,
 
 			color : utils::Color {
 				color_enabled : false,
@@ -52,16 +47,16 @@ impl SplitBox {
 				blue : 0,
 			},
 
-			line_type : style,
+			line_type : 0,
 
-			horizontal : vec!(nheight >> 1),
-			vertical : vec!(nwidth >> 1),
+			horizontal : vec!(nsize >> 1),
+			vertical : vec!(nsize >> 1),
 
 			hovered : 255,
 		}
 	}
 
-	pub fn draw(&self, out : &mut Stdout) {
+	fn draw(&self, out : &mut Stdout) {
 
 		// Top
 		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
@@ -114,7 +109,14 @@ impl SplitBox {
 		}
 	}
 
-	pub fn update(&mut self, input : &input::InputHandler) {
+	fn clear(&self, out : &mut Stdout) {
+		for i in 0..self.height {
+			execute!(out, crossterm::cursor::MoveTo(self.x, self.y+i)).unwrap();
+			utils::repeat(out, ' ', self.width);
+		}
+	}
+
+	fn update(&mut self, input : &input::InputHandler) {
 
 		let mut last_column : u16 = 0;
 		let mut last_row : u16;

@@ -28,7 +28,7 @@ pub struct CheckBox {
 
 
 impl traits::UserInterface for CheckBox {
-	fn new(nx : u16, ny : u16) -> Self {
+	fn new(nx : u16, ny : u16, _size : u16) -> Self {
 		CheckBox {
 			x : nx,
 			y : ny,

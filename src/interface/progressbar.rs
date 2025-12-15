@@ -5,6 +5,7 @@ use std::io::{stdout, Write, Stdout};
 
 use crate::helpers::utils;
 use crate::helpers::input;
+use crate::interface::traits;
 
 pub struct ProgressBar {
 	// Size and position
@@ -32,22 +33,18 @@ pub struct ProgressBar {
 }
 
 
-impl ProgressBar {
-	pub fn new(
-		nx : u16, ny : u16, nsize : u16,
-		nprogress_full : u32, nprogress_max : u32,
-		ncharset : [char; 4] 
-	) -> Self {
+impl traits::UserInterface for ProgressBar {
+	fn new(nx : u16, ny : u16, nsize : u16) -> Self {
 
-	ProgressBar {
+		ProgressBar {
 			x : nx, y : ny,
 			size : nsize,
 	
 			percentage_show : 0,
-			progress_full : nprogress_full,
-			progress_max : nprogress_max,
+			progress_full : 0,
+			progress_max : 1,
 	
-			charset : ncharset,
+			charset : ['<', '=', ' ', '>'],
 			colorset : [
 				utils::Color {
 					color_enabled : true,
@@ -114,8 +111,7 @@ impl ProgressBar {
 		
 	}
 
-	pub fn draw(&self, out : &mut Stdout) {
-
+	fn draw(&self, out : &mut Stdout) {
 		self.color_bg.write_color(out, true);
 
 		// Left of the bar
@@ -146,7 +142,14 @@ impl ProgressBar {
 		stdout().flush().unwrap();
 	}
 
-	pub fn update(&mut self, input : &input::InputHandler) {
+	fn clear(&self, out : &mut Stdout) {
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.size+2);
+
+		stdout().flush().unwrap();
+	}
+
+	fn update(&mut self, input : &input::InputHandler) {
 		self.hovered = utils::check_collision(
 			self.x, self.y,
 			self.size, 1,
