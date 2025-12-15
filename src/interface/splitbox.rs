@@ -30,32 +30,6 @@ pub struct SplitBox {
 
 
 impl traits::UserInterface for SplitBox {
-	fn new(nx : u16, ny : u16, nsize : u16) -> Self {
-
-		SplitBox {
-			x : nx, y : ny,
-			width : nsize, height : nsize,
-
-			color : utils::Color {
-				color_enabled : false,
-				color : 0,
-				bright : false,
-
-				truecolor : false,
-				red : 0,
-				green : 0,
-				blue : 0,
-			},
-
-			line_type : 0,
-
-			horizontal : vec!(nsize >> 1),
-			vertical : vec!(nsize >> 1),
-
-			hovered : 255,
-		}
-	}
-
 	fn draw(&self, out : &mut Stdout) {
 
 		// Top
@@ -147,5 +121,32 @@ impl traits::UserInterface for SplitBox {
 			last_column = column;
 		}
 		self.hovered = 255;
+	}
+}
+
+impl SplitBox {
+	pub fn new(nx : u16, ny : u16, nwidth : u16, nheight : u16) -> Self {
+		SplitBox {
+			x : nx, y : ny,
+			width : nwidth, height : nheight,
+
+			color : utils::Color {
+				color_enabled : false,
+				color : 0,
+				bright : false,
+
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			line_type : 0,
+
+			horizontal : vec!(nheight >> 1),
+			vertical : vec!(nwidth >> 1),
+
+			hovered : 255,
+		}
 	}
 }

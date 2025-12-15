@@ -34,16 +34,63 @@ pub struct ProgressBar {
 
 
 impl traits::UserInterface for ProgressBar {
-	fn new(nx : u16, ny : u16, nsize : u16) -> Self {
+	fn draw(&self, out : &mut Stdout) {
+		self.color_bg.write_color(out, true);
 
+		// Left of the bar
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		self.colorset[0].write_color(out, false);
+		
+		write!(out, "{}", self.charset[0]).unwrap();
+
+		// Unfilled part
+		self.colorset[2].write_color(out, false);
+		utils::repeat(out, self.charset[2], self.size);
+
+		// Right of the bar
+		self.colorset[3].write_color(out, false);
+		write!(out, "{}", self.charset[3]).unwrap();
+
+		// Calculation
+		let percent : f64 = (self.progress_full as f64 / self.progress_max as f64).min(1.0);
+		let bars_full_amount : u16 = (percent * self.size as f64) as u16;
+
+		// Fill bar
+		execute!(out, crossterm::cursor::MoveTo(self.x +1, self.y)).unwrap();
+		self.colorset[1].write_color(out, false);
+		utils::repeat(out, self.charset[1], bars_full_amount);
+
+		write!(out, "\x1b[0m").unwrap();
+
+		stdout().flush().unwrap();
+	}
+
+	fn clear(&self, out : &mut Stdout) {
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.size+2);
+
+		stdout().flush().unwrap();
+	}
+
+	fn update(&mut self, input : &input::InputHandler) {
+		self.hovered = utils::check_collision(
+			self.x, self.y,
+			self.size, 1,
+			input.mouse.x, input.mouse.y
+		);
+	}
+}
+
+impl ProgressBar {
+	fn new(nx : u16, ny : u16, nsize : u16) -> Self {
 		ProgressBar {
 			x : nx, y : ny,
 			size : nsize,
-	
+
 			percentage_show : 0,
 			progress_full : 0,
 			progress_max : 1,
-	
+
 			charset : ['<', '=', ' ', '>'],
 			colorset : [
 				utils::Color {
@@ -92,7 +139,6 @@ impl traits::UserInterface for ProgressBar {
 				},
 			],
 
-			
 			color_bg : utils::Color {
 				color_enabled : false,
 					
@@ -107,53 +153,5 @@ impl traits::UserInterface for ProgressBar {
 			
 			hovered : false,
 		}
-		
-		
-	}
-
-	fn draw(&self, out : &mut Stdout) {
-		self.color_bg.write_color(out, true);
-
-		// Left of the bar
-		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
-		self.colorset[0].write_color(out, false);
-		
-		write!(out, "{}", self.charset[0]).unwrap();
-
-		// Unfilled part
-		self.colorset[2].write_color(out, false);
-		utils::repeat(out, self.charset[2], self.size);
-
-		// Right of the bar
-		self.colorset[3].write_color(out, false);
-		write!(out, "{}", self.charset[3]).unwrap();
-
-		// Calculation
-		let percent : f64 = (self.progress_full as f64 / self.progress_max as f64).min(1.0);
-		let bars_full_amount : u16 = (percent * self.size as f64) as u16;
-
-		// Fill bar
-		execute!(out, crossterm::cursor::MoveTo(self.x +1, self.y)).unwrap();
-		self.colorset[1].write_color(out, false);
-		utils::repeat(out, self.charset[1], bars_full_amount);
-
-		write!(out, "\x1b[0m").unwrap();
-
-		stdout().flush().unwrap();
-	}
-
-	fn clear(&self, out : &mut Stdout) {
-		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
-		utils::repeat(out, ' ', self.size+2);
-
-		stdout().flush().unwrap();
-	}
-
-	fn update(&mut self, input : &input::InputHandler) {
-		self.hovered = utils::check_collision(
-			self.x, self.y,
-			self.size, 1,
-			input.mouse.x, input.mouse.y
-		);
 	}
 }

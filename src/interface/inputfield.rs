@@ -32,42 +32,6 @@ pub struct InputField {
 
 
 impl traits::UserInterface for InputField {
-	fn new(nx : u16, ny : u16, ntext : u16) -> Self {
-		InputField {
-			x : nx,
-			y : ny,
-			size : ntext,
-			text : "".to_string(),
-
-			color : utils::Color {
-				color_enabled : true,
-			
-				color : 0,
-				bright : false,
-				
-				truecolor : false,
-				red : 0,
-				green : 0,
-				blue : 0,
-			},
-
-			bgcolor : utils::Color {
-				color_enabled : true,
-						
-				color : 7,
-				bright : false,
-							
-				truecolor : false,
-				red : 0,
-				green : 0,
-				blue : 0,
-			},
-			
-			hovered : false,
-			cursor : 0
-		}
-	}
-	
 	fn draw(&self, out : &mut Stdout) {
 		self.color.write_color(out, false);
 		self.bgcolor.write_color(out, true);
@@ -120,6 +84,44 @@ impl traits::UserInterface for InputField {
 					self.cursor += 1;
 				}
 			}
+		}
+	}
+}
+
+impl InputField {
+	fn new(nx : u16, ny : u16, ntext : u16) -> Self {
+		InputField {
+			x : nx,
+			y : ny,
+			size : ntext,
+			text : "".to_string(),
+
+			color : utils::Color {
+				color_enabled : true,
+			
+				color : 0,
+				bright : false,
+				
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			bgcolor : utils::Color {
+				color_enabled : true,
+						
+				color : 7,
+				bright : false,
+							
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+			
+			hovered : false,
+			cursor : 0
 		}
 	}
 }

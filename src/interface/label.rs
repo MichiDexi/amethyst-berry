@@ -28,41 +28,6 @@ pub struct Label {
 
 
 impl traits::UserInterface for Label {
-	fn new(nx : u16, ny : u16, nsize : u16) -> Self {
-		Label {
-			x : nx,
-			y : ny,
-			size : nsize,
-			text : "".to_string(),
-
-			color : utils::Color {
-				color_enabled : true,
-			
-				color : 0,
-				bright : false,
-				
-				truecolor : false,
-				red : 0,
-				green : 0,
-				blue : 0,
-			},
-
-			bgcolor : utils::Color {
-				color_enabled : true,
-						
-				color : 7,
-				bright : false,
-							
-				truecolor : false,
-				red : 0,
-				green : 0,
-				blue : 0,
-			},
-			
-			hovered : false,
-		}
-	}
-	
 	fn draw(&self, out : &mut Stdout) {
 
 		self.color.write_color(out, false);
@@ -91,5 +56,42 @@ impl traits::UserInterface for Label {
 			self.size, 1,
 			input.mouse.x, input.mouse.y
 		);
+	}
+}
+
+impl Label {
+	pub fn new(nx : u16, ny : u16, nsize : u16, ntext : &str) -> Self {
+		Label {
+			x : nx,
+			y : ny,
+			size : nsize,
+			text : ntext.to_string(),
+
+			color : utils::Color {
+				color_enabled : true,
+			
+				color : 0,
+				bright : false,
+				
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			bgcolor : utils::Color {
+				color_enabled : true,
+						
+				color : 7,
+				bright : false,
+							
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+			
+			hovered : false,
+		}
 	}
 }

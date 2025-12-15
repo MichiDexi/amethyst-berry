@@ -24,39 +24,6 @@ pub struct Box {
 
 
 impl traits::UserInterface for Box {
-	fn new(nx : u16, ny : u16, ntext : u16) -> Self {
-		Box {
-			x : nx, y : ny,
-			width : ntext, height : ntext,
-			
-			color : utils::Color {
-				color_enabled : true,
-				color : 7,
-				bright : false,
-
-				truecolor : false,
-				red : 0,
-				green : 0,
-				blue : 0,
-			},
-
-			color_hovered : utils::Color {
-				color_enabled : true,
-				color : 3,
-				bright : false,
-
-				truecolor : false,
-				red : 0,
-				green : 0,
-				blue : 0,
-			},
-
-			line_type : 0,
-
-			hovered : false,
-		}
-	}
-	
 	fn draw(&self, out : &mut Stdout) {
 
 		if self.hovered {
@@ -119,5 +86,40 @@ impl traits::UserInterface for Box {
 			self.width, self.height,
 			input.mouse.x, input.mouse.y
 		);
+	}
+}
+
+impl Box {
+	fn new(nx : u16, ny : u16, nwidth : u16, nheight : u16) -> Self {
+		Box {
+			x : nx, y : ny,
+			width : nwidth, height : nheight,
+			
+			color : utils::Color {
+				color_enabled : true,
+				color : 7,
+				bright : false,
+
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			color_hovered : utils::Color {
+				color_enabled : true,
+				color : 3,
+				bright : false,
+
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			line_type : 0,
+
+			hovered : false,
+		}
 	}
 }

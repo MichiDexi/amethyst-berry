@@ -28,42 +28,6 @@ pub struct CheckBox {
 
 
 impl traits::UserInterface for CheckBox {
-	fn new(nx : u16, ny : u16, _size : u16) -> Self {
-		CheckBox {
-			x : nx,
-			y : ny,
-
-			color : utils::Color {
-				color_enabled : true,
-			
-				color : 0,
-				bright : false,
-				
-				truecolor : false,
-				red : 0,
-				green : 0,
-				blue : 0,
-			},
-
-			bgcolor : utils::Color {
-				color_enabled : true,
-						
-				color : 7,
-				bright : false,
-							
-				truecolor : false,
-				red : 0,
-				green : 0,
-				blue : 0,
-			},
-
-			charset : ['[', 'X', ' ', ']'],
-			
-			hovered : false,
-			checked : false
-		}
-	}
-	
 	fn draw(&self, out : &mut Stdout) {
 
 		self.color.write_color(out, false);
@@ -101,6 +65,44 @@ impl traits::UserInterface for CheckBox {
 
 		if self.hovered && input.mouse.lclick {
 			self.checked = !self.checked;
+		}
+	}
+}
+
+impl CheckBox {
+	fn new(nx : u16, ny : u16) -> Self {
+		CheckBox {
+			x : nx,
+			y : ny,
+
+			color : utils::Color {
+				color_enabled : true,
+			
+				color : 0,
+				bright : false,
+				
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			bgcolor : utils::Color {
+				color_enabled : true,
+						
+				color : 7,
+				bright : false,
+							
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			charset : ['[', 'X', ' ', ']'],
+			
+			hovered : false,
+			checked : false
 		}
 	}
 }
