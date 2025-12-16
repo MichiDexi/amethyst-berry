@@ -105,9 +105,12 @@ impl MapCluster {
 			.map(|line| line.to_string())
 			.collect();
 
-		for map in mapcluster.iter() {
-			
-			let name : String =
+		for i in 0..mapcluster.len() {
+			let mut current_char : u16 = 0; // Index of the current character that's being parsed
+
+
+			// String decoding
+			let name : String = 
 		}
 	}
 
