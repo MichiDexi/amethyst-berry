@@ -7,7 +7,7 @@ pub enum Menu {
 	MapEdit,
 	MapCreate,
 	MapDelete,
-	MapMove,
+	MapRename,
 	MapPractice,
 
 	LobbySelect,
@@ -15,21 +15,21 @@ pub enum Menu {
 	LobbyEdit,
 	LobbyCreate,
 	LobbyDelete,
-	LobbyMove,
+	LobbyRename,
 
 	SavefileSelect,
 	SavefileView,
 	SavefileEdit,
 	SavefileCreate,
 	SavefileDelete,
-	SavefileMove,
+	SavefileRename,
 
 	UserSelect,
 	UserView,
 	UserEdit,
 	UserCreate,
 	UserDelete,
-	UserMove,
+	UserRename,
 
 	ModBrowser,
 	ModInstall,
