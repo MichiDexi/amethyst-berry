@@ -110,3 +110,20 @@ pub fn check_collision(
 	my >= y && // my is below the upper side
 	my < y + height // mx is above the lower side (inside the box, is colliding)
 }
+
+
+// Hex <-> Decimal Convertions
+
+pub fn hex_decimal(value : &str) -> u64 {
+	let mut output : u64 = 0;
+	let chars : Vec<char> = value.chars().collect();
+
+	for i in 0..value.len() {
+		let character : char = chars[value.len() - i];
+		
+	}
+}
+
+pub fn decimal_hex(value : u64) -> &str {
+	
+}

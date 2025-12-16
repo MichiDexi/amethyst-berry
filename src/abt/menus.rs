@@ -39,9 +39,6 @@ pub enum Menu {
 	FindCelesteExecutable,
 	ChangeCelesteExecutable,
 	EditLaunchOptions,
-
-	SpeedrunSelect,
-	SpeedrunTable,
 	
 	MapCreationSelect,
 	MapCreationCreate,
