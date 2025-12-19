@@ -1,4 +1,5 @@
 use std::{
+	io,
 	time::{
 		Duration,
 		Instant,
@@ -21,7 +22,12 @@ pub mod abt;
 
 const TARGET_FPS : f64 = 30.0;
 
-fn main() {
+fn main() -> io::Result<()> {
+
+	println!("{}", helpers::utils::decimal_hex(100));
+	println!("{}", helpers::utils::hex_decimal("FF0"));
+	return Ok(());
+
 	// Initialize everything, including:
 	// InputHandler, Main menu
 	helpers::input::init().unwrap();

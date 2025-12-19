@@ -110,7 +110,7 @@ impl MapCluster {
 
 
 			// String decoding
-			let name : String = 
+			let name : String = "a".to_string();
 		}
 	}
 
