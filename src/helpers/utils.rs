@@ -115,57 +115,10 @@ pub fn check_collision(
 // Hex <-> Decimal Convertions
 
 pub fn hex_decimal(value : &str) -> u64 {
-	let mut output : u64 = 0;
-	let chars : Vec<char> = value.chars().collect();
-
-	for i in 0..chars.len() {
-		let character : char = chars[chars.len() - 1 - i];
-
-		match character {
-			'1' => output += 1,
-			'2' => output += 2,
-			'3' => output += 3,
-			'4' => output += 4,
-			'5' => output += 5,
-			'6' => output += 6,
-			'7' => output += 7,
-			'8' => output += 8,
-			'9' => output += 9,
-			'A' => output += 10,
-			'B' => output += 11,
-			'C' => output += 12,
-			'D' => output += 13,
-			'E' => output += 14,
-			'F' => output += 15,
-			_ => {} // 0 -> +0; Anything else ignored
-		}
-		if i != chars.len()-1 {
-			output <<= 4;
-		}
-	}
-	output
+	u64::from_str_radix(value, 16).unwrap_or(0)
 }
 
-pub fn decimal_hex(mut value: u64) -> String {
-	if value == 0 {
-		return "0".to_string();
-	}
-
-	let mut output = String::new();
-
-	while value > 0 {
-		let digit = (value & 0xF) as u8;
-
-		let ch = match digit {
-			0..=9  => (b'0' + digit) as char,
-			10..=15 => (b'A' + (digit - 10)) as char,
-			_ => {'0'},
-		};
-
-		output.push(ch);
-		value >>= 4;
-	}
-
-	output.chars().rev().collect()
+pub fn decimal_hex(value: u64) -> String {
+	format!("{:X}", value)
 }
 
