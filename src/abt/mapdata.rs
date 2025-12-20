@@ -9,6 +9,39 @@ pub struct MapCluster {
 	d_side : Map,
 }
 
+impl MapCluster {
+	pub fn new(nname : &str) -> Self {
+		Self {
+			name : nname.to_string(),
+			a_side : Map::new(&(nname.to_string() + " A-side")),
+			b_side : Map::new(&(nname.to_string() + " B-side")),
+			c_side : Map::new(&(nname.to_string() + " C-side")),
+			d_side : Map::new(&(nname.to_string() + " D-side")),
+		}
+	}
+
+	pub fn load(path : &Path) {
+		let mapcluster : Vec<String> = fs::read_to_string(path)
+			.unwrap()
+			.lines()
+			.map(|line| line.to_string())
+			.collect();
+
+		for i in 0..mapcluster.len() {
+			let mut current_char : u16 = 0; // Index of the current character that's being parsed
+
+
+			// String decoding
+			let name : String = "a".to_string();
+		}
+	}
+
+	pub fn save(path : &Path) {
+		
+	}
+}
+
+
 pub struct Checkpoint {
 	id : u8,
 	name : String,
@@ -19,6 +52,19 @@ pub struct Checkpoint {
 	min_deaths : u16,
 }
 
+impl Checkpoint {
+	pub fn new(nname : &str, nid : u8) -> Self {
+		Self {
+			id : nid,
+			name : nname.to_string(),
+			notes : "".to_string(),
+			chokepoints : Vec::new(),
+			min_deaths : 0
+		}
+	}
+}
+
+
 pub struct Chokepoint {
 	id : u8,
 	name : String,
@@ -28,10 +74,32 @@ pub struct Chokepoint {
 	highest_backtoback_amount : u16, // weird meassurement, but I'd use that
 }
 
+impl Chokepoint {
+	pub fn new(nname : &str, nid : u8) -> Self {
+		Self {
+			id : nid,
+			name : nname.to_string(),
+			notes : "".to_string(),
+			highest_backtoback_amount : 0
+		}
+	}
+}
+
+
 pub struct CheckpointRange {
 	id_start : u8,
 	id_end : u8,
 }
+
+impl CheckpointRange {
+	pub fn new(nid_s : u8, nid_e : u8) -> Self {
+		Self {
+			id_start : nid_s,
+			id_end : nid_e
+		}
+	}
+}
+
 
 pub struct Map {
 	// Main data
@@ -94,27 +162,52 @@ pub struct Map {
 	pb : u32, // Furthest the user has come
 	min_deaths_pb : u32,
 	checkpoints : Vec<Checkpoint>,
-	ranged_runs : Vec<CheckpointRange>,
+	range_runs : Vec<CheckpointRange>,
 }
 
-impl MapCluster {
-	pub fn load(path : &Path) {
-		let mapcluster : Vec<String> = fs::read_to_string(path)
-			.unwrap()
-			.lines()
-			.map(|line| line.to_string())
-			.collect();
-
-		for i in 0..mapcluster.len() {
-			let mut current_char : u16 = 0; // Index of the current character that's being parsed
-
-
-			// String decoding
-			let name : String = "a".to_string();
+impl Map {
+	pub fn new(nname : &str) -> Self {
+		Self {
+			name : nname.to_string(),
+			tag : "".to_string(),
+			difficulty : 0,
+			length : 0,
+			clear_progress : 0,
+			deaths : 0,
+			strawberry_amount : 0,
+			strawberry_collected : 0,
+			goldberry_exists : false,
+			goldberry_collected : false,
+			goldberry_type : 0,
+			silverberry_exists : false,
+			silverberry_amount : 0,
+			silverberry_collected : 0,
+			silverberry_type : 0,
+			specialberry_exists : false,
+			specialberry_name : "".to_string(),
+			specialberry_collected : false,
+			challenge_activate : false,
+			min_dashes_pb : 0,
+			min_dashes_bronze : 0,
+			min_dashes_silver : 0,
+			min_dashes_gold : 0,
+			min_jumps_pb : 0,
+			min_jumps_bronze : 0,
+			min_jumps_silver : 0,
+			min_jumps_gold : 0,
+			fastest_time : 0,
+			speedrun_bronze : 0,
+			speedrun_silver : 0,
+			speedrun_gold : 0,
+			cassette_exists : false,
+			cassette_collected : false,
+			crystalheart_exists : false,
+			crystalheart_name : "".to_string(),
+			crystalheart_collected : false,
+			pb : 0,
+			min_deaths_pb : 0,
+			checkpoints : Vec::new(),
+			range_runs : Vec::new(),
 		}
-	}
-
-	pub fn save(path : &Path) {
-		
 	}
 }

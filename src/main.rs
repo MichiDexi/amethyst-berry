@@ -24,13 +24,15 @@ const TARGET_FPS : f64 = 30.0;
 
 fn main() -> io::Result<()> {
 
-	println!("{}", helpers::utils::decimal_hex(100));
-	println!("{}", helpers::utils::hex_decimal("FF0"));
-	return Ok(());
+	/*
+		println!("{}", helpers::utils::decimal_hex(100));
+		println!("{}", helpers::utils::hex_decimal("FF0"));
+		return Ok(());
+	*/
 
 	// Initialize everything, including:
 	// InputHandler, Main menu
-	helpers::input::init().unwrap();
+	helpers::input::init()?;
 	let framerate : Duration = Duration::from_secs_f64(1.0 / TARGET_FPS);
 	let mut input : helpers::input::InputHandler = helpers::input::InputHandler::new();
 
@@ -44,7 +46,7 @@ fn main() -> io::Result<()> {
 	loop {
 		// Set frame up
 		let now : Instant = Instant::now();
-		input.update().unwrap();
+		input.update()?;
 
 		// The actual frame
 		match menu {
@@ -66,5 +68,6 @@ fn main() -> io::Result<()> {
 
 	// The loop has been exited, undo initialization of
 	// InputHandler and screen extras
-	helpers::input::uninit().unwrap();
+	helpers::input::uninit()?;
+	Ok(())
 }
