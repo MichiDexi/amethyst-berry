@@ -20,7 +20,7 @@ impl MapCluster {
 		}
 	}
 
-	pub fn load(path : &Path) {
+	pub fn load(&mut self, path : &Path) {
 		let mapcluster : Vec<String> = fs::read_to_string(path)
 			.unwrap()
 			.lines()
@@ -28,17 +28,24 @@ impl MapCluster {
 			.collect();
 
 		for i in 0..mapcluster.len() {
-			let mut current_char : u16 = 0; // Index of the current character that's being parsed
-
-
-			// String decoding
-			let name : String = "a".to_string();
+			let map_obj : Map = parse_map(&mapcluster[i]);
+			match i {
+				0 => { self.a_side = map_obj; },
+				1 => { self.b_side = map_obj; },
+				2 => { self.c_side = map_obj; },
+				3 => { self.d_side = map_obj; },
+				_ => {}
+			};
 		}
 	}
 
 	pub fn save(path : &Path) {
 		
 	}
+}
+
+fn parse_map(map : &String) -> Map {
+	
 }
 
 
