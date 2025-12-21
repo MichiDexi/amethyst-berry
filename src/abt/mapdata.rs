@@ -47,12 +47,61 @@ impl MapCluster {
 }
 
 pub fn parse_map(map : &String) -> Map {
+	assert!(map.is_ascii(), "non-ASCII input detected");
 
 	let mut map_obj_output : Map = Map::new("placeholder name");
-	let mut currentchar : u16 = helpers::utils::hex_decimal(&map[0..2]) as u16 +2;
+	let mut currentchar : usize = helpers::utils::hex_decimal(&map[0..2]) as usize +2;
+	let bytes = map.as_bytes();
+	
 	// Tag string parsing
-	let tag : &str = &map[2_usize..currentchar as usize];
-	map_obj_output.tag = tag.to_string();
+	map_obj_output.tag = map[2_usize..currentchar].to_string();
+
+	// Some numerical values
+	map_obj_output.difficulty = 
+		helpers::utils::hex_decimal(
+			&map[currentchar..currentchar +2]) as u8;
+
+	map_obj_output.clear_progress = 
+		helpers::utils::hex_decimal(
+			&map[currentchar +2..currentchar +4]) as u8;
+			
+	map_obj_output.deaths = 
+		helpers::utils::hex_decimal(
+			&map[currentchar +4..currentchar +12]) as u32;
+
+	// Strawberries
+	map_obj_output.strawberry_amount = 
+		helpers::utils::hex_decimal(
+			&map[currentchar +12..currentchar +16]) as u16;
+
+	map_obj_output.strawberry_collected = 
+		helpers::utils::hex_decimal(
+			&map[currentchar +16..currentchar +20]) as u16;
+
+	// Golden berries
+	currentchar += 20;
+	if bytes[currentchar] == 1 {
+		map_obj_output.goldberry_exists = true;
+		map_obj_output.goldberry_collected = bytes[currentchar + 1] == 1;
+		map_obj_output.goldberry_type = bytes[currentchar +2];
+		currentchar += 2;
+	}
+	currentchar += 1;
+
+	// Silver berries
+	if bytes[currentchar] == 1 {
+		map_obj_output.silverberry_exists = true;
+		
+		map_obj_output.silverberry_amount =
+		helpers::utils::hex_decimal(&map[currentchar..currentchar +1]) as u8;
+		
+		map_obj_output.silverberry_collected =
+		helpers::utils::hex_decimal(&map[currentchar..currentchar +2]) as u8;
+		
+		map_obj_output.silverberry_type =
+		helpers::utils::hex_decimal(&map[currentchar..currentchar +3]) as u8;
+	}
+	currentchar += 1;
 	
 	map_obj_output
 }
@@ -122,7 +171,6 @@ pub struct Map {
 	pub name : String,
 	pub tag : String,
 	pub difficulty : u8,
-	pub length : u8,
 	pub clear_progress : u8,
 	pub deaths : u32,
 
@@ -187,7 +235,6 @@ impl Map {
 			name : nname.to_string(),
 			tag : "".to_string(),
 			difficulty : 0,
-			length : 0,
 			clear_progress : 0,
 			deaths : 0,
 			strawberry_amount : 0,

@@ -24,8 +24,9 @@ const TARGET_FPS : f64 = 30.0;
 
 fn main() -> io::Result<()> {
 
-	let map : abt::mapdata::Map = abt::mapdata::parse_map(&"05abcdef".to_string());
+	let map : abt::mapdata::Map = abt::mapdata::parse_map(&"05abcdeff".to_string());
 	println!("{}", map.tag);
+	println!("{}", map.difficulty);
 	return Ok(());
 	
 
