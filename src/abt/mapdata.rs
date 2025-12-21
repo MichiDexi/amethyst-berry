@@ -93,15 +93,30 @@ pub fn parse_map(map : &String) -> Map {
 		map_obj_output.silverberry_exists = true;
 		
 		map_obj_output.silverberry_amount =
-		helpers::utils::hex_decimal(&map[currentchar..currentchar +1]) as u8;
+			helpers::utils::hex_decimal(&map[currentchar..currentchar +1]) as u8;
 		
 		map_obj_output.silverberry_collected =
-		helpers::utils::hex_decimal(&map[currentchar..currentchar +2]) as u8;
+			helpers::utils::hex_decimal(&map[currentchar..currentchar +2]) as u8;
 		
 		map_obj_output.silverberry_type =
-		helpers::utils::hex_decimal(&map[currentchar..currentchar +3]) as u8;
+			helpers::utils::hex_decimal(&map[currentchar..currentchar +3]) as u8;
 	}
 	currentchar += 1;
+
+	// Special berry
+	if bytes[currentchar] == 1 {
+		map_obj_output.specialberry_exists = true;
+
+		let name_len : u64 = helpers::utils::hex_decimal(
+			&map[currentchar+1..currentchar+3]);
+		
+		currentchar += 3;
+		map_obj_output.specialberry_name =
+			map[currentchar..currentchar + name_len as usize].to_string();
+
+		currentchar += name_len as usize;
+		map_obj_output.specialberry_collected = bytes[currentchar] == 1;
+	}
 	
 	map_obj_output
 }
