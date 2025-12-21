@@ -24,11 +24,10 @@ const TARGET_FPS : f64 = 30.0;
 
 fn main() -> io::Result<()> {
 
-	/*
-		println!("{}", helpers::utils::decimal_hex(100));
-		println!("{}", helpers::utils::hex_decimal("FF0"));
-		return Ok(());
-	*/
+	let map : abt::mapdata::Map = abt::mapdata::parse_map(&"05abcdef".to_string());
+	println!("{}", map.tag);
+	return Ok(());
+	
 
 	// Initialize everything, including:
 	// InputHandler, Main menu
