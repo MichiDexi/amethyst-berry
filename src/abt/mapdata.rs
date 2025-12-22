@@ -46,82 +46,6 @@ impl MapCluster {
 	}
 }
 
-pub fn parse_map(map : &String) -> Map {
-	assert!(map.is_ascii(), "non-ASCII input detected");
-
-	let mut map_obj_output : Map = Map::new("placeholder name");
-	let mut currentchar : usize = helpers::utils::hex_decimal(&map[0..2]) as usize +2;
-	let bytes = map.as_bytes();
-	
-	// Tag string parsing
-	map_obj_output.tag = map[2_usize..currentchar].to_string();
-
-	// Some numerical values
-	map_obj_output.difficulty = 
-		helpers::utils::hex_decimal(
-			&map[currentchar..currentchar +2]) as u8;
-
-	map_obj_output.clear_progress = 
-		helpers::utils::hex_decimal(
-			&map[currentchar +2..currentchar +4]) as u8;
-			
-	map_obj_output.deaths = 
-		helpers::utils::hex_decimal(
-			&map[currentchar +4..currentchar +12]) as u32;
-
-	// Strawberries
-	map_obj_output.strawberry_amount = 
-		helpers::utils::hex_decimal(
-			&map[currentchar +12..currentchar +16]) as u16;
-
-	map_obj_output.strawberry_collected = 
-		helpers::utils::hex_decimal(
-			&map[currentchar +16..currentchar +20]) as u16;
-
-	// Golden berries
-	currentchar += 20;
-	if bytes[currentchar] == 1 {
-		map_obj_output.goldberry_exists = true;
-		map_obj_output.goldberry_collected = bytes[currentchar + 1] == 1;
-		map_obj_output.goldberry_type = bytes[currentchar +2];
-		currentchar += 2;
-	}
-	currentchar += 1;
-
-	// Silver berries
-	if bytes[currentchar] == 1 {
-		map_obj_output.silverberry_exists = true;
-		
-		map_obj_output.silverberry_amount =
-			helpers::utils::hex_decimal(&map[currentchar..currentchar +1]) as u8;
-		
-		map_obj_output.silverberry_collected =
-			helpers::utils::hex_decimal(&map[currentchar..currentchar +2]) as u8;
-		
-		map_obj_output.silverberry_type =
-			helpers::utils::hex_decimal(&map[currentchar..currentchar +3]) as u8;
-	}
-	currentchar += 1;
-
-	// Special berry
-	if bytes[currentchar] == 1 {
-		map_obj_output.specialberry_exists = true;
-
-		let name_len : u64 = helpers::utils::hex_decimal(
-			&map[currentchar+1..currentchar+3]);
-		
-		currentchar += 3;
-		map_obj_output.specialberry_name =
-			map[currentchar..currentchar + name_len as usize].to_string();
-
-		currentchar += name_len as usize;
-		map_obj_output.specialberry_collected = bytes[currentchar] == 1;
-	}
-	
-	map_obj_output
-}
-
-
 pub struct Checkpoint {
 	pub id : u8,
 	pub name : String,
@@ -287,5 +211,29 @@ impl Map {
 			checkpoints : Vec::new(),
 			range_runs : Vec::new(),
 		}
+	}
+}
+
+pub fn present_map(map : &Map) {
+	println!("map {} - {} - {} - {} - {}", map.name, map.tag, map.difficulty, map.clear_progress, map.deaths);
+	println!("str {} - {}", map.strawberry_amount, map.strawberry_collected);
+	println!("gol {} - {} - {}", map.goldberry_exists, map.goldberry_collected, map.goldberry_type);
+	println!("sil {} - {} - {} - {}", map.silverberry_exists, map.silverberry_amount, map.silverberry_collected, map.silverberry_type);
+	println!("spe {} - {} - {}", map.specialberry_exists, map.specialberry_name, map.specialberry_collected);
+	println!("cha {} - {} - {} - {} - {} - {} - {} - {} - {}", map.challenge_activate, map.min_dashes_pb, map.min_dashes_bronze, map.min_dashes_silver, map.min_dashes_gold, map.min_jumps_pb, map.min_jumps_bronze, map.min_jumps_silver, map.min_jumps_gold);
+	println!("frn {} - {} - {} - {}", map.fastest_time, map.speedrun_bronze, map.speedrun_silver, map.speedrun_gold);
+	println!("cry {} - {} - {} - {} - {}", map.cassette_exists, map.cassette_collected, map.crystalheart_exists, map.crystalheart_name, map.crystalheart_collected);
+	println!("pra {} - {} - {} - {} - {}", map.pb, map.min_deaths_pb, map.difficulty, map.clear_progress, map.deaths);
+
+	
+	for checkpoint in &map.checkpoints {
+		println!("  che {} - {} - {} - {}", checkpoint.name, checkpoint.id, checkpoint.notes, checkpoint.min_deaths);
+		for chokepoint in &checkpoint.chokepoints {
+			println!("    cho {} - {} - {} - {}", chokepoint.name, chokepoint.id, chokepoint.notes, chokepoint.highest_backtoback_amount);
+		}
+	}
+
+	for range in &map.range_runs {
+		println!("  ran {} - {}", range.id_start, range.id_end);
 	}
 }

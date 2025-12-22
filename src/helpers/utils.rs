@@ -118,7 +118,6 @@ pub fn hex_decimal(value : &str) -> u64 {
 	u64::from_str_radix(value, 16).unwrap_or(0)
 }
 
-pub fn decimal_hex(value: u64) -> String {
-	format!("{:X}", value)
+pub fn decimal_hex(value: u64, width: usize) -> String {
+	format!("{:0width$X}", value, width = width)
 }
-
