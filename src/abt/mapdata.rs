@@ -1,7 +1,7 @@
 pub use std::path::Path;
 use std::fs;
 
-use crate::helpers;
+use crate::abt::mapparsing::*;
 
 pub struct MapCluster {
 	pub name : String,
@@ -29,8 +29,8 @@ impl MapCluster {
 			.map(|line| line.to_string())
 			.collect();
 
-		for i in 0..mapcluster.len() {
-			let map_obj : Map = parse_map(&mapcluster[i]);
+		for (i, map) in (0_u8..).zip(mapcluster.into_iter()) {
+			let map_obj : Map = parse_map(&map);
 			match i {
 				0 => { self.a_side = map_obj; },
 				1 => { self.b_side = map_obj; },
