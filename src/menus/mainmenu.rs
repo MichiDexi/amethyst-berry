@@ -1,16 +1,10 @@
 use std::{
-	time::{
-		Duration,
-		Instant,
-	},
-	thread::{
-		sleep
-	},
 	io::{
-		stdout,
 		Write,
 		Stdout,
 	},
+	rc::Rc,
+	cell::RefCell,
 };
 use crate::{
 	interface::{
@@ -33,7 +27,8 @@ pub struct MainMenu {
 	achievements : label::Label,
 	challenges : label::Label,
 	tier : textbox::Box,
-	selection : Selector
+	selection : Selector,
+	menu : Rc<RefCell<menus::Menu>>
 }
 
 enum Selector {
@@ -49,7 +44,7 @@ enum Selector {
 }
 
 impl MainMenu {
-	pub fn init(out : &mut Stdout) -> Self {
+	pub fn init(menu_ref : Rc<RefCell<menus::Menu>>) -> Self {
 		let maps_label : label::Label = label::Label::new(2, 3, 12, "Maps");
 		let mods_label : label::Label = label::Label::new(2, 5, 12, "Mods");
 		let wiki_label : label::Label = label::Label::new(2, 7, 12, "Wiki");
@@ -61,7 +56,7 @@ impl MainMenu {
 		let tier_label : textbox::Box = textbox::Box::new(15, 3, 7, 7);
 		let selector : Selector = Selector::Maps;
 		
-		let obj = Self {
+		Self {
 			maps : maps_label,
 			mods : mods_label,
 			wiki : wiki_label,
@@ -72,14 +67,11 @@ impl MainMenu {
 			challenges : challenges_label,
 			tier : tier_label,
 			selection : selector,
-		};
-
-		obj.init_draw(out);
-
-		obj
+			menu : menu_ref
+		}
 	}
 
-	fn init_draw(&self, out : &mut Stdout) {
+	pub fn init_draw(&self, out : &mut Stdout) {
 		write!(out, "\x1b[2J").unwrap();
 		traits::UserInterface::draw(&self.maps, out);
 		traits::UserInterface::draw(&self.mods, out);
@@ -92,7 +84,7 @@ impl MainMenu {
 		traits::UserInterface::draw(&self.tier, out);
 	}
 
-	pub fn tick(&mut self, input : &input::InputHandler, out : &mut Stdout, menu : &mut menus::Menu) {
+	pub fn tick(&mut self, input : &input::InputHandler, out : &mut Stdout) {
 
 		// Label vector
 		// Needed to make "Label loop" work
@@ -125,7 +117,8 @@ impl MainMenu {
 				traits::UserInterface::draw(*label, out); // Add new label
 			}
 		}
-
+		
+		// Tier button
 		let prev_state : bool = self.tier.hovered; // Before updating to current input
 		traits::UserInterface::update(&mut self.tier, input);
 		let redraw_requested : bool = self.tier.hovered != prev_state; // If input has changed, you should redraw
@@ -139,7 +132,7 @@ impl MainMenu {
 		}
 
 		if self.tier.hovered && input.mouse.lclick {
-			*menu = menus::Menu::Out;
+			*self.menu.borrow_mut() = menus::Menu::Out;
 		}
 	}
 }

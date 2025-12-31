@@ -12,6 +12,8 @@ use std::{
 		Write
 	},
 };
+use std::rc::Rc;
+use std::cell::RefCell;
 
 
 pub mod interface;
@@ -30,8 +32,9 @@ fn main() -> io::Result<()> {
 
 	// Initialize variables that persist between menu switches
 	let mut out = stdout();
-	let mut menu = abt::menus::Menu::Main;
-	let mut mainmenu = menus::mainmenu::MainMenu::init(&mut out);
+	let menu = Rc::new(RefCell::new(abt::menus::Menu::Main));
+	let mut mainmenu = menus::mainmenu::MainMenu::init(Rc::clone(&menu));
+	mainmenu.init_draw(&mut out);
 	
 	// Loop and use the program:
 	// Switch between menus and interact with the filesystem
@@ -41,12 +44,13 @@ fn main() -> io::Result<()> {
 		input.update()?;
 
 		// The actual frame
-		match menu {
-			abt::menus::Menu::Main => mainmenu.tick(&input, &mut out, &mut menu),
+		let cmenu = *menu.borrow();
+		match cmenu {
+			abt::menus::Menu::Main => mainmenu.tick(&input, &mut out),
 			abt::menus::Menu::Out => break,
 			_ => {}
 		}
-		if menu == abt::menus::Menu::Out {
+		if *menu.borrow() == abt::menus::Menu::Out {
 			break;
 		}
 
