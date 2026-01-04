@@ -60,3 +60,5 @@ pub struct Map {
 	pub checkpoints : Vec<Checkpoint>,
 	pub range_runs : Vec<CheckpointRange>,
 }
+
+

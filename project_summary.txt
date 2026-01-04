@@ -1,0 +1,2592 @@
+# ./src/menus/mainmenu.rs #
+use std::{
+	io::{
+		Write,
+		Stdout,
+	},
+	rc::Rc,
+	cell::RefCell,
+};
+use crate::{
+	interface::{
+		label,
+		textbox,
+		traits
+	},
+	helpers::input,
+	abt::menus,
+};
+
+
+pub struct MainMenu {
+	maps : label::Label,
+	mods : label::Label,
+	wiki : label::Label,
+	launch : label::Label,
+	speedruns : label::Label,
+	mapcreation : label::Label,
+	achievements : label::Label,
+	challenges : label::Label,
+	tier : textbox::Box,
+	selection : Selector,
+	menu : Rc<RefCell<menus::Menu>>
+}
+
+enum Selector {
+	Maps,
+	Mods,
+	Wiki,
+	Launch,
+	Speedruns,
+	MapCreation,
+	Achievements,
+	Challenges,
+	Tier,
+}
+
+impl MainMenu {
+	pub fn init(menu_ref : Rc<RefCell<menus::Menu>>) -> Self {
+		let maps_label : label::Label = label::Label::new(2, 3, 12, "Maps");
+		let mods_label : label::Label = label::Label::new(2, 5, 12, "Mods");
+		let wiki_label : label::Label = label::Label::new(2, 7, 12, "Wiki");
+		let launch_label : label::Label = label::Label::new(2, 9, 12, "Launch");
+		let speedruns_label : label::Label = label::Label::new(2, 11, 12, "Speedruns");
+		let mapcreation_label : label::Label = label::Label::new(2, 13, 12, "Create map");
+		let achievements_label : label::Label = label::Label::new(2, 15, 12, "Achievement");
+		let challenges_label : label::Label = label::Label::new(2, 17, 12, "Challenges");
+		let tier_label : textbox::Box = textbox::Box::new(15, 3, 7, 7);
+		let selector : Selector = Selector::Maps;
+		
+		Self {
+			maps : maps_label,
+			mods : mods_label,
+			wiki : wiki_label,
+			launch : launch_label,
+			speedruns : speedruns_label,
+			mapcreation : mapcreation_label,
+			achievements : achievements_label,
+			challenges : challenges_label,
+			tier : tier_label,
+			selection : selector,
+			menu : menu_ref
+		}
+	}
+
+	pub fn init_draw(&self, out : &mut Stdout) {
+		write!(out, "\x1b[2J").unwrap();
+		traits::UserInterface::draw(&self.maps, out);
+		traits::UserInterface::draw(&self.mods, out);
+		traits::UserInterface::draw(&self.wiki, out);
+		traits::UserInterface::draw(&self.launch, out);
+		traits::UserInterface::draw(&self.speedruns, out);
+		traits::UserInterface::draw(&self.mapcreation, out);
+		traits::UserInterface::draw(&self.achievements, out);
+		traits::UserInterface::draw(&self.challenges, out);
+		traits::UserInterface::draw(&self.tier, out);
+	}
+
+	pub fn tick(&mut self, input : &input::InputHandler, out : &mut Stdout) {
+
+		// Label vector
+		// Needed to make "Label loop" work
+		let mut labels : Vec<&mut label::Label> =
+		vec!(
+			&mut self.maps, &mut self.mods,
+			&mut self.wiki, &mut self.launch,
+			&mut self.speedruns,
+			&mut self.mapcreation,
+			&mut self.achievements,
+			&mut self.challenges
+		);
+
+		// Label loop
+		for label in labels.iter_mut() {
+			let prev_state : bool = label.hovered; // Before updating to current input
+			traits::UserInterface::update(*label, input);
+			let redraw_requested : bool = label.hovered != prev_state; // If input has changed, you should redraw
+
+			if redraw_requested {
+				traits::UserInterface::clear(*label, out); // Clear previous label
+			}
+			if label.hovered {
+				label.x = 3; // Move the label if hovered
+			}
+			else {
+				label.x = 2; // Put the label back if not
+			}
+			if redraw_requested {
+				traits::UserInterface::draw(*label, out); // Add new label
+			}
+		}
+		
+		// Tier button
+		let prev_state : bool = self.tier.hovered; // Before updating to current input
+		traits::UserInterface::update(&mut self.tier, input);
+		let redraw_requested : bool = self.tier.hovered != prev_state; // If input has changed, you should redraw
+
+		if redraw_requested {
+			traits::UserInterface::clear(&self.tier, out);
+		}
+		self.tier.color.color_enabled = self.tier.hovered;
+		if redraw_requested {
+			traits::UserInterface::draw(&self.tier, out);
+		}
+
+		if self.tier.hovered && input.mouse.lclick {
+			*self.menu.borrow_mut() = menus::Menu::Out;
+		}
+	}
+}
+
+
+# ./src/menus/maps/edit.rs #
+
+
+# ./src/menus/maps/rename.rs #
+
+
+# ./src/menus/maps/create.rs #
+
+
+# ./src/menus/maps/select.rs #
+
+
+# ./src/menus/maps/view.rs #
+
+
+# ./src/menus/maps/delete.rs #
+
+
+# ./src/menus/users/edit.rs #
+
+
+# ./src/menus/users/rename.rs #
+
+
+# ./src/menus/users/create.rs #
+
+
+# ./src/menus/users/select.rs #
+
+
+# ./src/menus/users/view.rs #
+
+
+# ./src/menus/users/delete.rs #
+
+
+# ./src/menus/lobbies/edit.rs #
+
+
+# ./src/menus/lobbies/rename.rs #
+
+
+# ./src/menus/lobbies/create.rs #
+
+
+# ./src/menus/lobbies/select.rs #
+
+
+# ./src/menus/lobbies/view.rs #
+
+
+# ./src/menus/lobbies/delete.rs #
+
+
+# ./src/menus/achievements/achievements.rs #
+
+
+# ./src/menus/savefiles/edit.rs #
+
+
+# ./src/menus/savefiles/rename.rs #
+
+
+# ./src/menus/savefiles/create.rs #
+
+
+# ./src/menus/savefiles/select.rs #
+
+
+# ./src/menus/savefiles/view.rs #
+
+
+# ./src/menus/savefiles/delete.rs #
+
+
+# ./src/menus/mod.rs #
+pub mod mainmenu;
+
+
+# ./src/interface/progressbar.rs #
+use crossterm::{
+	execute,
+};
+use std::io::{stdout, Write, Stdout};
+
+use crate::helpers::utils;
+use crate::helpers::input;
+use crate::interface::traits;
+
+pub struct ProgressBar {
+	// Size and position
+	pub x : u16, pub y : u16,
+	pub size : u16,
+
+	// Extra options
+	pub percentage_show : u8, // 0 -> Full numbers; 1 -> 1 decimal; 2 -> 2 decimal
+	pub progress_full : u32, // How much of percentage_max is full
+	pub progress_max : u32, // The max number the bar can show
+
+	pub charset : [char; 4],
+	pub colorset : [utils::Color; 4],
+	pub color_bg : utils::Color,
+	/*
+		Charset:
+		0 - Left of the progress bar
+		1 - Filled part of the progress bar
+		2 - Unfilled part of the progress bar
+		3 - Right of the progress bar
+	*/
+	
+	// Event polling
+	pub hovered : bool,
+}
+
+
+impl traits::UserInterface for ProgressBar {
+	fn draw(&self, out : &mut Stdout) {
+		self.color_bg.write_color(out, true);
+
+		// Left of the bar
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		self.colorset[0].write_color(out, false);
+		
+		write!(out, "{}", self.charset[0]).unwrap();
+
+		// Unfilled part
+		self.colorset[2].write_color(out, false);
+		utils::repeat(out, self.charset[2], self.size);
+
+		// Right of the bar
+		self.colorset[3].write_color(out, false);
+		write!(out, "{}", self.charset[3]).unwrap();
+
+		// Calculation
+		let percent : f64 = (self.progress_full as f64 / self.progress_max as f64).min(1.0);
+		let bars_full_amount : u16 = (percent * self.size as f64) as u16;
+
+		// Fill bar
+		execute!(out, crossterm::cursor::MoveTo(self.x +1, self.y)).unwrap();
+		self.colorset[1].write_color(out, false);
+		utils::repeat(out, self.charset[1], bars_full_amount);
+
+		write!(out, "\x1b[0m").unwrap();
+
+		stdout().flush().unwrap();
+	}
+
+	fn clear(&self, out : &mut Stdout) {
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.size+2);
+
+		stdout().flush().unwrap();
+	}
+
+	fn update(&mut self, input : &input::InputHandler) {
+		self.hovered = utils::check_collision(
+			self.x, self.y,
+			self.size, 1,
+			input.mouse.x, input.mouse.y
+		);
+	}
+}
+
+impl ProgressBar {
+	fn new(nx : u16, ny : u16, nsize : u16) -> Self {
+		ProgressBar {
+			x : nx, y : ny,
+			size : nsize,
+
+			percentage_show : 0,
+			progress_full : 0,
+			progress_max : 1,
+
+			charset : ['<', '=', ' ', '>'],
+			colorset : [
+				utils::Color {
+					color_enabled : true,
+			
+					color : 7,
+					bright : false,
+			
+					truecolor : false,
+					red : 0,
+					green : 0,
+					blue : 0,
+				},
+				utils::Color {
+					color_enabled : true,
+	
+					color : 2,
+					bright : false,
+	
+					truecolor : false,
+					red : 0,
+					green : 0,
+					blue : 0,
+				},
+				utils::Color {
+					color_enabled : true,
+	
+					color : 0,
+					bright : false,
+	
+					truecolor : false,
+					red : 0,
+					green : 0,
+					blue : 0,
+				},
+				utils::Color {
+					color_enabled : true,
+												
+					color : 7,
+					bright : false,
+												
+					truecolor : false,
+					red : 0,
+					green : 0,
+					blue : 0,
+				},
+			],
+
+			color_bg : utils::Color {
+				color_enabled : false,
+					
+				color : 4,
+				bright : false,
+					
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+			
+			hovered : false,
+		}
+	}
+}
+
+
+# ./src/interface/checkbox.rs #
+use crossterm::{
+	execute,
+};
+pub use std::io::{
+	Stdout,
+	Write,
+	stdout,
+	self,
+};
+
+use crate::helpers::utils;
+use crate::helpers::input;
+use crate::interface::traits;
+
+pub struct CheckBox {
+	// Size and position
+	pub x : u16, pub y : u16,
+
+	// Extra options
+	pub color : utils::Color,
+	pub bgcolor : utils::Color,
+	pub charset : [char; 4],
+
+	// Event polling
+	pub hovered : bool,
+	pub checked : bool
+}
+
+
+impl traits::UserInterface for CheckBox {
+	fn draw(&self, out : &mut Stdout) {
+
+		self.color.write_color(out, false);
+		self.bgcolor.write_color(out, true);
+
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		write!(out, "{}", self.charset[0]).unwrap();
+
+		if self.checked {
+			write!(out, "{}", self.charset[1]).unwrap();
+		}
+		else {
+			write!(out, "{}", self.charset[2]).unwrap();
+		}
+		write!(out, "{}", self.charset[3]).unwrap();
+
+		write!(out, "\x1b[0m").unwrap();
+
+		stdout().flush().unwrap();
+	}
+
+	fn clear(&self, out : &mut Stdout) {
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, self.charset[0], 3);
+
+		stdout().flush().unwrap();
+	}
+
+	fn update(&mut self, input : &input::InputHandler) {
+		self.hovered = utils::check_collision(
+			self.x, self.y,
+			3, 1,
+			input.mouse.x, input.mouse.y
+		);
+
+		if self.hovered && input.mouse.lclick {
+			self.checked = !self.checked;
+		}
+	}
+}
+
+impl CheckBox {
+	fn new(nx : u16, ny : u16) -> Self {
+		CheckBox {
+			x : nx,
+			y : ny,
+
+			color : utils::Color {
+				color_enabled : true,
+			
+				color : 0,
+				bright : false,
+				
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			bgcolor : utils::Color {
+				color_enabled : true,
+						
+				color : 7,
+				bright : false,
+							
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			charset : ['[', 'X', ' ', ']'],
+			
+			hovered : false,
+			checked : false
+		}
+	}
+}
+
+
+# ./src/interface/label.rs #
+use crossterm::{
+	execute,
+};
+pub use std::io::{
+	Stdout,
+	Write,
+	stdout,
+	self,
+};
+
+use crate::helpers::utils;
+use crate::helpers::input;
+use crate::interface::traits;
+
+pub struct Label {
+	// Size and position
+	pub x : u16, pub y : u16,
+	pub size : u16,
+	pub text : String,
+
+	// Extra options
+	pub color : utils::Color,
+	pub bgcolor : utils::Color,
+
+	// Event polling
+	pub hovered : bool,
+}
+
+
+impl traits::UserInterface for Label {
+	fn draw(&self, out : &mut Stdout) {
+
+		self.color.write_color(out, false);
+		self.bgcolor.write_color(out, true);
+
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.size);
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		write!(out, "{}", utils::shorten_text(&self.text, self.size)).unwrap();
+
+		write!(out, "\x1b[0m").unwrap();
+
+		stdout().flush().unwrap();
+	}
+
+	fn clear(&self, out : &mut Stdout) {
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.size);
+
+		stdout().flush().unwrap();
+	}
+
+	fn update(&mut self, input : &input::InputHandler) {
+		self.hovered = utils::check_collision(
+			self.x, self.y,
+			self.size, 1,
+			input.mouse.x, input.mouse.y
+		);
+	}
+}
+
+impl Label {
+	pub fn new(nx : u16, ny : u16, nsize : u16, ntext : &str) -> Self {
+		Label {
+			x : nx,
+			y : ny,
+			size : nsize,
+			text : ntext.to_string(),
+
+			color : utils::Color {
+				color_enabled : true,
+			
+				color : 0,
+				bright : false,
+				
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			bgcolor : utils::Color {
+				color_enabled : true,
+						
+				color : 7,
+				bright : false,
+							
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+			
+			hovered : false,
+		}
+	}
+}
+
+
+# ./src/interface/list.rs #
+use std::io::{
+	Write,
+	Stdout,
+};
+use crossterm::{
+	execute,
+};
+
+use crate::helpers::utils;
+use crate::helpers::input;
+use crate::interface::traits;
+
+
+pub struct List {
+	// Size and position
+	pub x : u16, pub y : u16,
+	pub width : u16, pub height : u16,
+
+	// Contents
+	pub items : Vec<String>,
+
+	// Extra options
+	pub color : utils::Color,
+	pub color_hovered : utils::Color,
+
+	// Event polling
+	pub hovered : u16,
+
+	// Internal
+	index : u16,
+}
+
+impl traits::UserInterface for List {
+	fn draw(&self, out : &mut Stdout) {
+
+		for i in 0..self.height {
+			if self.index+i >= self.items.len() as u16 {
+				break;
+			}
+			
+			if self.hovered == self.index+i {
+				self.color_hovered.write_color(out, false);
+			}
+			else {
+				self.color.write_color(out, false);
+			}
+			
+			execute!(out, crossterm::cursor::MoveTo(self.x, self.y+i)).unwrap();
+			write!(out, "{}", utils::shorten_text(&self.items[(self.index+i) as usize], self.width)).unwrap();
+		}
+
+		write!(out, "\x1b[0m").unwrap();
+	}
+
+	fn clear(&self, out : &mut Stdout) {
+
+		for i in 0..self.height {
+			execute!(out, crossterm::cursor::MoveTo(self.x, self.y+i)).unwrap();
+			utils::repeat(out, ' ', self.width);
+		}
+	}
+	
+	fn update(&mut self, input : &input::InputHandler) {
+	
+		if utils::check_collision(
+			self.x, self.y,
+			self.width, self.height,
+			input.mouse.x, input.mouse.y
+		) { // This is true when the mouse is hovering something
+			self.hovered = input.mouse.y + self.index - self.y + 1; // +1 because 0 is nothing, 1 is the first etc.
+		}
+
+		if input.mouse.scroll == 0 {
+			return;
+		}
+
+		if (self.index as i32 - input.mouse.scroll as i32) < 0 {
+			self.index = 0;
+		}
+		else if self.index as i32 - input.mouse.scroll as i32 >= self.items.len() as i32 - self.height as i32 {
+			self.index = self.items.len() as u16 - self.height;
+		}
+		else {
+			match input.mouse.scroll {
+				1 => self.index -= 1,
+				-1 => self.index += 1,
+				_ => {}
+			}
+		}
+	}
+}
+
+impl List {
+	fn new(nx : u16, ny : u16, nwidth : u16, nheight : u16) -> Self {
+		List {
+			x : nx, y : ny,
+			width : nwidth, height : nheight,
+
+			items : vec!(),
+			
+			color : utils::Color {
+				color_enabled : true,
+				color : 7,
+				bright : false,
+
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			color_hovered : utils::Color {
+				color_enabled : true,
+				color : 6,
+				bright : false,
+
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			hovered : 0,
+			index : 0,
+		}
+	}
+}
+
+
+# ./src/interface/inputfield.rs #
+use crossterm::{
+	execute,
+	event::{
+		KeyCode,
+	},
+};
+pub use std::io::{
+	Stdout,
+	Write,
+	stdout,
+	self,
+};
+
+use crate::helpers::utils;
+use crate::helpers::input;
+use crate::interface::traits;
+
+pub struct InputField {
+	// Size and position
+	pub x : u16, pub y : u16,
+	pub size : u16,
+	pub text : String,
+
+	// Extra options
+	pub color : utils::Color,
+	pub bgcolor : utils::Color,
+
+	// Event polling
+	pub hovered : bool,
+	pub cursor : u16,
+}
+
+
+impl traits::UserInterface for InputField {
+	fn draw(&self, out : &mut Stdout) {
+		self.color.write_color(out, false);
+		self.bgcolor.write_color(out, true);
+
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.size);
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		write!(out, "{}", utils::shorten_text(&self.text, self.size)).unwrap();
+
+		write!(out, "\x1b[0m").unwrap();
+
+		stdout().flush().unwrap();
+	}
+	
+	fn clear(&self, out : &mut Stdout) {
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.size);
+
+		stdout().flush().unwrap();
+	}
+	
+	fn update(&mut self, input : &input::InputHandler) {
+		self.hovered = utils::check_collision(
+			self.x, self.y,
+			self.size, 1,
+			input.mouse.x, input.mouse.y
+		);
+
+		if self.hovered {
+			// Cursor Movement
+			if input.keyboard.just_pressed(KeyCode::Left) && self.cursor != 0 {
+				self.cursor -= 1;
+			}
+			if input.keyboard.just_pressed(KeyCode::Right) && self.cursor != self.text.len() as u16 {
+				self.cursor += 1;
+			}
+
+			// Special keys
+			if input.keyboard.just_pressed(KeyCode::Backspace) && self.cursor != 0 {
+				self.text.remove((self.cursor - 1) as usize);
+				self.cursor -= 1;
+			}
+			if input.keyboard.just_pressed(KeyCode::Delete) && self.cursor != self.text.len() as u16 {
+				self.text.remove((self.cursor) as usize);
+			}
+
+			for key in input.keyboard.just_pressed.iter() {
+				if let KeyCode::Char(c) = key {
+					self.text.insert(self.cursor as usize, *c);
+					self.cursor += 1;
+				}
+			}
+		}
+	}
+}
+
+impl InputField {
+	fn new(nx : u16, ny : u16, ntext : u16) -> Self {
+		InputField {
+			x : nx,
+			y : ny,
+			size : ntext,
+			text : "".to_string(),
+
+			color : utils::Color {
+				color_enabled : true,
+			
+				color : 0,
+				bright : false,
+				
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			bgcolor : utils::Color {
+				color_enabled : true,
+						
+				color : 7,
+				bright : false,
+							
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+			
+			hovered : false,
+			cursor : 0
+		}
+	}
+}
+
+
+# ./src/interface/textbox.rs #
+use crossterm::{
+	execute,
+	cursor::MoveTo,
+};
+use std::io::{stdout, Write, Stdout};
+
+use crate::helpers::utils;
+use crate::helpers::input;
+use crate::interface::traits;
+
+pub struct Box {
+	// Size and position
+	pub x : u16, pub y : u16,
+	pub width : u16, pub height : u16,
+
+	// Extra options
+	pub color : utils::Color,
+	pub color_hovered : utils::Color,
+	pub line_type : u8,
+
+	// Event polling
+	pub hovered : bool,
+}
+
+
+impl traits::UserInterface for Box {
+	fn draw(&self, out : &mut Stdout) {
+
+		if self.hovered {
+			self.color_hovered.write_color(out, false);
+		}
+		else {
+			self.color.write_color(out, false);
+		}
+		
+
+		// Top
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		write!(out, "{}", utils::get_char(self.line_type, 2)).unwrap();
+		utils::repeat(out, utils::get_char(self.line_type, 0), self.width-2);
+		write!(out, "{}", utils::get_char(self.line_type, 3)).unwrap();
+
+		// Middle
+		for i in 0..self.height-2 {
+			execute!(out, MoveTo(self.x, self.y + i + 1)).unwrap();
+			write!(out, "{}", utils::get_char(self.line_type, 1)).unwrap();
+			execute!(out, MoveTo(self.x + self.width - 1, self.y + i + 1)).unwrap();
+			write!(out, "{}", utils::get_char(self.line_type, 1)).unwrap();
+		}
+
+		// Bottom
+		execute!(out, MoveTo(self.x, self.y + self.height - 1)).unwrap();
+		write!(out, "{}", utils::get_char(self.line_type, 4)).unwrap();
+		utils::repeat(out, utils::get_char(self.line_type, 0), self.width-2);
+		write!(out, "{}", utils::get_char(self.line_type, 5)).unwrap();
+
+		write!(out, "\x1b[0m").unwrap();
+
+		stdout().flush().unwrap();
+	}
+
+	fn clear(&self, out : &mut Stdout) {
+		// Top
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.width);
+
+		// Middle
+		for i in 0..self.height-2 {
+			execute!(out, MoveTo(self.x, self.y + i + 1)).unwrap();
+			write!(out, " ").unwrap();
+			execute!(out, MoveTo(self.x + self.width - 1, self.y + i + 1)).unwrap();
+			write!(out, " ").unwrap();
+		}
+
+		// Bottom
+		execute!(out, MoveTo(self.x, self.y + self.height - 1)).unwrap();
+		utils::repeat(out, ' ', self.width);
+
+		stdout().flush().unwrap();
+	}
+	
+	fn update(&mut self, input : &input::InputHandler) {
+
+		self.hovered = utils::check_collision(
+			self.x, self.y,
+			self.width, self.height,
+			input.mouse.x, input.mouse.y
+		);
+	}
+}
+
+impl Box {
+	pub fn new(nx : u16, ny : u16, nwidth : u16, nheight : u16) -> Self {
+		Box {
+			x : nx, y : ny,
+			width : nwidth, height : nheight,
+			
+			color : utils::Color {
+				color_enabled : true,
+				color : 7,
+				bright : false,
+
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			color_hovered : utils::Color {
+				color_enabled : true,
+				color : 3,
+				bright : false,
+
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			line_type : 0,
+
+			hovered : false,
+		}
+	}
+}
+
+
+# ./src/interface/splitbox.rs #
+use crossterm::{
+	execute,
+	cursor::MoveTo,
+};
+use std::io::{
+	Write,
+	Stdout
+};
+
+use crate::helpers::utils;
+use crate::helpers::input;
+use crate::interface::traits;
+
+pub struct SplitBox {
+	// Size and position
+	pub x : u16, pub y : u16,
+	pub width : u16, pub height : u16,
+
+	// Extra options
+	pub color : utils::Color,
+	pub line_type : u8,
+
+	// Splits
+	pub horizontal : Vec<u16>,
+	pub vertical : Vec<u16>,
+
+	// Event polling
+	pub hovered : u8,
+}
+
+
+impl traits::UserInterface for SplitBox {
+	fn draw(&self, out : &mut Stdout) {
+
+		// Top
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		write!(out, "{}", utils::get_char(self.line_type, 2)).unwrap();
+		utils::repeat(out, utils::get_char(self.line_type, 0), self.width-2);
+		write!(out, "{}", utils::get_char(self.line_type, 3)).unwrap();
+
+		// Middle
+		for i in 0..self.height-2 {
+			execute!(out, MoveTo(self.x, self.y + i + 1)).unwrap();
+			write!(out, "{}", utils::get_char(self.line_type, 1)).unwrap();
+			execute!(out, MoveTo(self.x + self.width - 1, self.y + i + 1)).unwrap();
+			write!(out, "{}", utils::get_char(self.line_type, 1)).unwrap();
+		}
+
+		// Bottom
+		execute!(out, MoveTo(self.x, self.y + self.height - 1)).unwrap();
+		write!(out, "{}", utils::get_char(self.line_type, 4)).unwrap();
+		utils::repeat(out, utils::get_char(self.line_type, 0), self.width-2);
+		write!(out, "{}", utils::get_char(self.line_type, 5)).unwrap();
+
+
+		// Vertical splits
+		for line in self.vertical.clone() {
+			execute!(out, MoveTo(self.x + line, self.y)).unwrap();
+			write!(out, "{}", utils::get_char(self.line_type, 8)).unwrap();
+			for i in 0..self.height-2 {
+				execute!(out, MoveTo(self.x + line, self.y + i + 1)).unwrap();
+				write!(out, "{}", utils::get_char(self.line_type, 1)).unwrap();
+			}
+			execute!(out, MoveTo(self.x + line, self.y + self.height - 1)).unwrap();
+			write!(out, "{}", utils::get_char(self.line_type, 9)).unwrap();
+		}
+
+		// Horizontal splits
+		for line in self.horizontal.clone() {
+			execute!(out, MoveTo(self.x, self.y + line)).unwrap();
+			write!(out, "{}", utils::get_char(self.line_type, 6)).unwrap();
+			for i in 0..self.width-2 {
+				execute!(out, MoveTo(self.x + i + 1, self.y + line)).unwrap();
+				if self.vertical.contains(&(i+1)) {
+					write!(out, "{}", utils::get_char(self.line_type, 10)).unwrap();
+				}
+				else {
+					write!(out, "{}", utils::get_char(self.line_type, 0)).unwrap();
+				}
+			}
+			execute!(out, MoveTo(self.x + self.width - 1, self.y + line)).unwrap();
+			write!(out, "{}", utils::get_char(self.line_type, 7)).unwrap();
+		}
+	}
+
+	fn clear(&self, out : &mut Stdout) {
+		for i in 0..self.height {
+			execute!(out, crossterm::cursor::MoveTo(self.x, self.y+i)).unwrap();
+			utils::repeat(out, ' ', self.width);
+		}
+	}
+
+	fn update(&mut self, input : &input::InputHandler) {
+
+		let mut last_column : u16 = 0;
+		let mut last_row : u16;
+		let mut id : u8 = 0;
+
+		let mut vertical = self.vertical.clone();
+		vertical.push(self.height);
+		let mut horizontal = self.vertical.clone();
+		horizontal.push(self.width);
+
+		for column in vertical.clone() {
+			last_row = 0;
+			for row in horizontal.clone() {
+				if utils::check_collision(
+					last_column+self.x,
+					last_row+self.y,
+					column - last_column,
+					row - last_row,
+					input.mouse.x, input.mouse.y
+				) {
+					self.hovered = id;
+					return;
+				}
+				
+				id += 1;
+				last_row = row;
+			}
+			last_column = column;
+		}
+		self.hovered = 255;
+	}
+}
+
+impl SplitBox {
+	pub fn new(nx : u16, ny : u16, nwidth : u16, nheight : u16) -> Self {
+		SplitBox {
+			x : nx, y : ny,
+			width : nwidth, height : nheight,
+
+			color : utils::Color {
+				color_enabled : false,
+				color : 0,
+				bright : false,
+
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			line_type : 0,
+
+			horizontal : vec!(nheight >> 1),
+			vertical : vec!(nwidth >> 1),
+
+			hovered : 255,
+		}
+	}
+}
+
+
+# ./src/interface/traits.rs #
+use std::io::Stdout;
+use crate::helpers::input;
+
+pub trait UserInterface {
+	fn draw(&self, out : &mut Stdout);
+	fn clear(&self, out : &mut Stdout);
+	fn update(&mut self, input: &input::InputHandler);
+}
+
+
+# ./src/interface/slider.rs #
+use crossterm::{
+	execute,
+};
+use std::io::{stdout, Write, Stdout};
+
+use crate::helpers::utils;
+use crate::helpers::input;
+use crate::interface::traits;
+
+pub struct Slider {
+	// Size and position
+	pub x : u16, pub y : u16,
+	pub size : u16,
+
+	// Extra options
+	pub colorset : [utils::Color; 4],
+	pub color_bg : utils::Color,
+	pub charset : [char; 4],
+
+	// Event polling
+	pub hovered : bool,
+	pub selected : u8,
+}
+
+
+impl traits::UserInterface for Slider {
+	fn draw(&self, out : &mut Stdout) {
+	
+		self.color_bg.write_color(out, true);
+
+		// Left of the bar
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		self.colorset[0].write_color(out, false);
+		
+		write!(out, "{}", self.charset[0]).unwrap();
+
+		// Background
+		self.colorset[2].write_color(out, false);
+		utils::repeat(out, self.charset[2], self.size);
+
+		// Right of the bar
+		self.colorset[3].write_color(out, false);
+		write!(out, "{}", self.charset[3]).unwrap();
+
+		// Selector
+		execute!(out, crossterm::cursor::MoveTo(self.x +1 +self.selected as u16, self.y)).unwrap();
+		self.colorset[1].write_color(out, false);
+		write!(out, "{}", self.charset[1]).unwrap();
+
+		write!(out, "\x1b[0m").unwrap();
+
+		stdout().flush().unwrap();
+	}
+
+	fn clear(&self, out : &mut Stdout) {
+		// Left of the bar
+		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
+		utils::repeat(out, ' ', self.size+2);
+
+		stdout().flush().unwrap();
+	}
+	
+	fn update(&mut self, input : &input::InputHandler) {
+		self.hovered = utils::check_collision(
+			self.x, self.y,
+			self.size, 1,
+			input.mouse.x, input.mouse.y
+		);
+
+		if self.hovered && input.mouse.lclickheld {
+			self.selected = (input.mouse.x - self.x) as u8;
+		}
+	}
+}
+
+impl Slider {
+	fn new(nx : u16, ny : u16, nsize : u16) -> Self {
+		Slider {
+			x : nx, y : ny,
+			size : nsize,
+			
+			colorset : [
+				utils::Color {
+					color_enabled : true,
+					color : 7,
+					bright : false,
+
+					truecolor : false,
+					red : 0,
+					green : 0,
+					blue : 0,
+				},
+				utils::Color {
+					color_enabled : true,
+					color : 7,
+					bright : false,
+
+					truecolor : false,
+					red : 0,
+					green : 0,
+					blue : 0,
+				},
+				utils::Color {
+					color_enabled : true,
+					color : 7,
+					bright : false,
+
+					truecolor : false,
+					red : 0,
+					green : 0,
+					blue : 0,
+				},
+				utils::Color {
+					color_enabled : true,
+					color : 7,
+					bright : false,
+
+					truecolor : false,
+					red : 0,
+					green : 0,
+					blue : 0,
+				},
+			],
+
+			color_bg : utils::Color {
+				color_enabled : false,
+				color : 0,
+				bright : false,
+
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			charset : ['<', '|', '-', '>'],
+
+			hovered : false,
+			selected : 0
+		}
+	}
+}
+
+
+# ./src/interface/mod.rs #
+pub mod textbox;
+pub mod splitbox;
+pub mod progressbar;
+pub mod label;
+pub mod list;
+pub mod slider;
+pub mod inputfield;
+pub mod checkbox;
+
+pub mod traits;
+
+
+# ./src/example.rs #
+/*
+use crossterm::{
+	execute,
+	cursor,
+};
+use std::{
+	// env, <- Will be important later
+	io::{
+		stdout,
+		Write,
+	},
+	thread::sleep,
+	time::{
+		Duration,
+		Instant
+	}
+};
+
+pub mod interface;
+pub mod helpers;
+
+const TARGET_FPS : f32 = 30.0;
+
+fn main() {
+	helpers::input::init().unwrap();
+	let framerate : Duration = Duration::from_secs_f32(1.0 / TARGET_FPS);
+
+	let mut input : helpers::input::InputHandler = helpers::input::InputHandler::new();
+
+	let mut textbox : interface::textbox::Box =
+	interface::textbox::Box::new(20, 10, 21, 11, 0);
+
+	let mut label : interface::label::Label =
+	interface::label::Label::new(14, 9, 33, "This button will stop the program");
+	
+	let mut bar : interface::progressbar::ProgressBar =
+	interface::progressbar::ProgressBar::new(10, 21, 41, 0, 100, ['<', '=', ' ', '>']);
+		
+	let mut table : interface::splitbox::SplitBox =
+	interface::splitbox::SplitBox::new(40, 22, 20, 20, 1);
+	
+	let mut list : interface::list::List =
+	interface::list::List::new(60, 2, 20, 10);
+	
+	let mut slider : interface::slider::Slider =
+	interface::slider::Slider::new(80, 30, 10);
+			
+	let mut inputfield : interface::inputfield::InputField =
+	interface::inputfield::InputField::new(80, 33, 20);
+				
+	let mut checkbox : interface::checkbox::CheckBox =
+	interface::checkbox::CheckBox::new(100, 10);
+
+	list.items.push("a".to_string());
+	list.items.push("b".to_string());
+	list.items.push("c".to_string());
+	list.items.push("d".to_string());
+	list.items.push("e".to_string());
+		list.items.push("a".to_string());
+		list.items.push("b".to_string());
+		list.items.push("c".to_string());
+		list.items.push("d".to_string());
+		list.items.push("e".to_string());
+			list.items.push("a".to_string());
+			list.items.push("b".to_string());
+			list.items.push("c".to_string());
+			list.items.push("d".to_string());
+			list.items.push("e".to_string());
+				list.items.push("a".to_string());
+				list.items.push("b".to_string());
+				list.items.push("c".to_string());
+				list.items.push("d".to_string());
+				list.items.push("e".to_string());
+					list.items.push("a".to_string());
+					list.items.push("b".to_string());
+					list.items.push("c".to_string());
+					list.items.push("d".to_string());
+					list.items.push("e".to_string());
+						list.items.push("a".to_string());
+						list.items.push("b".to_string());
+						list.items.push("c".to_string());
+						list.items.push("d".to_string());
+						list.items.push("e".to_string());
+	
+	let mut c : u16 = 0;
+
+	loop {
+		let now = Instant::now(); // Get frame time
+
+		let mut out = stdout();
+
+		input.update().unwrap();
+		
+		textbox.update(&input);
+		table.update(&input);
+		list.update(&input);
+		slider.update(&input);
+		inputfield.update(&input);
+		checkbox.update(&input);
+		
+		if input.mouse.lclick {
+			if textbox.hovered {
+				break;
+			}
+		}
+
+
+		
+
+		
+
+		c += 1;
+		if c.is_multiple_of(10) {
+			if c.is_multiple_of(20) {
+				label.y += 1;
+			}
+			else {
+				label.y -= 1;
+			}
+			bar.progress_full += 3;
+		}
+		write!(out, "\x1b[2J").unwrap();
+		if input.mouse.lclick {
+			execute!(out, crossterm::cursor::MoveTo(0, 0)).unwrap();
+		    println!("Mouse click! {} {}", input.mouse.x, input.mouse.y);
+		}
+		label.draw(&mut out);
+		textbox.draw(&mut out);
+		bar.draw(&mut out);
+		table.draw(&mut out);
+		list.draw(&mut out);
+		slider.draw(&mut out);
+		inputfield.draw(&mut out);
+		checkbox.draw(&mut out);
+		stdout().flush().unwrap();
+		
+		// Frame time management for consistent framerate
+		let frame_duration = Instant::now().duration_since(now);
+		if frame_duration < framerate {
+			sleep(framerate - frame_duration);
+		}
+	}
+	
+	helpers::input::uninit().unwrap();
+}
+*/
+
+
+# ./src/main.rs #
+use std::{
+	io,
+	time::{
+		Duration,
+		Instant,
+	},
+	thread::{
+		sleep
+	},
+	io::{
+		stdout,
+		Write
+	},
+};
+use std::rc::Rc;
+use std::cell::RefCell;
+
+
+pub mod interface;
+pub mod helpers;
+pub mod menus;
+pub mod abt;
+
+const TARGET_FPS : f64 = 30.0;
+
+fn main() -> io::Result<()> {
+	// Initialize everything, including:
+	// InputHandler, Main menu
+	helpers::input::init()?;
+	let framerate : Duration = Duration::from_secs_f64(1.0 / TARGET_FPS);
+	let mut input : helpers::input::InputHandler = helpers::input::InputHandler::new();
+
+	// Initialize variables that persist between menu switches
+	let mut out = stdout();
+	let menu = Rc::new(RefCell::new(abt::menus::Menu::Main));
+	let mut mainmenu = menus::mainmenu::MainMenu::init(Rc::clone(&menu));
+	mainmenu.init_draw(&mut out);
+	
+	// Loop and use the program:
+	// Switch between menus and interact with the filesystem
+	loop {
+		// Set frame up
+		let now : Instant = Instant::now();
+		input.update()?;
+
+		// The actual frame
+		let cmenu = *menu.borrow();
+		match cmenu {
+			abt::menus::Menu::Main => mainmenu.tick(&input, &mut out),
+			abt::menus::Menu::Out => break,
+			_ => {}
+		}
+		if *menu.borrow() == abt::menus::Menu::Out {
+			break;
+		}
+
+		// Frame time management for consistent framerate
+		stdout().flush().unwrap();
+		let frame_duration = Instant::now().duration_since(now);
+		if frame_duration < framerate {
+			sleep(framerate - frame_duration);
+		}
+	}
+
+	// The loop has been exited, undo initialization of
+	// InputHandler and screen extras
+	helpers::input::uninit()?;
+	Ok(())
+}
+
+
+# ./src/helpers/input.rs #
+use std::{
+	time::{
+		Duration,
+		Instant,
+	},
+	io,
+	collections::HashSet,
+};
+use crossterm::{
+	event::{
+		Event,
+		KeyEventKind,
+		KeyEvent,
+		KeyCode,
+		MouseEvent,
+		MouseEventKind,
+		MouseButton,
+		poll,
+		read,
+	},
+	terminal::{
+		enable_raw_mode,
+		disable_raw_mode,
+		SetTitle,
+	},
+	execute,
+};
+
+
+// Keyboard config
+const REPEAT_DELAY : Duration = Duration::from_millis(250); // Wait before first repeat
+const REPEAT_RATE : Duration = Duration::from_millis(50);   // Interval between repeats
+
+pub struct Mouse { // Has all the mouse attributes
+	pub x : u16,
+	pub y : u16,
+	pub lclick : bool,
+	pub lclickheld : bool,
+	pub rclick : bool,
+	pub rclickheld : bool,
+	pub scroll : i8, // 1 for up, -1 for down (I think)
+}
+
+pub struct Keyboard {
+	pub pressed : HashSet<KeyCode>, // What is pressed currently
+	pub just_pressed : HashSet<KeyCode>, // What was pressed this frame
+	pub last_press_time : std::collections::HashMap<KeyCode, Instant>,
+	// Length of press (used to calculate stuff)
+}
+
+pub struct Window { // Most of these don't even get updated, so I don't know why I made this at all
+	pub focused : bool,
+	pub width : u16,
+	pub height : u16,
+}
+
+
+// This is the only struct that has actual functions!
+// But those functions are more like abstractions...
+// Skill issue on my end :(
+// I'll remove this one soon maybe, or not, possibly
+impl Keyboard {
+	pub fn is_pressed(&self, key: KeyCode) -> bool {
+		self.pressed.contains(&key)
+	}
+
+	pub fn just_pressed(&self, key: KeyCode) -> bool {
+		self.just_pressed.contains(&key)
+	}
+}
+
+
+// I bundled all the structs into one because I'm to lazy to initialize all of them separately
+pub struct InputHandler {
+	pub mouse : Mouse,
+	pub keyboard : Keyboard,
+	pub window : Window,
+}
+
+impl InputHandler {
+	pub fn new() -> Self { // Told you I was too lazy to initialize all of them :P
+		let termsize = crossterm::terminal::size().unwrap();
+		Self {
+			mouse : Mouse {
+				x : 0,
+				y : 0,
+				lclick : false,
+				lclickheld : false,
+				rclick : false,
+				rclickheld : false,
+				scroll : 0
+			},
+			keyboard : Keyboard {
+				pressed : HashSet::new(),
+				just_pressed : HashSet::new(),
+				last_press_time : std::collections::HashMap::new(),
+			},
+			window : Window {
+				focused : true, 
+				width : termsize.0,
+				height : termsize.1,
+			}
+		}
+	}
+
+	pub fn update(&mut self) -> io::Result<()> { // This polls inputs
+
+		self.mouse.lclick = false;
+		self.mouse.rclick = false;
+		let now = Instant::now();
+		self.mouse.scroll = 0;
+		self.keyboard.just_pressed.clear();
+		
+		while poll(Duration::from_millis(0))? {
+			match read()? {
+				Event::FocusGained => self.window.focused = true,
+				Event::FocusLost => self.window.focused = false,
+				Event::Mouse(event) => { Self::handle_mouse(event, &mut self.mouse); },
+				Event::Resize(width, height) => {self.window.width = width; self.window.height = height},
+				Event::Key(KeyEvent { code, kind, .. }) => {
+					if matches!(kind, KeyEventKind::Press | KeyEventKind::Repeat) {
+						if !self.keyboard.pressed.contains(&code) {
+							self.keyboard.just_pressed.insert(code);
+							self.keyboard.last_press_time.insert(code, Instant::now());
+						}
+						self.keyboard.pressed.insert(code);
+					}
+				}
+				_ => {}
+			}
+		}
+
+		// handle repeats
+		for key in self.keyboard.pressed.iter() {
+		    if let Some(&last_time) = self.keyboard.last_press_time.get(key) {
+		        let elapsed = now.duration_since(last_time);
+		        if elapsed >= REPEAT_DELAY {
+		            // calculate how many repeats have passed
+		            let repeats = ((elapsed - REPEAT_DELAY).as_millis() / REPEAT_RATE.as_millis()) as usize;
+		            if repeats > 0 {
+		                self.keyboard.just_pressed.insert(*key);       // trigger repeat
+		                self.keyboard.last_press_time.insert(*key, now); // reset timer
+		            }
+		        }
+		    }
+		}
+		
+		// remove keys that have been released
+		let key_timeout = Duration::from_millis(100); // adjust as needed
+		self.keyboard.pressed.retain(|k| {
+		    if let Some(&t) = self.keyboard.last_press_time.get(k) {
+		        now.duration_since(t) < key_timeout
+		    } else {
+		        false
+		    }
+		});
+		
+		Ok(())
+	}
+
+	// I wonder what 'handle_mouse' does...
+	// I think it might use the 'mouse' struct, I'm not sure...
+	fn handle_mouse(event : MouseEvent, mouse : &mut Mouse) {
+	
+
+		
+		mouse.x = event.column;
+		mouse.y = event.row;
+	
+		match event.kind {
+			MouseEventKind::Down(MouseButton::Left)  => mouse.lclick     = true,
+			MouseEventKind::Drag(MouseButton::Left)  => mouse.lclickheld = true,
+			MouseEventKind::Up(MouseButton::Left)    => mouse.lclickheld = false,
+			MouseEventKind::Down(MouseButton::Right) => mouse.rclick     = true,
+			MouseEventKind::Drag(MouseButton::Right) => mouse.rclickheld = true,
+			MouseEventKind::Up(MouseButton::Right)   => mouse.rclickheld = false,
+			MouseEventKind::ScrollUp => mouse.scroll = 1,
+			MouseEventKind::ScrollDown => mouse.scroll = -1,
+			_ => {}
+		}
+	}
+}
+
+
+// Imagine doing stuff manually lmao
+pub fn init() -> io::Result<()> {
+	let mut stdout = io::stdout();
+	execute!(stdout, crossterm::terminal::EnterAlternateScreen).unwrap();
+	execute!(stdout, crossterm::cursor::Hide).unwrap();
+	execute!(stdout, crossterm::event::EnableBracketedPaste).unwrap();
+	execute!(stdout, crossterm::event::EnableFocusChange).unwrap();
+	execute!(stdout, crossterm::event::EnableMouseCapture).unwrap();
+	execute!(stdout, SetTitle("Amethyst berry tool"))?;
+	enable_raw_mode()?;
+	Ok(())
+}
+
+pub fn uninit() -> io::Result<()> { // De-initializes the end of all functions
+	let mut stdout = io::stdout();
+	execute!(stdout, crossterm::terminal::LeaveAlternateScreen).unwrap();
+	execute!(stdout, crossterm::cursor::Show).unwrap();
+	execute!(stdout, crossterm::event::DisableBracketedPaste).unwrap();
+	execute!(stdout, crossterm::event::DisableFocusChange).unwrap();
+	execute!(stdout, crossterm::event::DisableMouseCapture).unwrap();
+	disable_raw_mode()?;
+	Ok(())
+}
+
+
+# ./src/helpers/utils.rs #
+pub use std::io::{
+	Stdout,
+	Write,
+	stdout,
+	self,
+};
+
+// Color structs
+
+pub struct Color {
+	pub color_enabled : bool,
+
+	pub color : u8,
+	pub bright : bool,
+
+	pub truecolor : bool,
+	pub red : u8,
+	pub green : u8,
+	pub blue : u8,
+}
+
+impl Color {
+	pub fn write_color(&self, out : &mut Stdout, background : bool) {
+		if !self.color_enabled {
+			return;
+		}
+	
+		let mut layer = match background {
+			true => 4,
+			false => 3,
+		};
+		
+		if self.truecolor {
+			write!(out, "\x1b[{}8;2;{};{};{}m", layer, self.red, self.green, self.blue).unwrap();
+		}
+		else {
+			if self.bright {
+				layer += 60; // Convert to bright
+			}
+			write!(out, "\x1b[{}{}m", layer, self.color).unwrap();
+		}
+	}
+}
+
+
+
+// Unicode characters
+
+pub const NORMAL : [char; 11] =    ['─', '│', '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼'];
+pub const THICK : [char; 11] =     ['━', '┃', '┏', '┓', '┗', '┛', '┣', '┫', '┳', '┻', '╋'];
+pub const DOT3 : [char; 2] =       ['┄', '┆'];
+pub const DOT3_THICK : [char; 2] = ['┅', '┇'];
+pub const DOT4 : [char; 2] =       ['┈', '┊'];
+pub const DOT4_THICK : [char; 2] = ['┉', '┋'];
+pub const MLINE : [char; 9] =      ['═', '║', '╔', '╗', '╚', '╝', '╠', '╣', '╬'];
+pub const SHADING : [char; 6] =    ['░', '▒', '▓', '█', '▄', '▀'];
+
+pub fn repeat(out : &mut Stdout, c : char, n : u16) {
+	for _ in 0..n {
+		write!(out, "{c}").unwrap();
+	}
+}
+
+pub fn get_char(ctype : u8, index : u8) -> char {
+	match ctype {
+		0 => NORMAL[index as usize],
+		1 => THICK[index as usize],
+		2 => DOT3[index as usize],
+		3 => DOT3_THICK[index as usize],
+		4 => DOT4[index as usize],
+		5 => DOT4_THICK[index as usize],
+		6 => MLINE[index as usize],
+		7 => SHADING[index as usize],
+		_ => NORMAL[index as usize],
+	}
+}
+
+
+
+// Other character shenanigans
+
+pub fn shorten_text(text : &str, length : u16) -> String {
+	if text.len() > length as usize {
+		let mut output = text[0..length as usize - 3].to_string();
+		output += "...";
+		output
+		// I used this earlier:
+		// output = (*(&text[0_usize..length as usize-3_usize].to_string()).clone()).to_string();
+		// It works, don't ask why
+	}
+	else {
+		text.to_string()
+		// This used to be '(&text).clone()' at one point
+		// This function has the silliest history ever
+	}
+}
+
+
+
+// Check collision
+
+pub fn check_collision(
+	x : u16, y : u16,
+	width : u16, height : u16,
+	mx : u16, my : u16
+) -> bool {
+
+	mx >= x && // mx is to the right of the left side
+	mx < x + width && // mx is to the left of the right side
+	my >= y && // my is below the upper side
+	my < y + height // mx is above the lower side (inside the box, is colliding)
+}
+
+
+// Hex <-> Decimal Convertions
+
+pub fn hex_decimal(value : &str) -> u64 {
+	u64::from_str_radix(value, 16).unwrap_or(0)
+}
+
+pub fn decimal_hex(value: u64, width: usize) -> String {
+	format!("{:0width$X}", value, width = width)
+}
+
+
+# ./src/helpers/mod.rs #
+pub mod utils;
+pub mod input;
+
+
+# ./src/abt/mapparsing.rs #
+use crate::helpers;
+use crate::abt::mapdata::*;
+
+pub fn parse_map(map : &String) -> Map {
+	assert!(map.is_ascii(), "non-ASCII input detected");
+
+	let mut map_obj_output : Map = Map::new("placeholder name");
+	let mut currentchar : usize = helpers::utils::hex_decimal(&map[0..2]) as usize +2;
+	let bytes = map.as_bytes();
+	
+	// Tag string parsing
+	map_obj_output.tag = map[2_usize..currentchar].to_string();
+
+	// Some numerical values
+	map_obj_output.difficulty = 
+		helpers::utils::hex_decimal(
+			&map[currentchar..currentchar +2]) as u8;
+
+	map_obj_output.clear_progress = 
+		helpers::utils::hex_decimal(
+			&map[currentchar +2..currentchar +4]) as u8;
+			
+	map_obj_output.deaths = 
+		helpers::utils::hex_decimal(
+			&map[currentchar +4..currentchar +12]) as u32;
+
+	// Strawberries
+	map_obj_output.strawberry_amount = 
+		helpers::utils::hex_decimal(
+			&map[currentchar +12..currentchar +16]) as u16;
+
+	map_obj_output.strawberry_collected = 
+		helpers::utils::hex_decimal(
+			&map[currentchar +16..currentchar +20]) as u16;
+
+	// Golden berries
+	currentchar += 20;
+	if bytes[currentchar] == 49 { // 49 -> '1' in ASCII
+		map_obj_output.goldberry_exists = true;
+		map_obj_output.goldberry_collected = bytes[currentchar + 1] == 49;
+		
+		map_obj_output.goldberry_type =
+			helpers::utils::hex_decimal(
+				&map[currentchar +2..currentchar +4]) as u8;
+
+		currentchar += 3;
+	}
+	currentchar += 1;
+
+	// Silver berries
+	if bytes[currentchar] == 49 { // 49 -> '1' in ASCII
+		map_obj_output.silverberry_exists = true;
+
+		currentchar += 1;
+		map_obj_output.silverberry_amount =
+			helpers::utils::hex_decimal(&map[currentchar..currentchar +2]) as u8;
+		
+		map_obj_output.silverberry_collected =
+			helpers::utils::hex_decimal(&map[currentchar+2..currentchar +4]) as u8;
+		
+		map_obj_output.silverberry_type =
+			helpers::utils::hex_decimal(&map[currentchar+4..currentchar +6]) as u8;
+
+		currentchar += 5;
+	}
+	currentchar += 1;
+
+	// Special berry
+	if bytes[currentchar] == 49 { // 49 -> '1' in ASCII
+		map_obj_output.specialberry_exists = true;
+
+		let name_len : u64 = helpers::utils::hex_decimal(
+			&map[currentchar+1..currentchar+3]);
+		
+		currentchar += 3;
+		map_obj_output.specialberry_name =
+			map[currentchar..currentchar + name_len as usize].to_string();
+
+		currentchar += name_len as usize;
+		map_obj_output.specialberry_collected = bytes[currentchar] == 49;
+	}
+	currentchar += 1;
+
+	// Challenge data
+	if bytes[currentchar] == 49 { // 49 -> '1' in ASCII
+		map_obj_output.challenge_activate = true;
+		
+		map_obj_output.min_dashes_pb =
+			helpers::utils::hex_decimal(&map[currentchar +1..currentchar +5]) as u16;
+
+		map_obj_output.min_dashes_bronze =
+			helpers::utils::hex_decimal(&map[currentchar +5..currentchar +9]) as u16;
+
+		map_obj_output.min_dashes_silver =
+			helpers::utils::hex_decimal(&map[currentchar +9..currentchar +13]) as u16;
+
+		map_obj_output.min_dashes_gold =
+			helpers::utils::hex_decimal(&map[currentchar +13..currentchar +17]) as u16;
+
+		currentchar += 17;
+
+		map_obj_output.min_jumps_pb =
+			helpers::utils::hex_decimal(&map[currentchar..currentchar +4]) as u16;
+
+		map_obj_output.min_jumps_bronze =
+			helpers::utils::hex_decimal(&map[currentchar +4..currentchar +8]) as u16;
+
+		map_obj_output.min_jumps_silver =
+			helpers::utils::hex_decimal(&map[currentchar +8..currentchar +12]) as u16;
+
+		map_obj_output.min_jumps_gold =
+			helpers::utils::hex_decimal(&map[currentchar +12..currentchar +16]) as u16;
+
+		currentchar += 15;
+	}
+	currentchar += 1;
+
+	// Speedrun data
+	map_obj_output.fastest_time =
+		helpers::utils::hex_decimal(&map[currentchar..currentchar +16]);
+
+	map_obj_output.speedrun_bronze =
+		helpers::utils::hex_decimal(&map[currentchar +16..currentchar +32]);
+
+	map_obj_output.speedrun_silver =
+		helpers::utils::hex_decimal(&map[currentchar +32..currentchar +48]);
+
+	map_obj_output.speedrun_gold =
+		helpers::utils::hex_decimal(&map[currentchar +48..currentchar +64]);
+	currentchar += 64;
+
+	// Extra data
+	if bytes[currentchar] == 49 {
+		map_obj_output.cassette_exists = true;
+		map_obj_output.cassette_collected = bytes[currentchar +1] == 49;
+		currentchar += 1;
+	}
+	currentchar += 1;
+
+	if bytes[currentchar] == 49 {
+		map_obj_output.crystalheart_exists = true;
+		
+		currentchar += 1;
+
+		// Crystal heart name
+		let name_len : u64 = helpers::utils::hex_decimal(
+			&map[currentchar..currentchar+2]);
+		
+		currentchar += 2;
+		map_obj_output.crystalheart_name =
+			map[currentchar..currentchar + name_len as usize].to_string();
+		
+		currentchar += name_len as usize;
+
+		map_obj_output.crystalheart_collected = bytes[currentchar +1] == 49;
+	}
+	currentchar += 1;
+
+	// HERE COMES THE FUN PART
+	// FROM HERE ON, THE CODE WILL BE EVEN WORSE
+
+	// Practice data
+	map_obj_output.pb =
+		helpers::utils::hex_decimal(&map[currentchar..currentchar +8]) as u32;
+
+	map_obj_output.min_deaths_pb =
+		helpers::utils::hex_decimal(&map[currentchar +8..currentchar +16]) as u32;
+	currentchar += 16;
+
+	let checkpoint_amount : u8 =
+		helpers::utils::hex_decimal(&map[currentchar..currentchar +2]) as u8;
+	currentchar += 2;
+
+	// Checkpoints
+	for i in 0..checkpoint_amount {
+		// Name
+		let name_len : u64 = helpers::utils::hex_decimal(
+			&map[currentchar..currentchar+2]);
+		currentchar += 2;
+		
+		let mut temp_checkpoint : Checkpoint = Checkpoint::new(
+			&map[currentchar..currentchar + name_len as usize], i);
+		
+		currentchar += name_len as usize;
+
+		// Notes
+		let name_len : u64 = helpers::utils::hex_decimal(
+			&map[currentchar..currentchar+2]);
+		currentchar += 2;
+		
+		temp_checkpoint.notes =
+			map[currentchar..currentchar + name_len as usize].to_string();
+		
+		currentchar += name_len as usize;
+
+		// Chokepoints
+		let chokepoint_amount : u8 =
+			helpers::utils::hex_decimal(&map[currentchar..currentchar +2]) as u8;
+		currentchar += 2;
+
+		for j in 0..chokepoint_amount {
+			
+			// Name
+			let name_len : u64 = helpers::utils::hex_decimal(
+				&map[currentchar..currentchar+2]);
+			currentchar += 2;
+			
+			let mut temp_chokepoint : Chokepoint = Chokepoint::new(
+				&map[currentchar..currentchar + name_len as usize], j);
+			
+			currentchar += name_len as usize;
+
+			// Notes
+			let name_len : u64 = helpers::utils::hex_decimal(
+				&map[currentchar..currentchar+2]);
+			currentchar += 2;
+			
+			temp_chokepoint.notes =
+				map[currentchar..currentchar + name_len as usize].to_string();
+			
+			currentchar += name_len as usize;
+
+			temp_chokepoint.highest_backtoback_amount =
+				helpers::utils::hex_decimal(&map[currentchar..currentchar +4]) as u16;
+			currentchar += 4;
+
+			temp_checkpoint.chokepoints.push(temp_chokepoint);
+		}
+
+		temp_checkpoint.min_deaths =
+			helpers::utils::hex_decimal(&map[currentchar..currentchar +4]) as u16;
+		currentchar += 4;
+		
+		map_obj_output.checkpoints.push(temp_checkpoint);
+	}
+
+	// Runs range
+	let rangedruns_amount : u8 =
+		helpers::utils::hex_decimal(&map[currentchar..currentchar +2]) as u8;
+	currentchar += 2;
+	
+	for _ in 0..rangedruns_amount {
+		map_obj_output.range_runs.push(
+			CheckpointRange {
+				id_start : helpers::utils::hex_decimal(&map[currentchar..currentchar +2]) as u8,
+				id_end : helpers::utils::hex_decimal(&map[currentchar+2..currentchar +4]) as u8
+			}
+		);
+		currentchar += 4;
+	}
+	
+	map_obj_output
+}
+
+
+
+
+pub fn parse_map_as_string(map : &Map) -> String {
+	let mut output_string : String = "".to_string();
+
+	// Main data
+	output_string += &helpers::utils::decimal_hex(map.tag.len() as u64, 2);
+	output_string += &map.tag;
+	output_string += &helpers::utils::decimal_hex(map.difficulty as u64, 2);
+	output_string += &helpers::utils::decimal_hex(map.clear_progress as u64, 2);
+	output_string += &helpers::utils::decimal_hex(map.deaths as u64, 8);
+
+	// Strawberries
+	output_string += &helpers::utils::decimal_hex(map.strawberry_amount as u64, 4);
+	output_string += &helpers::utils::decimal_hex(map.strawberry_collected as u64, 4);
+
+	// Golden berries
+	output_string += &bool_char(map.goldberry_exists);
+	if map.goldberry_exists {
+		output_string += &bool_char(map.goldberry_collected);
+		output_string += &helpers::utils::decimal_hex(map.goldberry_type as u64, 2);
+	}
+
+	// Silver berries
+	output_string += &bool_char(map.silverberry_exists);
+	if map.silverberry_exists {
+		output_string += &helpers::utils::decimal_hex(map.silverberry_amount as u64, 2);
+		output_string += &helpers::utils::decimal_hex(map.silverberry_collected as u64, 2);
+		output_string += &helpers::utils::decimal_hex(map.silverberry_type as u64, 2);
+	}
+
+	// Special berry
+	output_string += &bool_char(map.specialberry_exists);
+	if map.specialberry_exists {
+		output_string += &helpers::utils::decimal_hex(map.specialberry_name.len() as u64, 2);
+		output_string += &map.specialberry_name;
+		output_string += &bool_char(map.specialberry_collected);
+	}
+
+	// Challenge data
+	output_string += &bool_char(map.challenge_activate);
+	if map.challenge_activate {
+		output_string += &helpers::utils::decimal_hex(map.min_dashes_pb as u64, 4);
+		output_string += &helpers::utils::decimal_hex(map.min_dashes_bronze as u64, 4);
+		output_string += &helpers::utils::decimal_hex(map.min_dashes_silver as u64, 4);
+		output_string += &helpers::utils::decimal_hex(map.min_dashes_gold as u64, 4);
+		output_string += &helpers::utils::decimal_hex(map.min_jumps_pb as u64, 4);
+		output_string += &helpers::utils::decimal_hex(map.min_jumps_bronze as u64, 4);
+		output_string += &helpers::utils::decimal_hex(map.min_jumps_silver as u64, 4);
+		output_string += &helpers::utils::decimal_hex(map.min_jumps_gold as u64, 4);
+	}
+
+	// Speedrun data
+	output_string += &helpers::utils::decimal_hex(map.fastest_time, 16);
+	output_string += &helpers::utils::decimal_hex(map.speedrun_bronze, 16);
+	output_string += &helpers::utils::decimal_hex(map.speedrun_silver, 16);
+	output_string += &helpers::utils::decimal_hex(map.speedrun_gold, 16);
+
+	// Extra data
+	output_string += &bool_char(map.cassette_exists);
+	if map.cassette_exists {
+		output_string += &bool_char(map.cassette_collected);
+	}
+	output_string += &bool_char(map.crystalheart_exists);
+	if map.crystalheart_exists {
+		output_string += &helpers::utils::decimal_hex(map.crystalheart_name.len() as u64, 2);
+		output_string += &map.crystalheart_name;
+		output_string += &bool_char(map.crystalheart_collected);
+	}
+
+	// Practice data
+	output_string += &helpers::utils::decimal_hex(map.pb as u64, 8);
+	output_string += &helpers::utils::decimal_hex(map.min_deaths_pb as u64, 8);
+
+	// Checkpoints
+	output_string += &helpers::utils::decimal_hex(map.checkpoints.len() as u64, 2);
+	for checkpoint in &map.checkpoints {
+		output_string += &helpers::utils::decimal_hex(checkpoint.name.len() as u64, 2);
+		output_string += &checkpoint.name;
+		output_string += &helpers::utils::decimal_hex(checkpoint.notes.len() as u64, 2);
+		output_string += &checkpoint.notes;
+		// Chokepoints in checkpoints
+		output_string += &helpers::utils::decimal_hex(checkpoint.chokepoints.len() as u64, 2);
+		for chokepoint in &checkpoint.chokepoints {
+			output_string += &helpers::utils::decimal_hex(chokepoint.name.len() as u64, 2);
+			output_string += &chokepoint.name;
+			output_string += &helpers::utils::decimal_hex(chokepoint.notes.len() as u64, 2);
+			output_string += &chokepoint.notes;
+			output_string += &helpers::utils::decimal_hex(chokepoint.highest_backtoback_amount as u64, 4);
+		}
+		output_string += &helpers::utils::decimal_hex(checkpoint.min_deaths as u64, 4);
+	}
+
+	// Ranges
+	output_string += &helpers::utils::decimal_hex(map.range_runs.len() as u64, 2);
+	for run in &map.range_runs {
+		output_string += &helpers::utils::decimal_hex(run.id_start as u64, 2);
+		output_string += &helpers::utils::decimal_hex(run.id_end as u64, 2);
+	}
+	
+	output_string
+}
+
+fn bool_char(input : bool) -> String {
+	match input {
+		false => "0".to_string(),
+		true => "1".to_string()
+	}
+}
+
+
+# ./src/abt/config.rs #
+pub struct Program {
+	pub menu : MainMenuLayout,
+	pub list : ListLayout,
+	pub terminal : TerminalData,
+	pub other : Other,
+}
+
+pub struct MainMenuLayout {
+	pub order : Vec<u8>
+}
+
+pub struct ListLayout {
+	pub name : u8,
+	pub index : u8,
+	pub value : u8,
+	pub date : u8,
+	
+	pub order : Vec<u8>
+}
+
+pub struct TerminalData {
+	pub color : u8, // 0 -> no color; 1 -> 8 color; 2 -> 16 color; 3 -> 256 color; 4 -> truecolor
+	pub cli : bool, // false -> TUI; true -> CLI
+	pub mouse_enabled : bool,
+}
+
+pub struct Other {
+	pub custom_load_directory : bool,
+}
+
+impl Program {
+	pub fn initialize() -> Self {
+		Program {
+			MainMenuLayout {
+				order : vec!(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+			},
+			ListLayout {
+				name : 40,
+				index : 10,
+				value : 20,
+				date : 30,
+
+				order : vec!(0, 1, 2, 3),
+			},
+			TerminalData {
+				color : 1,
+				cli : false,
+				mouse_enabled : false,
+			},
+			Other {
+				custom_load_directory : false,
+			}
+		}
+	}
+}
+
+
+# ./src/abt/mapdata.rs #
+pub use std::path::Path;
+use std::fs;
+
+use crate::abt::mapparsing::*;
+
+pub struct MapCluster {
+	pub name : String,
+	pub a_side : Map,
+	pub b_side : Map,
+	pub c_side : Map,
+	pub d_side : Map,
+}
+
+impl MapCluster {
+	pub fn new(nname : &str) -> Self {
+		Self {
+			name : nname.to_string(),
+			a_side : Map::new(&(nname.to_string() + " A-side")),
+			b_side : Map::new(&(nname.to_string() + " B-side")),
+			c_side : Map::new(&(nname.to_string() + " C-side")),
+			d_side : Map::new(&(nname.to_string() + " D-side")),
+		}
+	}
+
+	pub fn load(&mut self, path : &Path) {
+		let mapcluster : Vec<String> = fs::read_to_string(path)
+			.unwrap()
+			.lines()
+			.map(|line| line.to_string())
+			.collect();
+
+		for (i, map) in (0_u8..).zip(mapcluster.into_iter()) {
+			let map_obj : Map = parse_map(&map);
+			match i {
+				0 => { self.a_side = map_obj; },
+				1 => { self.b_side = map_obj; },
+				2 => { self.c_side = map_obj; },
+				3 => { self.d_side = map_obj; },
+				_ => {}
+			};
+		}
+	}
+
+	pub fn save(path : &Path) {
+		
+	}
+}
+
+pub struct Checkpoint {
+	pub id : u8,
+	pub name : String,
+	pub notes : String,
+	pub chokepoints : Vec<Chokepoint>,
+
+	// Practice data
+	pub min_deaths : u16,
+}
+
+impl Checkpoint {
+	pub fn new(nname : &str, nid : u8) -> Self {
+		Self {
+			id : nid,
+			name : nname.to_string(),
+			notes : "".to_string(),
+			chokepoints : Vec::new(),
+			min_deaths : 0
+		}
+	}
+}
+
+
+pub struct Chokepoint {
+	pub id : u8,
+	pub name : String,
+	pub notes : String,
+
+	// Practice data
+	pub highest_backtoback_amount : u16, // weird meassurement, but I'd use that
+}
+
+impl Chokepoint {
+	pub fn new(nname : &str, nid : u8) -> Self {
+		Self {
+			id : nid,
+			name : nname.to_string(),
+			notes : "".to_string(),
+			highest_backtoback_amount : 0
+		}
+	}
+}
+
+
+pub struct CheckpointRange {
+	pub id_start : u8,
+	pub id_end : u8,
+}
+
+impl CheckpointRange {
+	pub fn new(nid_s : u8, nid_e : u8) -> Self {
+		Self {
+			id_start : nid_s,
+			id_end : nid_e
+		}
+	}
+}
+
+
+pub struct Map {
+	// Main data
+	pub name : String,
+	pub tag : String,
+	pub difficulty : u8,
+	pub clear_progress : u8,
+	pub deaths : u32,
+
+	// Strawberries
+	pub strawberry_amount : u16,
+	pub strawberry_collected : u16,
+	
+	// Golden berries refer to 'main-deathlessberries', the type can be changed
+	pub goldberry_exists : bool,
+	pub goldberry_collected : bool,
+	pub goldberry_type : u8,
+	
+	// Silver berries refer to 'sub-deathlessberries', the type can be changed
+	pub silverberry_exists : bool,
+	pub silverberry_amount : u8,
+	pub silverberry_collected : u8,
+	pub silverberry_type : u8,
+
+	// This is a place for the 'Moonberry' or 'Winged Goldberry'
+	pub specialberry_exists : bool,
+	pub specialberry_name : String,
+	pub specialberry_collected : bool,
+
+	// Challenge data
+	pub challenge_activate : bool,
+	pub min_dashes_pb : u16,
+	pub min_dashes_bronze : u16,
+	pub min_dashes_silver : u16,
+	pub min_dashes_gold : u16,
+	pub min_jumps_pb : u16,
+	pub min_jumps_bronze : u16,
+	pub min_jumps_silver : u16,
+	pub min_jumps_gold : u16,
+
+	// Speedrun data
+	pub fastest_time : u64,
+	pub speedrun_bronze : u64,
+	pub speedrun_silver : u64,
+	pub speedrun_gold : u64,
+	
+	// Extra data no one could care less about
+	pub cassette_exists : bool,
+	pub cassette_collected : bool,
+	pub crystalheart_exists : bool,
+	pub crystalheart_name : String,
+	pub crystalheart_collected : bool,
+
+
+	// Here is all the practice data
+	// This is very complex data, that may or may not break when I'll try to parse it
+
+
+	pub pb : u32, // Furthest the user has come
+	pub min_deaths_pb : u32,
+	pub checkpoints : Vec<Checkpoint>,
+	pub range_runs : Vec<CheckpointRange>,
+}
+
+impl Map {
+	pub fn new(nname : &str) -> Self {
+		Self {
+			name : nname.to_string(),
+			tag : "".to_string(),
+			difficulty : 0,
+			clear_progress : 0,
+			deaths : 0,
+			strawberry_amount : 0,
+			strawberry_collected : 0,
+			goldberry_exists : false,
+			goldberry_collected : false,
+			goldberry_type : 0,
+			silverberry_exists : false,
+			silverberry_amount : 0,
+			silverberry_collected : 0,
+			silverberry_type : 0,
+			specialberry_exists : false,
+			specialberry_name : "".to_string(),
+			specialberry_collected : false,
+			challenge_activate : false,
+			min_dashes_pb : 0,
+			min_dashes_bronze : 0,
+			min_dashes_silver : 0,
+			min_dashes_gold : 0,
+			min_jumps_pb : 0,
+			min_jumps_bronze : 0,
+			min_jumps_silver : 0,
+			min_jumps_gold : 0,
+			fastest_time : 0,
+			speedrun_bronze : 0,
+			speedrun_silver : 0,
+			speedrun_gold : 0,
+			cassette_exists : false,
+			cassette_collected : false,
+			crystalheart_exists : false,
+			crystalheart_name : "".to_string(),
+			crystalheart_collected : false,
+			pb : 0,
+			min_deaths_pb : 0,
+			checkpoints : Vec::new(),
+			range_runs : Vec::new(),
+		}
+	}
+}
+
+pub fn present_map(map : &Map) {
+	println!("map {} - {} - {} - {} - {}", map.name, map.tag, map.difficulty, map.clear_progress, map.deaths);
+	println!("str {} - {}", map.strawberry_amount, map.strawberry_collected);
+	println!("gol {} - {} - {}", map.goldberry_exists, map.goldberry_collected, map.goldberry_type);
+	println!("sil {} - {} - {} - {}", map.silverberry_exists, map.silverberry_amount, map.silverberry_collected, map.silverberry_type);
+	println!("spe {} - {} - {}", map.specialberry_exists, map.specialberry_name, map.specialberry_collected);
+	println!("cha {} - {} - {} - {} - {} - {} - {} - {} - {}", map.challenge_activate, map.min_dashes_pb, map.min_dashes_bronze, map.min_dashes_silver, map.min_dashes_gold, map.min_jumps_pb, map.min_jumps_bronze, map.min_jumps_silver, map.min_jumps_gold);
+	println!("frn {} - {} - {} - {}", map.fastest_time, map.speedrun_bronze, map.speedrun_silver, map.speedrun_gold);
+	println!("cry {} - {} - {} - {} - {}", map.cassette_exists, map.cassette_collected, map.crystalheart_exists, map.crystalheart_name, map.crystalheart_collected);
+	println!("pra {} - {} - {} - {} - {}", map.pb, map.min_deaths_pb, map.difficulty, map.clear_progress, map.deaths);
+
+	
+	for checkpoint in &map.checkpoints {
+		println!("  che {} - {} - {} - {}", checkpoint.name, checkpoint.id, checkpoint.notes, checkpoint.min_deaths);
+		for chokepoint in &checkpoint.chokepoints {
+			println!("    cho {} - {} - {} - {}", chokepoint.name, chokepoint.id, chokepoint.notes, chokepoint.highest_backtoback_amount);
+		}
+	}
+
+	for range in &map.range_runs {
+		println!("  ran {} - {}", range.id_start, range.id_end);
+	}
+}
+
+
+# ./src/abt/mod.rs #
+pub mod menus;
+pub mod mapdata;
+pub mod mapparsing;
+
+
+# ./src/abt/menus.rs #
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Menu {
+	Main,
+
+	MapSelect,
+	MapView,
+	MapEdit,
+	MapCreate,
+	MapDelete,
+	MapRename,
+	MapPractice,
+
+	LobbySelect,
+	LobbyView,
+	LobbyEdit,
+	LobbyCreate,
+	LobbyDelete,
+	LobbyRename,
+
+	SavefileSelect,
+	SavefileView,
+	SavefileEdit,
+	SavefileCreate,
+	SavefileDelete,
+	SavefileRename,
+
+	UserSelect,
+	UserView,
+	UserEdit,
+	UserCreate,
+	UserDelete,
+	UserRename,
+
+	ModBrowser,
+	ModInstall,
+	ModManage,
+	ModView,
+
+	FindCelesteExecutable,
+	ChangeCelesteExecutable,
+	EditLaunchOptions,
+	
+	MapCreationSelect,
+	MapCreationCreate,
+	
+	Tier,
+	Achievements,
+	Wiki,
+
+	Out
+}
+
+

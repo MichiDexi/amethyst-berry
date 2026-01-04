@@ -1,0 +1,39 @@
+
+# Current goals #
+[ ] Example String
+[ ] Replace "...exists" and "...collected" booleans with 'Option<bool>'
+[ ] Finish filesystem//CERD*
+[ ] Remove submenus in abt/menus::Menu enum, submenus are handled by menus themselves
+[ ] Add the rest of the menus
+[ ] Finish Input library for controllers
+[ ] Add initialization logic (config, data)
+[X] Make menus use 'Rc<RefCell>', that points to the menu value, instead of wiring it via tick() arguments (very messy and adds repetition)
+[X] Make the "map <-> raw string" parsers
+[X] Create the first menu
+[X] Finish TUI library
+[X] Finish Input library for mouse & keyboard
+
+# Future goals #
+[ ] Add a pure CLI option
+[ ] Speedruns & Challenge integration
+[ ] XP / Tier calculation
+[ ] Importing/Exporting entire savefiles in a compressed state
+[ ] Color customization in config
+[ ] Config parsing
+[ ] Savefile / TAS / Mod manager (In-game)
+[ ] Quicklaunch function
+ |> [ ] Executable searching
+ |> [ ] Options
+     |> [ ] Arguments
+     |> [ ] Celeste / Everest
+[ ] Wiki
+ |> [ ] Bookmarks
+ |> [ ] Link following
+ |> [ ] Reader
+[ ] Users (passwd protected)
+ |> [ ] User comparing
+ |> [ ] Password protection
+
+
+
+*CERD = Create, edit, rename, delete functions. Basic file usage/management
