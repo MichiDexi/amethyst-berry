@@ -16,15 +16,12 @@ pub struct Checkpoint {
 }
 
 impl Checkpoint {
-	pub fn new(nname : &str, silvers_exist : bool) -> Self {
+	pub fn new(nname : &str) -> Self {
 		Self {
 			name : nname.to_string(),
 			notes : Notes::new(),
 			chokepoints : Vec::new(),
-			silver_collected : match silvers_exist {
-				true => Some(false),
-				false => None
-			},
+			silver_collected : None,
 			
 			min_deaths : 0,
 			runs_died : 0,
@@ -154,6 +151,7 @@ pub struct TypedCollectable {
 }
 
 
+
 impl Map {
 	pub fn new() -> Self {
 		Self {
@@ -193,6 +191,8 @@ impl Map {
 		}
 	}
 }
+
+
 
 pub fn present_map(map : &Map) {
 	println!("name: {}", map.name);
@@ -242,6 +242,25 @@ pub fn present_map(map : &Map) {
 	if let Some(v) = &map.speedrun {
 		println!("speedrun: {} {} {} {}", v.pb, v.bronze, v.silver, v.gold);
 	}
+
+	for checkpoint in &map.checkpoints {
+		println!("checkpoint: {} {} {} {} {} {}", checkpoint.name, checkpoint.notes.notes, checkpoint.notes.speedrun_notes, checkpoint.notes.min_dash_notes, checkpoint.notes.min_jump_notes, checkpoint.notes.goldenberry_notes);
+		if let Some(v) = checkpoint.silver_collected {
+			println!("{} {} {} {}", checkpoint.runs_died, checkpoint.runs_passed, checkpoint.min_deaths, v);
+		}
+		else {
+			println!("{} {} {}", checkpoint.runs_died, checkpoint.runs_passed, checkpoint.min_deaths);
+		}
+		for chokepoint in &checkpoint.chokepoints {
+			println!("chokepoint: {} {} {} {} {} {}", chokepoint.name, chokepoint.notes.notes, chokepoint.notes.speedrun_notes, chokepoint.notes.min_dash_notes, chokepoint.notes.min_jump_notes, chokepoint.notes.goldenberry_notes);
+			println!("{} {} {}", chokepoint.runs_died, chokepoint.runs_passed, chokepoint.highest_backtoback_amount);
+		}
+	}
+
+	for run in &map.range_runs {
+		println!("run: {} {}", run.id_start, run.id_end);
+	}
+
 	
 	println!("pb: {}", map.pb);
 	println!("min_deaths_pb: {}", map.min_deaths_pb);
