@@ -63,9 +63,22 @@ impl traits::UserInterface for CheckBox {
 			input.mouse.x, input.mouse.y
 		);
 
-		if self.hovered && input.mouse.lclick {
+		if self.hovered && (input.mouse.lclick || input.actions.confirm) {
 			self.checked = !self.checked;
 		}
+	}
+
+	fn is_hovered(&self) -> bool {
+		self.hovered
+	}
+
+	fn set_position(&mut self, x : u16, y : u16) {
+		self.x = x;
+		self.y = y;
+	}
+
+	fn set_color(&mut self, color : bool) {
+		self.color.color_enabled = color;
 	}
 }
 

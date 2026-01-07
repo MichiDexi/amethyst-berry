@@ -86,6 +86,19 @@ impl traits::UserInterface for InputField {
 			}
 		}
 	}
+
+	fn is_hovered(&self) -> bool {
+		self.hovered
+	}
+
+	fn set_position(&mut self, x : u16, y : u16) {
+		self.x = x;
+		self.y = y;
+	}
+
+	fn set_color(&mut self, color : bool) {
+		self.color.color_enabled = color;
+	}
 }
 
 impl InputField {

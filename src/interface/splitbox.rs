@@ -122,6 +122,19 @@ impl traits::UserInterface for SplitBox {
 		}
 		self.hovered = 255;
 	}
+
+	fn is_hovered(&self) -> bool {
+		self.hovered != 255
+	}
+
+	fn set_position(&mut self, x : u16, y : u16) {
+		self.x = x;
+		self.y = y;
+	}
+
+	fn set_color(&mut self, color : bool) {
+		self.color.color_enabled = color;
+	}
 }
 
 impl SplitBox {

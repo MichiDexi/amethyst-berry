@@ -32,6 +32,7 @@ const REPEAT_DELAY : Duration = Duration::from_millis(250); // Wait before first
 const REPEAT_RATE : Duration = Duration::from_millis(50);   // Interval between repeats
 
 pub struct Mouse { // Has all the mouse attributes
+	pub enabled : bool,
 	pub x : u16,
 	pub y : u16,
 	pub lclick : bool,
@@ -46,6 +47,15 @@ pub struct Keyboard {
 	pub just_pressed : HashSet<KeyCode>, // What was pressed this frame
 	pub last_press_time : std::collections::HashMap<KeyCode, Instant>,
 	// Length of press (used to calculate stuff)
+}
+
+pub struct Actions {
+	pub up : bool,
+	pub down : bool,
+	pub left : bool,
+	pub right : bool,
+	pub confirm : bool,
+	pub deny : bool,
 }
 
 pub struct Window { // Most of these don't even get updated, so I don't know why I made this at all
@@ -75,6 +85,7 @@ pub struct InputHandler {
 	pub mouse : Mouse,
 	pub keyboard : Keyboard,
 	pub window : Window,
+	pub actions : Actions,
 }
 
 impl InputHandler {
@@ -82,6 +93,7 @@ impl InputHandler {
 		let termsize = crossterm::terminal::size().unwrap();
 		Self {
 			mouse : Mouse {
+				enabled : true,
 				x : 0,
 				y : 0,
 				lclick : false,
@@ -99,6 +111,14 @@ impl InputHandler {
 				focused : true, 
 				width : termsize.0,
 				height : termsize.1,
+			},
+			actions : Actions {
+				up : false,
+				down : false,
+				left : false,
+				right : false,
+				confirm : false,
+				deny : false,
 			}
 		}
 	}
@@ -154,14 +174,48 @@ impl InputHandler {
 		        false
 		    }
 		});
+
+		Self::handle_keybinds(&self.keyboard, &mut self.actions);
 		
 		Ok(())
+	}
+
+	fn handle_keybinds(keyboard : &Keyboard, actions : &mut Actions) {
+
+		actions.up = handle_keybind(keyboard,
+		vec!(&KeyCode::Char('w'), &KeyCode::Up, &KeyCode::Char('k')));
+
+		actions.down = handle_keybind(keyboard,
+		vec!(&KeyCode::Char('s'), &KeyCode::Down, &KeyCode::Char('j')));
+
+		actions.left = handle_keybind(keyboard,
+		vec!(&KeyCode::Char('a'), &KeyCode::Left, &KeyCode::Char('h')));
+
+		actions.right = handle_keybind(keyboard,
+		vec!(&KeyCode::Char('d'), &KeyCode::Right, &KeyCode::Char('l')));
+
+		actions.confirm = handle_keybind(keyboard,
+		vec!(&KeyCode::Char('y'), &KeyCode::Char(' '), &KeyCode::Char('z')));
+
+		actions.deny = handle_keybind(keyboard,
+		vec!(&KeyCode::Char('x'), &KeyCode::Backspace));
+
+		fn handle_keybind(keyboard : &Keyboard, keys : Vec<&KeyCode>) -> bool {
+			for key in keys {
+				if keyboard.just_pressed.contains(key) {
+					return true;
+				}
+			}
+			false
+		}
 	}
 
 	// I wonder what 'handle_mouse' does...
 	// I think it might use the 'mouse' struct, I'm not sure...
 	fn handle_mouse(event : MouseEvent, mouse : &mut Mouse) {
-	
+		if !mouse.enabled {
+			return;
+		}
 
 		
 		mouse.x = event.column;

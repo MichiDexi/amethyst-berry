@@ -24,6 +24,7 @@ pub struct Label {
 
 	// Event polling
 	pub hovered : bool,
+	pub clicked : bool,
 }
 
 
@@ -34,10 +35,10 @@ impl traits::UserInterface for Label {
 		self.bgcolor.write_color(out, true);
 
 		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
-		utils::repeat(out, ' ', self.size);
-		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
-		write!(out, "{}", utils::shorten_text(&self.text, self.size)).unwrap();
-
+		let txt = utils::shorten_text(&self.text, self.size);
+		write!(out, "{}", txt).unwrap();
+		utils::repeat(out, ' ', self.size - txt.len() as u16);
+		
 		write!(out, "\x1b[0m").unwrap();
 
 		stdout().flush().unwrap();
@@ -56,14 +57,29 @@ impl traits::UserInterface for Label {
 			self.size, 1,
 			input.mouse.x, input.mouse.y
 		);
+
+		self.clicked = self.hovered && input.mouse.lclick;
+	}
+
+	fn is_hovered(&self) -> bool {
+		self.hovered
+	}
+
+	fn set_position(&mut self, x : u16, y : u16) {
+		self.x = x;
+		self.y = y;
+	}
+
+	fn set_color(&mut self, color : bool) {
+		self.color.color_enabled = color;
 	}
 }
 
 impl Label {
-	pub fn new(nx : u16, ny : u16, nsize : u16, ntext : &str) -> Self {
+	pub fn new(nsize : u16, ntext : &str) -> Self {
 		Label {
-			x : nx,
-			y : ny,
+			x : 0,
+			y : 0,
 			size : nsize,
 			text : ntext.to_string(),
 
@@ -92,6 +108,7 @@ impl Label {
 			},
 			
 			hovered : false,
+			clicked : false,
 		}
 	}
 }

@@ -1,12 +1,12 @@
 
 # Current goals #
 [ ] Example String
-[ ] Replace "...exists" and "...collected" booleans with 'Option<bool>'
-[ ] Finish filesystem//CERD*
+[X] Replace "...exists" and "...collected" booleans with 'Option<bool>'
+[-] Finish filesystem//CERD*
 [ ] Remove submenus in abt/menus::Menu enum, submenus are handled by menus themselves
 [ ] Add the rest of the menus
 [ ] Finish Input library for controllers
-[ ] Add initialization logic (config, data)
+[X] Add initialization logic (config, data)
 [X] Make menus use 'Rc<RefCell>', that points to the menu value, instead of wiring it via tick() arguments (very messy and adds repetition)
 [X] Make the "map <-> raw string" parsers
 [X] Create the first menu

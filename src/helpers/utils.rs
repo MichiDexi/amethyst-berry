@@ -22,6 +22,7 @@ pub struct Color {
 impl Color {
 	pub fn write_color(&self, out : &mut Stdout, background : bool) {
 		if !self.color_enabled {
+			write!(out, "\x1b[3{}m", self.color).unwrap();
 			return;
 		}
 	
@@ -35,7 +36,7 @@ impl Color {
 		}
 		else {
 			if self.bright {
-				layer += 60; // Convert to bright
+				layer += 6; // Convert to bright
 			}
 			write!(out, "\x1b[{}{}m", layer, self.color).unwrap();
 		}
