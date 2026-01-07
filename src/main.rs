@@ -23,7 +23,7 @@ pub mod helpers;
 pub mod menus;
 pub mod abt;
 
-const TARGET_FPS : f64 = 60.0;
+const TARGET_FPS : f64 = 30.0;
 
 fn main() -> io::Result<()> {
 	// Initialize everything, including:
@@ -36,7 +36,7 @@ fn main() -> io::Result<()> {
 	let mut out = stdout();
 	let menu = Rc::new(RefCell::new(abt::menus::Menu::Main));
 	let mut mainmenu = menus::mainmenu::MainMenu::init(Rc::clone(&menu));
-	mainmenu.init_draw(&mut out);
+	mainmenu.init_draw(&input, &mut out);
 	
 	// Loop and use the program:
 	// Switch between menus and interact with the filesystem

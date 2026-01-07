@@ -2,16 +2,16 @@
 set -e
 
 TERM="kitty"
-BASE="$HOME/abt/"
+BASE="$HOME/workspace/abt/"
 
 spawn() {
   local ws="$1"
   local dir="$2"
   local cmd="$3"
 
-	sleep 0.5
+	sleep 0.3
   hyprctl dispatch workspace "$ws"
-  sleep 0.5
+  sleep 0.3
 
   if [[ -n "$cmd" ]]; then
     kitty --hold bash -lc "\"cd \\\"$dir\\\" && $cmd\"" &
