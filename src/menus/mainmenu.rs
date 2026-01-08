@@ -13,7 +13,9 @@ use crate::{
 		traits
 	},
 	helpers::input,
+	helpers::utils,
 	abt::menus,
+	menus::menu_traits,
 };
 
 
@@ -28,15 +30,15 @@ pub struct MainMenu {
 	menu : Rc<RefCell<menus::Menu>>
 }
 
-impl MainMenu {
-	pub fn init(menu_ref : Rc<RefCell<menus::Menu>>) -> Self {
+impl menu_traits::Menu for MainMenu {
+	fn init(menu_ref : Rc<RefCell<menus::Menu>>) -> Self {
 		let maps_label : label::Label = label::Label::new(12, "Maps");
 		let mods_label : label::Label = label::Label::new(12, "Mods");
 		let wiki_label : label::Label = label::Label::new(12, "Wiki");
 		let launch_label : label::Label = label::Label::new(12, "Launch");
 		let speedruns_label : label::Label = label::Label::new(12, "Speedruns");
 		let challenges_label : label::Label = label::Label::new(12, "Challenges");
-		let tier_label : textbox::Box = textbox::Box::new(15, 3, 7, 7);
+		let tier_label : textbox::Box = textbox::Box::new(15, 3, 5, 3);
 		
 		Self {
 			maps : maps_label,
@@ -50,29 +52,10 @@ impl MainMenu {
 		}
 	}
 
-	pub fn init_draw(&mut self, input : &input::InputHandler, out : &mut Stdout) {
+	fn redraw(&mut self, input : &input::InputHandler, out : &mut Stdout) {
 		write!(out, "\x1b[2J").unwrap();
 
-		object(&mut self.maps, input, &self.menu, menus::Menu::UserSelect,
-		(2, 2), (3, 2), out);
-
-		object(&mut self.mods, input, &self.menu, menus::Menu::UserSelect,
-		(2, 4), (3, 4), out);
-		
-		object(&mut self.wiki, input, &self.menu, menus::Menu::UserSelect,
-		(2, 6), (3, 6), out);
-		
-		object(&mut self.launch, input, &self.menu, menus::Menu::UserSelect,
-		(2, 8), (3, 8), out);
-
-		object(&mut self.speedruns, input, &self.menu, menus::Menu::UserSelect,
-		(2, 10), (3, 10), out);
-
-		object(&mut self.challenges, input, &self.menu, menus::Menu::UserSelect,
-		(2, 12), (3, 12), out);
-
-		object(&mut self.tier, input, &self.menu, menus::Menu::Out,
-		(15, 3), (15, 3), out);
+		self.update(input, out);
 
 		traits::UserInterface::draw(&self.maps, out);
 		traits::UserInterface::draw(&self.mods, out);
@@ -83,68 +66,37 @@ impl MainMenu {
 		traits::UserInterface::draw(&self.tier, out);
 	}
 
-	pub fn tick(&mut self, input : &input::InputHandler, out : &mut Stdout) {
+	fn tick(&mut self, input : &input::InputHandler, out : &mut Stdout) {
 
-		object(&mut self.maps, input, &self.menu, menus::Menu::UserSelect,
-		(2, 2), (3, 2), out);
+		if input.window.request_full_redraw {
+			self.redraw(input, out);
+		}
 
-		object(&mut self.mods, input, &self.menu, menus::Menu::UserSelect,
-		(2, 4), (3, 4), out);
-		
-		object(&mut self.wiki, input, &self.menu, menus::Menu::UserSelect,
-		(2, 6), (3, 6), out);
-		
-		object(&mut self.launch, input, &self.menu, menus::Menu::UserSelect,
-		(2, 8), (3, 8), out);
-
-		object(&mut self.speedruns, input, &self.menu, menus::Menu::UserSelect,
-		(2, 10), (3, 10), out);
-
-		object(&mut self.challenges, input, &self.menu, menus::Menu::UserSelect,
-		(2, 12), (3, 12), out);
-
-		object(&mut self.tier, input, &self.menu, menus::Menu::Out,
-		(15, 3), (15, 3), out);
+		self.update(input, out);
 	}
 }
 
-fn object(
-	object : &mut impl traits::UserInterface, input : &input::InputHandler,
-	menu_reference : &Rc<RefCell<menus::Menu>>, menu_clicked : menus::Menu,
-	norm : (u16, u16), hover : (u16, u16), 
-	out : &mut Stdout
-) {
-	let prev_state : bool = object.is_hovered();
-	object.set_position(norm.0, norm.1);
-	traits::UserInterface::update(object, input);
-	let redraw_requested : bool =
-		object.is_hovered() != prev_state;
+impl MainMenu {
+	fn update(&mut self, input : &input::InputHandler, out : &mut Stdout) {
+		utils::object(&mut self.maps, input, &self.menu, menus::Menu::UserSelect,
+		(2, 2), (3, 2), 0, out);
 
-	if redraw_requested {
-
-		if prev_state {
-			object.set_position(hover.0, hover.1);
-		}
-		else {
-			object.set_position(norm.0, norm.1);
-		}
+		utils::object(&mut self.mods, input, &self.menu, menus::Menu::UserSelect,
+		(2, 4), (3, 4), 0, out);
 		
-		traits::UserInterface::clear(object, out);
-	}
-	
-	if object.is_hovered() {
-		object.set_position(hover.0, hover.1);
-		object.set_color(true);
-		if input.mouse.lclick {
-			*menu_reference.borrow_mut() = menu_clicked;
-		}
-	}
-	else {
-		object.set_color(false);
-		object.set_position(norm.0, norm.1);
-	}
-	
-	if redraw_requested {
-		traits::UserInterface::draw(object, out);
+		utils::object(&mut self.wiki, input, &self.menu, menus::Menu::UserSelect,
+		(2, 6), (3, 6), 0, out);
+		
+		utils::object(&mut self.launch, input, &self.menu, menus::Menu::UserSelect,
+		(2, 8), (3, 8), 0, out);
+
+		utils::object(&mut self.speedruns, input, &self.menu, menus::Menu::UserSelect,
+		(2, 10), (3, 10), 0, out);
+
+		utils::object(&mut self.challenges, input, &self.menu, menus::Menu::UserSelect,
+		(2, 12), (3, 12), 0, out);
+
+		utils::object(&mut self.tier, input, &self.menu, menus::Menu::Out,
+		(-7, 3), (-7, 3), 1, out);
 	}
 }

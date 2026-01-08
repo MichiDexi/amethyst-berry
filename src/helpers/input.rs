@@ -62,6 +62,9 @@ pub struct Window { // Most of these don't even get updated, so I don't know why
 	pub focused : bool,
 	pub width : u16,
 	pub height : u16,
+	pub width_prev : u16,
+	pub height_prev : u16,
+	pub request_full_redraw : bool,
 }
 
 
@@ -111,6 +114,9 @@ impl InputHandler {
 				focused : true, 
 				width : termsize.0,
 				height : termsize.1,
+				width_prev : termsize.0,
+				height_prev : termsize.1,
+				request_full_redraw : true,
 			},
 			actions : Actions {
 				up : false,
@@ -124,14 +130,22 @@ impl InputHandler {
 	}
 
 	pub fn update(&mut self) -> io::Result<()> { // This polls inputs
-
+		let now = Instant::now();
+		
 		self.mouse.lclick = false;
 		self.mouse.rclick = false;
-		let now = Instant::now();
 		self.mouse.scroll = 0;
+		
 		self.keyboard.just_pressed.clear();
 		
+		let (w, h) = crossterm::terminal::size()?;
+		let resized = self.window.width != w || self.window.height != h;
+		self.window.width = w;
+		self.window.height = h;
+		self.window.request_full_redraw = resized;
+		
 		while poll(Duration::from_millis(0))? {
+
 			match read()? {
 				Event::FocusGained => self.window.focused = true,
 				Event::FocusLost => self.window.focused = false,

@@ -76,9 +76,9 @@ impl traits::UserInterface for Slider {
 		self.hovered
 	}
 
-	fn set_position(&mut self, x : u16, y : u16) {
-		self.x = x;
-		self.y = y;
+	fn set_position(&mut self, x : i16, y : i16, anchor : u8, size : (u16, u16)) {
+		self.x = (x + if anchor == 1 || anchor == 3 { size.0 } else {0} as i16) as u16;
+		self.y = (y + if anchor == 2 || anchor == 3 { size.1 } else {0} as i16) as u16;
 	}
 
 	fn set_color(&mut self, _ : bool) { }
