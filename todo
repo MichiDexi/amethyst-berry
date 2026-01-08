@@ -2,8 +2,8 @@
 # Current goals #
 [ ] Example String
 [X] Replace "...exists" and "...collected" booleans with 'Option<bool>'
-[-] Finish filesystem//CERD*
-[ ] Remove submenus in abt/menus::Menu enum, submenus are handled by menus themselves
+[X] Finish filesystem//CERD*
+[X] Remove submenus in abt/menus::Menu enum, submenus are handled by menus themselves
 [ ] Add the rest of the menus
 [ ] Finish Input library for controllers
 [X] Add initialization logic (config, data)
