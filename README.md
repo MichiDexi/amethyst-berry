@@ -19,14 +19,14 @@ From notes for maps to a golden practice helper, this can help you in more ways 
 
 ## Installation
 
-Method 1: Download a release on github
+### Method 1: Download a release on github
 
 Only works on Windows and Linux
 
 Under "Releases", click latest and pick the version you need
 
 
-Method 2: Compiling it yourself
+### Method 2: Compiling it yourself
 
 You'll need Rust to compile this project, visit https://rust-lang.org/tools/install/ for help
 
@@ -34,7 +34,14 @@ Clone the project using "git clone", cd into the project and run "cargo build --
 
 The output execuable should be in 'target/$TARGET/', $TARGET represents your machines target (x86_64-pc-windows-msvc, for example)
 
-Alternatively, you can run the 'build.sh' script. The output executable will be in 'build/'
+
+### Method 2.5: Compiling it yourself, but using the script
+
+You'll need Rust to compile this project, visit https://rust-lang.org/tools/install/ for help
+
+Clone the project using "git clone", cd into the project and the 'build.sh' script
+
+The output executable will be in 'build/'
 
 Note: build.sh only works for Windows and Linux, for it to work on MacOS, you need to modify the script
 
