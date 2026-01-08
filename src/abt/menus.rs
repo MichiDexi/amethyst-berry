@@ -4,6 +4,7 @@ pub enum Menu {
 
 	MapSelect,
 	MapView,
+	PracticeView,
 	LobbySelect,
 	SavefileSelect,
 	UserSelect,
@@ -12,9 +13,11 @@ pub enum Menu {
 	ModManage,
 
 	CelesteExecutable,
-	
+	Launch,
+
+	Speedruns,
 	Tier,
-	Achievements,
+	Challenges,
 	Wiki,
 
 	Out

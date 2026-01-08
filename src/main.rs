@@ -12,6 +12,10 @@ use std::{
 		Write
 	},
 };
+use crossterm::{
+	execute,
+	terminal::{self, ClearType},
+};
 // use std::fs;
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -23,40 +27,45 @@ pub mod helpers;
 pub mod menus;
 pub mod abt;
 
+use crate::menus::menu_traits::Menu;
+
 const TARGET_FPS : f64 = 30.0;
 
 fn main() -> io::Result<()> {
-	// Initialize everything, including:
-	// InputHandler, Main menu
+	// initialize everything needed, like:
+	// InputHandler, menus
 	helpers::input::init()?;
 	let framerate : Duration = Duration::from_secs_f64(1.0 / TARGET_FPS);
 	let mut input : helpers::input::InputHandler = helpers::input::InputHandler::new();
 
-	// Initialize variables that persist between menu switches
+	// initialize variables that persist between menus
 	let mut out = stdout();
 	let menu = Rc::new(RefCell::new(abt::menus::Menu::Main));
 	let mut mainmenu = menus::mainmenu::MainMenu::init(Rc::clone(&menu));
-	mainmenu.init_draw(&input, &mut out);
+	mainmenu.redraw(&input, &mut out);
 	
-	// Loop and use the program:
-	// Switch between menus and interact with the filesystem
+	// the actual program
 	loop {
-		// Set frame up
+		// setup for the frame
+		// includes frame timing, input polling and redraw request accepting
 		let now : Instant = Instant::now();
 		input.update()?;
+		if input.window.request_full_redraw {
+			execute!(
+			    out,
+			    terminal::Clear(ClearType::All)
+			)?;
+		}
 
-		// The actual frame
+		// menu checking and executing their tick() behavior
 		let cmenu = *menu.borrow();
 		match cmenu {
 			abt::menus::Menu::Main => mainmenu.tick(&input, &mut out),
-			abt::menus::Menu::Out => break,
-			_ => {}
-		}
-		if *menu.borrow() == abt::menus::Menu::Out {
-			break;
+			_ => break,
 		}
 
-		// Frame time management for consistent framerate
+		// flushing buffer and wait for the rest of
+		// the frame to keep framerate stable
 		stdout().flush().unwrap();
 		let frame_duration = Instant::now().duration_since(now);
 		if frame_duration < framerate {
@@ -64,8 +73,9 @@ fn main() -> io::Result<()> {
 		}
 	}
 
-	// The loop has been exited, undo initialization of
-	// InputHandler and screen extras
+	// the loop has exited, undo initialization of
+	// InputHandler and screen extras because
+	// they harm the terminal for no reason
 	helpers::input::uninit()?;
 	Ok(())
 }

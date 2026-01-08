@@ -6,6 +6,6 @@ pub trait UserInterface {
 	fn clear(&self, out : &mut Stdout);
 	fn update(&mut self, input : &input::InputHandler);
 	fn is_hovered(&self) -> bool;
-	fn set_position(&mut self, x : u16, y : u16);
+	fn set_position(&mut self, x : i16, y : i16, anchor : u8, size : (u16, u16));
 	fn set_color(&mut self, color : bool);
 }
