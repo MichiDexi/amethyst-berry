@@ -68,6 +68,7 @@ fn main() -> io::Result<()> {
 		}
 		new_menu = *menu.borrow();
 		if new_menu != cmenu {
+			input.update()?; // Second update to disallow clicking in a menu that hasn't appeared yet
 			match new_menu {
 				abt::menus::Menu::Main => mainmenu.redraw(&input, &mut out),
 				abt::menus::Menu::UserSelect => userselect.redraw(&input, &mut out),

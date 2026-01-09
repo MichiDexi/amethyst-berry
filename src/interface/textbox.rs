@@ -88,7 +88,7 @@ impl traits::UserInterface for Box {
 		);
 	}
 
-	fn is_hovered(&self) -> bool {
+	fn redraw_requested(&self) -> bool {
 		self.hovered
 	}
 
