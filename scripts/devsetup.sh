@@ -35,4 +35,4 @@ spawn 3 "$BASE/src/helpers/"
 
 # Workspace 4 – Documentation and other stuff
 spawn 4 "$BASE/"
-spawn 4 "$BASE/documentation/"
+spawn 4 "$BASE/docs/"

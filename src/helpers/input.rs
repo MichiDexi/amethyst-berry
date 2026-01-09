@@ -46,6 +46,7 @@ pub struct Keyboard {
 	pub pressed : HashSet<KeyCode>, // What is pressed currently
 	pub just_pressed : HashSet<KeyCode>, // What was pressed this frame
 	pub last_press_time : std::collections::HashMap<KeyCode, Instant>,
+	pub key_events : Vec<KeyEvent>
 	// Length of press (used to calculate stuff)
 }
 
@@ -109,6 +110,7 @@ impl InputHandler {
 				pressed : HashSet::new(),
 				just_pressed : HashSet::new(),
 				last_press_time : std::collections::HashMap::new(),
+				key_events : Vec::new()
 			},
 			window : Window {
 				focused : true, 
@@ -137,6 +139,7 @@ impl InputHandler {
 		self.mouse.scroll = 0;
 		
 		self.keyboard.just_pressed.clear();
+		self.keyboard.key_events.clear();
 		
 		let (w, h) = crossterm::terminal::size()?;
 		let resized = self.window.width != w || self.window.height != h;
@@ -145,20 +148,13 @@ impl InputHandler {
 		self.window.request_full_redraw = resized;
 		
 		while poll(Duration::from_millis(0))? {
-
 			match read()? {
 				Event::FocusGained => self.window.focused = true,
 				Event::FocusLost => self.window.focused = false,
 				Event::Mouse(event) => { Self::handle_mouse(event, &mut self.mouse); },
 				Event::Resize(width, height) => {self.window.width = width; self.window.height = height},
-				Event::Key(KeyEvent { code, kind, .. }) => {
-					if matches!(kind, KeyEventKind::Press | KeyEventKind::Repeat) {
-						if !self.keyboard.pressed.contains(&code) {
-							self.keyboard.just_pressed.insert(code);
-							self.keyboard.last_press_time.insert(code, Instant::now());
-						}
-						self.keyboard.pressed.insert(code);
-					}
+				Event::Key(key) => {
+					self.keyboard.key_events.push(key);
 				}
 				_ => {}
 			}

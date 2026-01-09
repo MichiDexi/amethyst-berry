@@ -1,14 +1,13 @@
 use crossterm::{
 	execute,
-	event::{
-		KeyCode,
-	},
+	event::KeyCode,
+	event::KeyEvent,
+	event::KeyEventKind
 };
-pub use std::io::{
+use std::io::{
 	Stdout,
 	Write,
 	stdout,
-	self,
 };
 
 use crate::helpers::utils;
@@ -18,8 +17,10 @@ use crate::interface::traits;
 pub struct InputField {
 	// Size and position
 	pub x : u16, pub y : u16,
+	pub tx : u16, pub ty : u16,
 	pub size : u16,
 	pub text : String,
+	pub output : String,
 
 	// Extra options
 	pub color : utils::Color,
@@ -41,6 +42,11 @@ impl traits::UserInterface for InputField {
 		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
 		write!(out, "{}", utils::shorten_text(&self.text, self.size)).unwrap();
 
+		execute!(out, crossterm::cursor::MoveTo(self.tx, self.ty)).unwrap();
+		utils::repeat(out, ' ', self.size);
+		execute!(out, crossterm::cursor::MoveTo(self.tx, self.ty)).unwrap();
+		write!(out, "{}", utils::shorten_text(&self.output, self.size)).unwrap();
+
 		write!(out, "\x1b[0m").unwrap();
 
 		stdout().flush().unwrap();
@@ -61,29 +67,8 @@ impl traits::UserInterface for InputField {
 		);
 
 		if self.hovered {
-			// Cursor Movement
-			if input.keyboard.just_pressed(KeyCode::Left) && self.cursor != 0 {
-				self.cursor -= 1;
-			}
-			if input.keyboard.just_pressed(KeyCode::Right) && self.cursor != self.text.len() as u16 {
-				self.cursor += 1;
-			}
-
-			// Special keys
-			if input.keyboard.just_pressed(KeyCode::Backspace) && self.cursor != 0 {
-				self.text.remove((self.cursor - 1) as usize);
-				self.cursor -= 1;
-			}
-			if input.keyboard.just_pressed(KeyCode::Delete) && self.cursor != self.text.len() as u16 {
-				self.text.remove((self.cursor) as usize);
-			}
-
-			for key in input.keyboard.just_pressed.iter() {
-				if let KeyCode::Char(c) = key {
-					self.text.insert(self.cursor as usize, *c);
-					self.cursor += 1;
-				}
-			}
+			read_line_from_keys(&input.keyboard.key_events, &mut self.output);
+			self.output = self.output.trim().to_string();
 		}
 	}
 
@@ -102,12 +87,19 @@ impl traits::UserInterface for InputField {
 }
 
 impl InputField {
-	fn new(nx : u16, ny : u16, ntext : u16) -> Self {
+	pub fn new(
+		nx : u16, ny : u16,
+		ntx : u16, nty : u16,
+		nsize : u16, ntext : &str) -> Self
+	{
 		InputField {
 			x : nx,
 			y : ny,
-			size : ntext,
-			text : "".to_string(),
+			tx : ntx,
+			ty : nty,
+			size : nsize,
+			text : ntext.to_string(),
+			output : "".to_string(),
 
 			color : utils::Color {
 				color_enabled : true,
@@ -137,4 +129,27 @@ impl InputField {
 			cursor : 0
 		}
 	}
+}
+
+fn read_line_from_keys(
+	events : &[KeyEvent],
+	buffer : &mut String,
+) -> Option<String> {
+    for event in events {
+        if event.kind != KeyEventKind::Press {
+            continue;
+        }
+
+        match event.code {
+            KeyCode::Char(c) => buffer.push(c),
+            KeyCode::Backspace => { buffer.pop(); }
+            KeyCode::Enter => {
+                let line = buffer.clone();
+                buffer.clear();
+                return Some(line);
+            }
+            _ => {}
+        }
+    }
+    None
 }
