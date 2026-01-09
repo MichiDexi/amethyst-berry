@@ -74,3 +74,18 @@ pub fn delete(name : &str) -> io::Result<()> {
 
 	Ok(())
 }
+
+pub fn list() -> Vec<String> {
+	let mut output : Vec<String> = Vec::new();
+	if let Some(path) = dirs::savedata_dir() &&
+		let Ok(entries) = fs::read_dir(path)
+	{
+		for entry in entries.flatten() {
+			let path = entry.path();
+			if path.is_dir() && let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+				output.push(name.to_string());
+			}
+		}
+	}
+	output
+}

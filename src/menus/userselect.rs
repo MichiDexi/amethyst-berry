@@ -32,9 +32,8 @@ impl menu_traits::Menu for UserSelect {
 		let deco_box : textbox::Box = textbox::Box::new(3, 1, 5, 5);
 		let tier_label : textbox::Box = textbox::Box::new(15, 3, 5, 3);
 
-		for i in 0..255 {
-			user_list.items.push(i.to_string());
-		}
+		user_list.items = crate::abt::fs::users::list();
+		
 		
 		Self {
 			users : user_list,
