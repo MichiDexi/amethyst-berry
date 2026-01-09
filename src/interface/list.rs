@@ -22,9 +22,11 @@ pub struct List {
 	// Extra options
 	pub color : utils::Color,
 	pub color_hovered : utils::Color,
+	pub color_selected : utils::Color,
 
 	// Event polling
 	pub hovered : Option<u16>,
+	pub selected : Option<u16>,
 
 	// Internal
 	index : u16,
@@ -38,8 +40,11 @@ impl traits::UserInterface for List {
 			if self.index+i >= self.items.len() as u16 {
 				break;
 			}
-			
-			if let Some(v) = self.hovered && v == self.index+i {
+
+			if let Some(v) = self.selected && v == self.index+i {
+				self.color_selected.write_color(out, false);
+			}
+			else if let Some(v) = self.hovered && v == self.index+i {
 				self.color_hovered.write_color(out, false);
 			}
 			else {
@@ -67,8 +72,16 @@ impl traits::UserInterface for List {
 			self.x, self.y,
 			self.width, self.height,
 			input.mouse.x, input.mouse.y
-		) { // This is true when the mouse is hovering something
+		) {
 			self.hovered = Some(input.mouse.y + self.index - self.y);
+			if input.mouse.lclick {
+				if self.selected == Some(input.mouse.y + self.index - self.y) {
+					self.selected = None;
+				}
+				else {
+					self.selected = Some(input.mouse.y + self.index - self.y);
+				}
+			}
 		}
 		else {
 			self.hovered = None;
@@ -142,6 +155,17 @@ impl List {
 			color_hovered : utils::Color {
 				color_enabled : true,
 				color : 6,
+				bright : true,
+
+				truecolor : false,
+				red : 0,
+				green : 0,
+				blue : 0,
+			},
+
+			color_selected : utils::Color {
+				color_enabled : true,
+				color : 6,
 				bright : false,
 
 				truecolor : false,
@@ -151,6 +175,7 @@ impl List {
 			},
 
 			hovered : None,
+			selected : None,
 			index : 0,
 
 			redraw_timer : 0

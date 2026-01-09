@@ -8,6 +8,7 @@ use std::{
 };
 use crate::{
 	interface::{
+		label,
 		list,
 		textbox,
 		traits,
@@ -23,7 +24,7 @@ use crate::{
 pub struct UserSelect {
 	users : list::List,
 	decoration : textbox::Box,
-	create : inputfield::InputField,
+	create : label::Label,
 	rename : inputfield::InputField,
 	delete : inputfield::InputField,
 	tier : textbox::Box,
@@ -36,6 +37,8 @@ impl menu_traits::Menu for UserSelect {
 		let deco_box : textbox::Box = textbox::Box::new(3, 1, 5, 5);
 		let tier_label : textbox::Box = textbox::Box::new(15, 3, 5, 3);
 
+		let create_label : label::Label = label::Label::new(8, " Create");
+		
 		let create_if : inputfield::InputField = inputfield::InputField::new(0, 0, 10);
 		let rename_if : inputfield::InputField = inputfield::InputField::new(0, 0, 10);
 		let delete_if : inputfield::InputField = inputfield::InputField::new(0, 0, 10);
@@ -46,7 +49,7 @@ impl menu_traits::Menu for UserSelect {
 		Self {
 			users : user_list,
 			decoration : deco_box,
-			create : create_if,
+			create : create_label,
 			rename : rename_if,
 			delete : delete_if,
 			tier : tier_label,
@@ -61,6 +64,7 @@ impl menu_traits::Menu for UserSelect {
 
 		traits::UserInterface::draw(&self.users, out);
 		traits::UserInterface::draw(&self.decoration, out);
+		traits::UserInterface::draw(&self.create, out);
 		traits::UserInterface::draw(&self.tier, out);
 	}
 
