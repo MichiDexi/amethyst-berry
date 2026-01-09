@@ -137,14 +137,14 @@ pub fn object(
 	norm : (i16, i16), hover : (i16, i16), anchor : u8,
 	out : &mut Stdout
 ) {
-	let prev_state : bool = object.is_hovered();
+	let prev_state : bool = object.redraw_requested();
 	object.set_position(
 		norm.0, norm.1,
 		anchor, (input.window.width, input.window.height)
 	);
 	traits::UserInterface::update(object, input);
 	let redraw_requested : bool =
-		object.is_hovered() != prev_state;
+		object.redraw_requested() != prev_state;
 
 	if redraw_requested {
 		if prev_state {
@@ -163,7 +163,7 @@ pub fn object(
 		traits::UserInterface::clear(object, out);
 	}
 	
-	if object.is_hovered() {
+	if object.redraw_requested() {
 		object.set_position(
 			hover.0, hover.1,
 			anchor, (input.window.width, input.window.height)

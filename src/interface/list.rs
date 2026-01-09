@@ -69,28 +69,34 @@ impl traits::UserInterface for List {
 		) { // This is true when the mouse is hovering something
 			self.hovered = input.mouse.y + self.index - self.y + 1; // +1 because 0 is nothing, 1 is the first etc.
 		}
-
-		if input.mouse.scroll == 0 {
+/*
+		if input.mouse.scroll == 0 ||
+			self.height as usize >= self.items.len()
+		{
 			return;
 		}
 
-		if (self.index as i32 - input.mouse.scroll as i32) < 0 {
-			self.index = 0;
+		if input.mouse.scroll as i32 == 1 &&
+			self.index == 0
+		{
+			return;
 		}
-		else if self.index as i32 - input.mouse.scroll as i32 >= self.items.len() as i32 - self.height as i32 {
-			self.index = self.items.len() as u16 - self.height;
+
+		if input.mouse.scroll as i32 == -1 &&
+			self.index == self.items.len() as u16
+		{
+			return;
 		}
-		else {
-			match input.mouse.scroll {
-				1 => self.index -= 1,
-				-1 => self.index += 1,
-				_ => {}
-			}
+*/
+		match input.mouse.scroll {
+			1 => self.index -= 1,
+			-1 => self.index += 1,
+			_ => {}
 		}
 	}
 
-	fn is_hovered(&self) -> bool {
-		self.hovered != 0
+	fn redraw_requested(&self) -> bool {
+		true
 	}
 
 	fn set_position(&mut self, x : i16, y : i16, anchor : u8, size : (u16, u16)) {
@@ -104,7 +110,7 @@ impl traits::UserInterface for List {
 }
 
 impl List {
-	fn new(nx : u16, ny : u16, nwidth : u16, nheight : u16) -> Self {
+	pub fn new(nx : u16, ny : u16, nwidth : u16, nheight : u16) -> Self {
 		List {
 			x : nx, y : ny,
 			width : nwidth, height : nheight,
