@@ -17,10 +17,9 @@ use crate::interface::traits;
 pub struct InputField {
 	// Size and position
 	pub x : u16, pub y : u16,
-	pub tx : u16, pub ty : u16,
 	pub size : u16,
-	pub text : String,
 	pub output : String,
+	pub output_prev : String,
 
 	// Extra options
 	pub color : utils::Color,
@@ -40,11 +39,6 @@ impl traits::UserInterface for InputField {
 		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
 		utils::repeat(out, ' ', self.size);
 		execute!(out, crossterm::cursor::MoveTo(self.x, self.y)).unwrap();
-		write!(out, "{}", utils::shorten_text(&self.text, self.size)).unwrap();
-
-		execute!(out, crossterm::cursor::MoveTo(self.tx, self.ty)).unwrap();
-		utils::repeat(out, ' ', self.size);
-		execute!(out, crossterm::cursor::MoveTo(self.tx, self.ty)).unwrap();
 		write!(out, "{}", utils::shorten_text(&self.output, self.size)).unwrap();
 
 		write!(out, "\x1b[0m").unwrap();
@@ -73,7 +67,11 @@ impl traits::UserInterface for InputField {
 	}
 
 	fn redraw_requested(&mut self) -> bool {
-		self.hovered
+		if self.output != self.output_prev {
+			self.output_prev = self.output.clone();
+			return true;
+		}
+		false
 	}
 
 	fn set_position(&mut self, x : i16, y : i16, anchor : u8, size : (u16, u16)) {
@@ -89,17 +87,14 @@ impl traits::UserInterface for InputField {
 impl InputField {
 	pub fn new(
 		nx : u16, ny : u16,
-		ntx : u16, nty : u16,
-		nsize : u16, ntext : &str) -> Self
+		nsize : u16) -> Self
 	{
 		InputField {
 			x : nx,
 			y : ny,
-			tx : ntx,
-			ty : nty,
 			size : nsize,
-			text : ntext.to_string(),
 			output : "".to_string(),
+			output_prev : "".to_string(),
 
 			color : utils::Color {
 				color_enabled : true,

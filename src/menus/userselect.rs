@@ -36,9 +36,9 @@ impl menu_traits::Menu for UserSelect {
 		let deco_box : textbox::Box = textbox::Box::new(3, 1, 5, 5);
 		let tier_label : textbox::Box = textbox::Box::new(15, 3, 5, 3);
 
-		let create_if : inputfield::InputField = inputfield::InputField::new(0, 0, 0, 0, 8, " Create");
-		let rename_if : inputfield::InputField = inputfield::InputField::new(0, 0, 0, 0, 8, " Rename");
-		let delete_if : inputfield::InputField = inputfield::InputField::new(0, 0, 0, 0, 8, " Delete");
+		let create_if : inputfield::InputField = inputfield::InputField::new(0, 0, 10);
+		let rename_if : inputfield::InputField = inputfield::InputField::new(0, 0, 10);
+		let delete_if : inputfield::InputField = inputfield::InputField::new(0, 0, 10);
 
 		user_list.items = crate::abt::fs::users::list();
 		
