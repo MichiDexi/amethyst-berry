@@ -28,6 +28,7 @@ pub struct List {
 
 	// Internal
 	index : u16,
+	redraw_timer : u8,
 }
 
 impl traits::UserInterface for List {
@@ -67,9 +68,12 @@ impl traits::UserInterface for List {
 			self.width, self.height,
 			input.mouse.x, input.mouse.y
 		) { // This is true when the mouse is hovering something
-			self.hovered = input.mouse.y + self.index - self.y + 1; // +1 because 0 is nothing, 1 is the first etc.
+			self.hovered = input.mouse.y + self.index - self.y; // +1 because 0 is nothing, 1 is the first etc.
 		}
-/*
+		else {
+			return;
+		}
+
 		if input.mouse.scroll == 0 ||
 			self.height as usize >= self.items.len()
 		{
@@ -83,11 +87,11 @@ impl traits::UserInterface for List {
 		}
 
 		if input.mouse.scroll as i32 == -1 &&
-			self.index == self.items.len() as u16
+			self.index == self.items.len() as u16 - self.height
 		{
 			return;
 		}
-*/
+
 		match input.mouse.scroll {
 			1 => self.index -= 1,
 			-1 => self.index += 1,
@@ -95,8 +99,14 @@ impl traits::UserInterface for List {
 		}
 	}
 
-	fn redraw_requested(&self) -> bool {
-		true
+	fn redraw_requested(&mut self) -> bool {
+		if self.redraw_timer == 255 {
+			self.redraw_timer = 0;
+		}
+		else {
+			self.redraw_timer += 1;
+		}
+		self.redraw_timer.is_multiple_of(2)
 	}
 
 	fn set_position(&mut self, x : i16, y : i16, anchor : u8, size : (u16, u16)) {
@@ -141,6 +151,8 @@ impl List {
 
 			hovered : 0,
 			index : 0,
+
+			redraw_timer : 0
 		}
 	}
 }

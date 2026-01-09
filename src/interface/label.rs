@@ -61,7 +61,7 @@ impl traits::UserInterface for Label {
 		self.clicked = self.hovered && input.mouse.lclick;
 	}
 
-	fn redraw_requested(&self) -> bool {
+	fn redraw_requested(&mut self) -> bool {
 		self.hovered
 	}
 

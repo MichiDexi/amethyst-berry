@@ -72,7 +72,7 @@ impl traits::UserInterface for Slider {
 		}
 	}
 
-	fn redraw_requested(&self) -> bool {
+	fn redraw_requested(&mut self) -> bool {
 		self.hovered
 	}
 

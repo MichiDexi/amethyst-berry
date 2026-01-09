@@ -123,7 +123,7 @@ impl traits::UserInterface for SplitBox {
 		self.hovered = 255;
 	}
 
-	fn redraw_requested(&self) -> bool {
+	fn redraw_requested(&mut self) -> bool {
 		self.hovered != 255
 	}
 

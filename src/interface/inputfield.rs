@@ -87,7 +87,7 @@ impl traits::UserInterface for InputField {
 		}
 	}
 
-	fn redraw_requested(&self) -> bool {
+	fn redraw_requested(&mut self) -> bool {
 		self.hovered
 	}
 

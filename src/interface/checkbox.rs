@@ -68,7 +68,7 @@ impl traits::UserInterface for CheckBox {
 		}
 	}
 
-	fn redraw_requested(&self) -> bool {
+	fn redraw_requested(&mut self) -> bool {
 		self.hovered
 	}
 

@@ -80,7 +80,7 @@ impl traits::UserInterface for ProgressBar {
 		);
 	}
 
-	fn redraw_requested(&self) -> bool {
+	fn redraw_requested(&mut self) -> bool {
 		self.hovered
 	}
 
