@@ -24,7 +24,7 @@ pub struct List {
 	pub color_hovered : utils::Color,
 
 	// Event polling
-	pub hovered : u16,
+	pub hovered : Option<u16>,
 
 	// Internal
 	index : u16,
@@ -39,7 +39,7 @@ impl traits::UserInterface for List {
 				break;
 			}
 			
-			if self.hovered == self.index+i {
+			if let Some(v) = self.hovered && v == self.index+i {
 				self.color_hovered.write_color(out, false);
 			}
 			else {
@@ -68,9 +68,10 @@ impl traits::UserInterface for List {
 			self.width, self.height,
 			input.mouse.x, input.mouse.y
 		) { // This is true when the mouse is hovering something
-			self.hovered = input.mouse.y + self.index - self.y; // +1 because 0 is nothing, 1 is the first etc.
+			self.hovered = Some(input.mouse.y + self.index - self.y);
 		}
 		else {
+			self.hovered = None;
 			return;
 		}
 
@@ -149,7 +150,7 @@ impl List {
 				blue : 0,
 			},
 
-			hovered : 0,
+			hovered : None,
 			index : 0,
 
 			redraw_timer : 0
