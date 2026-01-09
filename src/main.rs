@@ -40,9 +40,11 @@ fn main() -> io::Result<()> {
 
 	// initialize variables that persist between menus
 	let mut out = stdout();
-	let menu = Rc::new(RefCell::new(abt::menus::Menu::Main));
+	let menu : Rc<RefCell<abt::menus::Menu>> = Rc::new(RefCell::new(abt::menus::Menu::Main));
 	let mut mainmenu = menus::mainmenu::MainMenu::init(Rc::clone(&menu));
+	let mut userselect = menus::userselect::UserSelect::init(Rc::clone(&menu));
 	mainmenu.redraw(&input, &mut out);
+	let mut new_menu : abt::menus::Menu;
 	
 	// the actual program
 	loop {
@@ -52,16 +54,25 @@ fn main() -> io::Result<()> {
 		input.update()?;
 		if input.window.request_full_redraw {
 			execute!(
-			    out,
-			    terminal::Clear(ClearType::All)
+				out,
+				terminal::Clear(ClearType::All)
 			)?;
 		}
 
 		// menu checking and executing their tick() behavior
-		let cmenu = *menu.borrow();
+		let cmenu : abt::menus::Menu = *menu.borrow();
 		match cmenu {
 			abt::menus::Menu::Main => mainmenu.tick(&input, &mut out),
+			abt::menus::Menu::UserSelect => userselect.tick(&input, &mut out),
 			_ => break,
+		}
+		new_menu = *menu.borrow();
+		if new_menu != cmenu {
+			match new_menu {
+				abt::menus::Menu::Main => mainmenu.redraw(&input, &mut out),
+				abt::menus::Menu::UserSelect => userselect.redraw(&input, &mut out),
+				_ => break,
+			}
 		}
 
 		// flushing buffer and wait for the rest of
