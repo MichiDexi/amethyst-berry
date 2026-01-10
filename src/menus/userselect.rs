@@ -112,6 +112,16 @@ impl menu_traits::Menu for UserSelect {
 		traits::UserInterface::draw(&self.decoration, out);
 		traits::UserInterface::draw(&self.create_button, out);
 		traits::UserInterface::draw(&self.tier, out);
+
+		match self.submenu {
+			Some(0) => {
+				
+			},
+			Some(_) => {
+				self.submenu = None;
+			}
+			None => { }
+		}
 	}
 
 	fn tick(&mut self, input : &input::InputHandler, out : &mut Stdout) {
@@ -131,39 +141,45 @@ impl UserSelect {
 		self.users.width = input.window.width -14 -2;
 		self.users.height = input.window.height -2 -2;
 
-		let selected_prev : bool = self.users.selected.is_some();
-		
-		utils::object(&mut self.users, input, &self.menu, menus::Menu::UserSelect,
-		(4, 2), (4, 2), 0, out);
+		match self.submenu {
+			None => {
+				let selected_prev : bool = self.users.selected.is_some();
+				
+				utils::object(&mut self.users, input, &self.menu, menus::Menu::UserSelect,
+				(4, 2), (4, 2), 0, out);
 
-		utils::object(&mut self.create_button, input, &self.menu, menus::Menu::UserSelect,
-		(-10, 10), (-10, 10), 1, out);
+				utils::object(&mut self.create_button, input, &self.menu, menus::Menu::UserSelect,
+				(-10, 10), (-10, 10), 1, out);
 
-		if self.users.selected.is_some() != selected_prev {
-			if self.users.selected.is_some() {
+				if self.users.selected.is_some() != selected_prev {
+					if self.users.selected.is_some() {
 
-				utils::object(&mut self.rename_button, input, &self.menu, menus::Menu::UserSelect,
-				(-10, 12), (-10, 12), 1, out);
+						utils::object(&mut self.rename_button, input, &self.menu, menus::Menu::UserSelect,
+						(-10, 12), (-10, 12), 1, out);
 
-				utils::object(&mut self.delete_button, input, &self.menu, menus::Menu::UserSelect,
-				(-10, 14), (-10, 14), 1, out);
+						utils::object(&mut self.delete_button, input, &self.menu, menus::Menu::UserSelect,
+						(-10, 14), (-10, 14), 1, out);
 
-				utils::object(&mut self.open_button, input, &self.menu, menus::Menu::UserSelect,
-				(-10, 16), (-10, 16), 1, out);
+						utils::object(&mut self.open_button, input, &self.menu, menus::Menu::UserSelect,
+						(-10, 16), (-10, 16), 1, out);
 
-				traits::UserInterface::draw(&self.rename_button, out);
-				traits::UserInterface::draw(&self.delete_button, out);
-				traits::UserInterface::draw(&self.open_button, out);
-			}
-			else {
-				traits::UserInterface::clear(&self.rename_button, out);
-				traits::UserInterface::clear(&self.delete_button, out);
-				traits::UserInterface::clear(&self.open_button, out);
+						traits::UserInterface::draw(&self.rename_button, out);
+						traits::UserInterface::draw(&self.delete_button, out);
+						traits::UserInterface::draw(&self.open_button, out);
+					}
+					else {
+						traits::UserInterface::clear(&self.rename_button, out);
+						traits::UserInterface::clear(&self.delete_button, out);
+						traits::UserInterface::clear(&self.open_button, out);
+					}
+				}
+
+				utils::object(&mut self.tier, input, &self.menu, menus::Menu::Main,
+				(-7, 3), (-7, 3), 1, out);
+			},
+			Some(_) => {
+				self.submenu = None;
 			}
 		}
-
-
-		utils::object(&mut self.tier, input, &self.menu, menus::Menu::Main,
-		(-7, 3), (-7, 3), 1, out);
 	}
 }
