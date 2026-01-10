@@ -149,6 +149,8 @@ impl UserSelect {
 		self.decoration.height = input.window.height -2;
 		self.users.width = input.window.width -14 -2;
 		self.users.height = input.window.height -2 -2;
+		self.create_submenu.decoration.width = input.window.width -10;
+		self.create_submenu.decoration.height = input.window.height -8;
 
 		let submenu_prev = self.submenu;
 
@@ -191,10 +193,25 @@ impl UserSelect {
 				utils::object(&mut self.tier, input, &self.menu, menus::Menu::Main,
 				(-7, 3), (-7, 3), 1, out);
 			},
+			
 			Some(0) => {
+				utils::object(&mut self.create_submenu.decoration, input, &self.menu, menus::Menu::UserSelect,
+				(5, 4), (5, 4), 0, out);
+				
+				utils::object(&mut self.create_submenu.message, input, &self.menu, menus::Menu::UserSelect,
+				(6, 7), (6, 7), 0, out);
+
 				utils::object(&mut self.create_submenu.input, input, &self.menu, menus::Menu::UserSelect,
-				(-10, 12), (-10, 12), 1, out);
+				(-10, 12), (-10, 12), 0, out);
+
+				utils::object(&mut self.create_submenu.out, input, &self.menu, menus::Menu::UserSelect,
+				(10, 10), (10, 10), 0, out);
+
+				if self.create_submenu.out.clicked {
+					self.submenu = None;
+				}
 			},
+			
 			_ => {
 				self.submenu = None;
 			}
