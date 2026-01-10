@@ -3,6 +3,9 @@ use std::io::Stdout;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use crossterm::terminal::enable_raw_mode;
+use crossterm::terminal::disable_raw_mode;
+
 use crate::interface::label;
 use crate::interface::list;
 use crate::interface::textbox;
@@ -82,21 +85,21 @@ impl menu_traits::Menu for UserSelect {
 
 			rename_button : label::Label::new(8, " Rename"),
 			rename_submenu : Rename {
-				decoration : textbox::Box::new(3, 1, 5, 5),
-				message : label::Label::new(19, " Rename a the user"),
+				decoration : textbox::Box::new(10, 10, 25, 9),
+				message : label::Label::new(19, " Rename the user"),
 				input : inputfield::InputField::new(0, 0, 15),
-				message_fail : label::Label::new(26, "Couldn't rename the user"),
+				message_fail : label::Label::new(26, ""),
 				confirm : label::Label::new(9, " Confirm"),
 				cancel : label::Label::new(8, " Cancel"),
 			},
 
 			delete_button : label::Label::new(8, " Delete"),
 			delete_submenu : Delete {
-				decoration : textbox::Box::new(3, 1, 5, 5),
+				decoration : textbox::Box::new(10, 10, 25, 9),
 				message : label::Label::new(16, " Are you sure?"),
 				confirm : label::Label::new(9, " Confirm"),
 				cancel : label::Label::new(8, " Cancel"),
-				message_fail : label::Label::new(26, "Couldn't rename the user"),
+				message_fail : label::Label::new(26, ""),
 			},
 			
 			open_button : label::Label::new(8, "  Open"),
@@ -125,6 +128,13 @@ impl menu_traits::Menu for UserSelect {
 				traits::UserInterface::draw(&self.create_submenu.input, out);
 				traits::UserInterface::draw(&self.create_submenu.confirm, out);
 				traits::UserInterface::draw(&self.create_submenu.cancel, out);
+			},
+			Some(1) => {
+				traits::UserInterface::draw(&self.rename_submenu.decoration, out);
+				traits::UserInterface::draw(&self.rename_submenu.message, out);
+				traits::UserInterface::draw(&self.rename_submenu.input, out);
+				traits::UserInterface::draw(&self.rename_submenu.confirm, out);
+				traits::UserInterface::draw(&self.rename_submenu.cancel, out);
 			},
 			Some(_) => {
 				self.submenu = None;
@@ -183,11 +193,18 @@ impl UserSelect {
 
 				utils::object(&mut self.create_button, input, &self.menu, menus::Menu::UserSelect,
 				(-10, 10), (-10, 10), 1, out);
+
+				utils::object(&mut self.rename_button, input, &self.menu, menus::Menu::UserSelect,
+				(-10, 12), (-10, 12), 1, out);
+				
 				if self.create_button.clicked {
 					self.submenu = Some(0);
 				}
 				if self.rename_button.clicked {
 					self.submenu = Some(1);
+					disable_raw_mode().unwrap();
+					println!("magic broken");
+					enable_raw_mode().unwrap();
 				}
 
 				if self.users.selected.is_some() != selected_prev {
