@@ -16,11 +16,8 @@ use crossterm::{
 	execute,
 	terminal::{self, ClearType},
 };
-// use std::fs;
 use std::rc::Rc;
 use std::cell::RefCell;
-// use std::path::PathBuf;
-
 
 pub mod interface;
 pub mod helpers;
@@ -41,10 +38,13 @@ fn main() -> io::Result<()> {
 	// initialize variables that persist between menus
 	let mut out = stdout();
 	let menu : Rc<RefCell<abt::menus::Menu>> = Rc::new(RefCell::new(abt::menus::Menu::Main));
-	let mut mainmenu = menus::mainmenu::MainMenu::init(Rc::clone(&menu));
-	let mut userselect = menus::userselect::UserSelect::init(Rc::clone(&menu));
+	let data : Rc<RefCell<abt::data::Data>> =
+		Rc::new(RefCell::new(abt::data::Data { user : None, savefile : None, lobby : None, map : None }));
+	let mut mainmenu = menus::mainmenu::MainMenu::init(Rc::clone(&menu), Rc::clone(&data));
+	let mut userselect = menus::userselect::UserSelect::init(Rc::clone(&menu), Rc::clone(&data));
 	mainmenu.redraw(&input, &mut out);
 	let mut new_menu : abt::menus::Menu;
+
 	
 	// the actual program
 	loop {

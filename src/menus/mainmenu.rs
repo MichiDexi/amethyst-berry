@@ -15,6 +15,7 @@ use crate::{
 	helpers::input,
 	helpers::utils,
 	abt::menus,
+	abt::data,
 	menus::menu_traits,
 };
 
@@ -31,7 +32,7 @@ pub struct MainMenu {
 }
 
 impl menu_traits::Menu for MainMenu {
-	fn init(menu_ref : Rc<RefCell<menus::Menu>>) -> Self {
+	fn init(menu_ref : Rc<RefCell<menus::Menu>>, _data_ref : Rc<RefCell<data::Data>>) -> Self {
 		let maps_label : label::Label = label::Label::new(12, "Maps");
 		let mods_label : label::Label = label::Label::new(12, "Mods");
 		let wiki_label : label::Label = label::Label::new(12, "Wiki");

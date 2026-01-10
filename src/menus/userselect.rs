@@ -17,6 +17,7 @@ use crate::{
 	helpers::input,
 	helpers::utils,
 	abt::menus,
+	abt::data,
 	menus::menu_traits,
 };
 
@@ -36,6 +37,7 @@ pub struct UserSelect {
 
 	tier : textbox::Box,
 	menu : Rc<RefCell<menus::Menu>>,
+	data : Rc<RefCell<data::Data>>,
 }
 
 pub struct Create {
@@ -52,19 +54,20 @@ pub struct Rename {
 	message : label::Label,
 	input : inputfield::InputField,
 	message_fail : label::Label,
-	out : label::Label,
+	confirm : label::Label,
+	cancel : label::Label,
 }
 
 pub struct Delete {
 	decoration : textbox::Box,
 	message : label::Label,
-	yes_option : label::Label,
-	no_option : label::Label,
+	confirm : label::Label,
+	cancel : label::Label,
 	message_fail : label::Label,
 }
 
 impl menu_traits::Menu for UserSelect {
-	fn init(menu_ref : Rc<RefCell<menus::Menu>>) -> Self {
+	fn init(menu_ref : Rc<RefCell<menus::Menu>>, data_ref : Rc<RefCell<data::Data>>) -> Self {
 		let mut user_list : list::List = list::List::new(3, 1, 5, 5);
 		user_list.items = crate::abt::fs::users::list();
 		
@@ -90,15 +93,16 @@ impl menu_traits::Menu for UserSelect {
 				message : label::Label::new(19, " Rename a the user"),
 				input : inputfield::InputField::new(0, 0, 15),
 				message_fail : label::Label::new(26, "Couldn't rename the user"),
-				out : label::Label::new(8, " Cancel"),
+				confirm : label::Label::new(9, " Confirm"),
+				cancel : label::Label::new(8, " Cancel"),
 			},
 
 			delete_button : label::Label::new(8, " Delete"),
 			delete_submenu : Delete {
 				decoration : textbox::Box::new(3, 1, 5, 5),
 				message : label::Label::new(16, " Are you sure?"),
-				yes_option : label::Label::new(5, " Yes"),
-				no_option : label::Label::new(5, " No"),
+				confirm : label::Label::new(9, " Confirm"),
+				cancel : label::Label::new(8, " Cancel"),
 				message_fail : label::Label::new(26, "Couldn't rename the user"),
 			},
 			
@@ -106,6 +110,7 @@ impl menu_traits::Menu for UserSelect {
 			
 			tier : textbox::Box::new(15, 3, 5, 3),
 			menu : menu_ref,
+			data : data_ref,
 		}
 	}
 
