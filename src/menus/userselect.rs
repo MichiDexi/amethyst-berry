@@ -231,7 +231,7 @@ impl UserSelect {
 				(5, 2), (5, 2), 4, out);
 
 				utils::object(&mut self.create_submenu.message_fail, input, &self.menu, menus::Menu::UserSelect,
-				(5, input.window.height as i16-2), (5, input.window.height as i16-2), 4, out);
+				(4, input.window.height as i16-1), (4, input.window.height as i16-1), 0, out);
 				
 				if self.create_submenu.confirm.clicked {
 					if let Err(v) = crate::abt::fs::users::create(&self.create_submenu.input.output) {
