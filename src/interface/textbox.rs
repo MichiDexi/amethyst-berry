@@ -97,8 +97,8 @@ impl traits::UserInterface for Box {
 		self.y = (y + if anchor == 2 || anchor == 3 { size.1 } else {0} as i16) as u16;
 
 		if anchor == 4 {
-			self.x = (x + size.0 as i16 /2) as u16 -(self.width/2);
-			self.y = (y + size.1 as i16 /2) as u16 -(self.height/2);
+			self.x = (x + (size.0/2) as i16) as u16 -(self.width/2);
+			self.y = (y + (size.1/2) as i16) as u16 -(self.height/2);
 		}
 	}
 

@@ -76,7 +76,7 @@ impl menu_traits::Menu for UserSelect {
 			
 			create_button : label::Label::new(8, " Create"),
 			create_submenu : Create {
-				decoration : textbox::Box::new(3, 1, 5, 5),
+				decoration : textbox::Box::new(10, 10, 30, 15),
 				message : label::Label::new(19, " Create a new user"),
 				input : inputfield::InputField::new(0, 0, 15),
 				message_fail : label::Label::new(26, "Couldn't create new user"),
@@ -151,8 +151,6 @@ impl UserSelect {
 		self.decoration.height = input.window.height -2;
 		self.users.width = input.window.width -14 -2;
 		self.users.height = input.window.height -2 -2;
-		self.create_submenu.decoration.width = input.window.width -10;
-		self.create_submenu.decoration.height = input.window.height -8;
 
 		let submenu_prev = self.submenu;
 
@@ -198,19 +196,19 @@ impl UserSelect {
 			
 			Some(0) => {
 				utils::object(&mut self.create_submenu.decoration, input, &self.menu, menus::Menu::UserSelect,
-				(5, 4), (5, 4), 0, out);
+				(0, 0), (0, 0), 4, out);
 				
 				utils::object(&mut self.create_submenu.message, input, &self.menu, menus::Menu::UserSelect,
-				(6, 7), (6, 7), 0, out);
+				(0, -3), (0, -3), 4, out);
 
 				utils::object(&mut self.create_submenu.input, input, &self.menu, menus::Menu::UserSelect,
-				(8, 12), (8, 12), 0, out);
+				(0, 0), (0, 0), 4, out);
 
 				utils::object(&mut self.create_submenu.confirm, input, &self.menu, menus::Menu::UserSelect,
-				(10, 10), (10, 10), 0, out);
+				(-4, 2), (-4, 2), 4, out);
 
 				utils::object(&mut self.create_submenu.cancel, input, &self.menu, menus::Menu::UserSelect,
-				(10, 10), (10, 10), 0, out);
+				(5, 2), (5, 2), 4, out);
 
 				if self.create_submenu.cancel.clicked {
 					self.submenu = None;
