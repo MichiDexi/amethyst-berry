@@ -112,9 +112,13 @@ impl menu_traits::Menu for UserSelect {
 		traits::UserInterface::draw(&self.decoration, out);
 		traits::UserInterface::draw(&self.create_button, out);
 		traits::UserInterface::draw(&self.tier, out);
+		traits::UserInterface::draw(&self.create_submenu.message_fail, out);
 
 		match self.submenu {
 			Some(0) => {
+				traits::UserInterface::draw(&self.create_submenu.decoration, out);
+				traits::UserInterface::draw(&self.create_submenu.message, out);
+				traits::UserInterface::draw(&self.create_submenu.input, out);
 				
 			},
 			Some(_) => {
@@ -150,6 +154,9 @@ impl UserSelect {
 
 				utils::object(&mut self.create_button, input, &self.menu, menus::Menu::UserSelect,
 				(-10, 10), (-10, 10), 1, out);
+				if self.create_button.clicked {
+					self.submenu = Some(0);
+				}
 
 				if self.users.selected.is_some() != selected_prev {
 					if self.users.selected.is_some() {
@@ -177,7 +184,11 @@ impl UserSelect {
 				utils::object(&mut self.tier, input, &self.menu, menus::Menu::Main,
 				(-7, 3), (-7, 3), 1, out);
 			},
-			Some(_) => {
+			Some(0) => {
+				utils::object(&mut self.create_submenu.input, input, &self.menu, menus::Menu::UserSelect,
+				(-10, 12), (-10, 12), 1, out);
+			},
+			_ => {
 				self.submenu = None;
 			}
 		}
