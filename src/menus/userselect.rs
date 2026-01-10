@@ -80,7 +80,8 @@ impl menu_traits::Menu for UserSelect {
 				message : label::Label::new(19, " Create a new user"),
 				input : inputfield::InputField::new(0, 0, 15),
 				message_fail : label::Label::new(26, "Couldn't create new user"),
-				out : label::Label::new(8, " Cancel"),
+				confirm : label::Label::new(9, " Confirm"),
+				cancel : label::Label::new(8, " Cancel"),
 			},
 
 			rename_button : label::Label::new(8, " Rename"),
@@ -99,7 +100,6 @@ impl menu_traits::Menu for UserSelect {
 				yes_option : label::Label::new(5, " Yes"),
 				no_option : label::Label::new(5, " No"),
 				message_fail : label::Label::new(26, "Couldn't rename the user"),
-				out : label::Label::new(8, " Cancel"),
 			},
 			
 			open_button : label::Label::new(8, "  Open"),

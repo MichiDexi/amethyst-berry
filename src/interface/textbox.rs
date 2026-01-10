@@ -95,6 +95,11 @@ impl traits::UserInterface for Box {
 	fn set_position(&mut self, x : i16, y : i16, anchor : u8, size : (u16, u16)) {
 		self.x = (x + if anchor == 1 || anchor == 3 { size.0 } else {0} as i16) as u16;
 		self.y = (y + if anchor == 2 || anchor == 3 { size.1 } else {0} as i16) as u16;
+
+		if anchor == 4 {
+			self.x = (x + size.0 as i16 /2) as u16 -(self.width/2);
+			self.y = (y + size.1 as i16 /2) as u16 -(self.height/2);
+		}
 	}
 
 	fn set_color(&mut self, color : bool) {
