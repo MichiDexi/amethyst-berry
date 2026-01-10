@@ -193,41 +193,40 @@ impl UserSelect {
 
 				utils::object(&mut self.create_button, input, &self.menu, menus::Menu::UserSelect,
 				(-10, 10), (-10, 10), 1, out);
-
-				utils::object(&mut self.rename_button, input, &self.menu, menus::Menu::UserSelect,
-				(-10, 12), (-10, 12), 1, out);
 				
+
+
+				if self.users.selected.is_some() {
+
+					utils::object(&mut self.rename_button, input, &self.menu, menus::Menu::UserSelect,
+					(-10, 12), (-10, 12), 1, out);
+
+					utils::object(&mut self.delete_button, input, &self.menu, menus::Menu::UserSelect,
+					(-10, 14), (-10, 14), 1, out);
+
+					utils::object(&mut self.open_button, input, &self.menu, menus::Menu::UserSelect,
+					(-10, 16), (-10, 16), 1, out);
+
+					if self.users.selected.is_some() != selected_prev {
+						traits::UserInterface::draw(&self.rename_button, out);
+						traits::UserInterface::draw(&self.delete_button, out);
+						traits::UserInterface::draw(&self.open_button, out);
+					}
+				}
+				else if self.users.selected.is_some() != selected_prev {
+					traits::UserInterface::clear(&self.rename_button, out);
+					traits::UserInterface::clear(&self.delete_button, out);
+					traits::UserInterface::clear(&self.open_button, out);
+				}
+
 				if self.create_button.clicked {
 					self.submenu = Some(0);
 				}
 				if self.rename_button.clicked {
 					self.submenu = Some(1);
-					disable_raw_mode().unwrap();
-					println!("magic broken");
-					enable_raw_mode().unwrap();
 				}
-
-				if self.users.selected.is_some() != selected_prev {
-					if self.users.selected.is_some() {
-
-						utils::object(&mut self.rename_button, input, &self.menu, menus::Menu::UserSelect,
-						(-10, 12), (-10, 12), 1, out);
-
-						utils::object(&mut self.delete_button, input, &self.menu, menus::Menu::UserSelect,
-						(-10, 14), (-10, 14), 1, out);
-
-						utils::object(&mut self.open_button, input, &self.menu, menus::Menu::UserSelect,
-						(-10, 16), (-10, 16), 1, out);
-
-						traits::UserInterface::draw(&self.rename_button, out);
-						traits::UserInterface::draw(&self.delete_button, out);
-						traits::UserInterface::draw(&self.open_button, out);
-					}
-					else {
-						traits::UserInterface::clear(&self.rename_button, out);
-						traits::UserInterface::clear(&self.delete_button, out);
-						traits::UserInterface::clear(&self.open_button, out);
-					}
+				if self.delete_button.clicked {
+					self.submenu = Some(2);
 				}
 
 				utils::object(&mut self.tier, input, &self.menu, menus::Menu::Main,
@@ -284,6 +283,41 @@ impl UserSelect {
 
 				utils::object(&mut self.rename_submenu.cancel, input, &self.menu, menus::Menu::UserSelect,
 				(5, 2), (5, 2), 4, out);
+
+				utils::object(&mut self.rename_submenu.message_fail, input, &self.menu, menus::Menu::UserSelect,
+				(4, input.window.height as i16-1), (4, input.window.height as i16-1), 0, out);
+				
+				if self.rename_submenu.confirm.clicked {
+					if let Some(selected) = self.users.selected &&
+						let Err(e) = crate::abt::fs::users::rename(
+						&self.users.items[selected as usize], &self.rename_submenu.input.output)
+					{
+						self.rename_submenu.message_fail.text = e.to_string();
+					}
+					self.message_timer = 100;
+					self.rename_submenu.input.reset();
+					update_userlist(&mut self.users);
+					self.submenu = None;
+				}
+				
+				if self.create_submenu.cancel.clicked {
+					self.create_submenu.input.reset();
+					self.submenu = None;
+				}
+			},
+
+			Some(2) => {
+				utils::object(&mut self.delete_submenu.decoration, input, &self.menu, menus::Menu::UserSelect,
+				(0, 0), (0, 0), 4, out);
+				
+				utils::object(&mut self.delete_submenu.message, input, &self.menu, menus::Menu::UserSelect,
+				(0, -1), (0, -1), 4, out);
+
+				utils::object(&mut self.delete_submenu.confirm, input, &self.menu, menus::Menu::UserSelect,
+				(-4, 1), (-4, 1), 4, out);
+
+				utils::object(&mut self.delete_submenu.cancel, input, &self.menu, menus::Menu::UserSelect,
+				(5, 1), (5, 1), 4, out);
 
 				utils::object(&mut self.rename_submenu.message_fail, input, &self.menu, menus::Menu::UserSelect,
 				(4, input.window.height as i16-1), (4, input.window.height as i16-1), 0, out);
