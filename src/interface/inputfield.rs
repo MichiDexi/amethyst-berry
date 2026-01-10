@@ -129,6 +129,11 @@ impl InputField {
 			cursor : 0
 		}
 	}
+
+	pub fn reset(&mut self) {
+		self.output = "".to_string();
+		self.output_prev = "".to_string();
+	}
 }
 
 fn read_line_from_keys(

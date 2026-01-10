@@ -69,9 +69,8 @@ pub struct Delete {
 impl menu_traits::Menu for UserSelect {
 	fn init(menu_ref : Rc<RefCell<menus::Menu>>, data_ref : Rc<RefCell<data::Data>>) -> Self {
 		let mut user_list : list::List = list::List::new(3, 1, 5, 5);
-		user_list.items = crate::abt::fs::users::list();
-		
-		
+		update_userlist(&mut user_list);
+
 		Self {
 			users : user_list,
 			decoration : textbox::Box::new(3, 1, 5, 5),
@@ -79,7 +78,7 @@ impl menu_traits::Menu for UserSelect {
 			
 			create_button : label::Label::new(8, " Create"),
 			create_submenu : Create {
-				decoration : textbox::Box::new(10, 10, 30, 15),
+				decoration : textbox::Box::new(10, 10, 25, 9),
 				message : label::Label::new(19, " Create a new user"),
 				input : inputfield::InputField::new(0, 0, 15),
 				message_fail : label::Label::new(26, "Couldn't create new user"),
@@ -197,6 +196,8 @@ impl UserSelect {
 
 				utils::object(&mut self.tier, input, &self.menu, menus::Menu::Main,
 				(-7, 3), (-7, 3), 1, out);
+
+				self.create_submenu.input.reset();
 			},
 			
 			Some(0) => {
@@ -204,7 +205,7 @@ impl UserSelect {
 				(0, 0), (0, 0), 4, out);
 				
 				utils::object(&mut self.create_submenu.message, input, &self.menu, menus::Menu::UserSelect,
-				(0, -3), (0, -3), 4, out);
+				(0, -2), (0, -2), 4, out);
 
 				utils::object(&mut self.create_submenu.input, input, &self.menu, menus::Menu::UserSelect,
 				(0, 0), (0, 0), 4, out);
@@ -214,7 +215,11 @@ impl UserSelect {
 
 				utils::object(&mut self.create_submenu.cancel, input, &self.menu, menus::Menu::UserSelect,
 				(5, 2), (5, 2), 4, out);
-
+				
+				if self.create_submenu.confirm.clicked {
+					self.submenu = None;
+				}
+				
 				if self.create_submenu.cancel.clicked {
 					self.submenu = None;
 				}
@@ -229,4 +234,8 @@ impl UserSelect {
 			menu_traits::Menu::redraw(self, input, out);
 		}
 	}
+}
+
+fn update_userlist(list : &mut list::List) {
+	list.items = crate::abt::fs::users::list();
 }
