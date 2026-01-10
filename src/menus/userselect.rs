@@ -194,19 +194,16 @@ impl UserSelect {
 				utils::object(&mut self.create_button, input, &self.menu, menus::Menu::UserSelect,
 				(-10, 10), (-10, 10), 1, out);
 				
+				utils::object(&mut self.rename_button, input, &self.menu, menus::Menu::UserSelect,
+				(-10, 12), (-10, 12), 1, out);
 
+				utils::object(&mut self.delete_button, input, &self.menu, menus::Menu::UserSelect,
+				(-10, 14), (-10, 14), 1, out);
 
+				utils::object(&mut self.open_button, input, &self.menu, menus::Menu::UserSelect,
+				(-10, 16), (-10, 16), 1, out);
+					
 				if self.users.selected.is_some() {
-
-					utils::object(&mut self.rename_button, input, &self.menu, menus::Menu::UserSelect,
-					(-10, 12), (-10, 12), 1, out);
-
-					utils::object(&mut self.delete_button, input, &self.menu, menus::Menu::UserSelect,
-					(-10, 14), (-10, 14), 1, out);
-
-					utils::object(&mut self.open_button, input, &self.menu, menus::Menu::UserSelect,
-					(-10, 16), (-10, 16), 1, out);
-
 					if self.users.selected.is_some() != selected_prev {
 						traits::UserInterface::draw(&self.rename_button, out);
 						traits::UserInterface::draw(&self.delete_button, out);
@@ -269,6 +266,7 @@ impl UserSelect {
 			},
 
 			Some(1) => {
+				println!("AAAAAAAAAAAAAAAAAA");
 				utils::object(&mut self.rename_submenu.decoration, input, &self.menu, menus::Menu::UserSelect,
 				(0, 0), (0, 0), 4, out);
 				
