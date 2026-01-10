@@ -43,7 +43,8 @@ pub struct Create {
 	message : label::Label,
 	input : inputfield::InputField,
 	message_fail : label::Label,
-	out : label::Label,
+	confirm : label::Label,
+	cancel : label::Label,
 }
 
 pub struct Rename {
@@ -60,7 +61,6 @@ pub struct Delete {
 	yes_option : label::Label,
 	no_option : label::Label,
 	message_fail : label::Label,
-	out : label::Label,
 }
 
 impl menu_traits::Menu for UserSelect {
@@ -125,7 +125,8 @@ impl menu_traits::Menu for UserSelect {
 				traits::UserInterface::draw(&self.create_submenu.decoration, out);
 				traits::UserInterface::draw(&self.create_submenu.message, out);
 				traits::UserInterface::draw(&self.create_submenu.input, out);
-				traits::UserInterface::draw(&self.create_submenu.out, out);
+				traits::UserInterface::draw(&self.create_submenu.confirm, out);
+				traits::UserInterface::draw(&self.create_submenu.cancel, out);
 			},
 			Some(_) => {
 				self.submenu = None;
@@ -205,10 +206,13 @@ impl UserSelect {
 				utils::object(&mut self.create_submenu.input, input, &self.menu, menus::Menu::UserSelect,
 				(8, 12), (8, 12), 0, out);
 
-				utils::object(&mut self.create_submenu.out, input, &self.menu, menus::Menu::UserSelect,
+				utils::object(&mut self.create_submenu.confirm, input, &self.menu, menus::Menu::UserSelect,
 				(10, 10), (10, 10), 0, out);
 
-				if self.create_submenu.out.clicked {
+				utils::object(&mut self.create_submenu.cancel, input, &self.menu, menus::Menu::UserSelect,
+				(10, 10), (10, 10), 0, out);
+
+				if self.create_submenu.cancel.clicked {
 					self.submenu = None;
 				}
 			},
