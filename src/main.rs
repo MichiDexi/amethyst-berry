@@ -28,11 +28,13 @@ fn main() -> io::Result<()> {
 
 	// initialize variables that persist between menus
 	let mut out = stdout();
+	// global shared data
 	let menu : Rc<RefCell<abt::menus::Menu>> =
 		Rc::new(RefCell::new(abt::menus::Menu::Main));
 	let data : Rc<RefCell<abt::data::Data>> =
 		Rc::new(RefCell::new(abt::data::Data {
 			user : None, savefile : None, lobby : None, map : None }));
+	// menus
 	let mut mainmenu =
 		menus::mainmenu::MainMenu::init(Rc::clone(&menu), Rc::clone(&data));
 	let mut userselect =

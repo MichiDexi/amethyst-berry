@@ -237,7 +237,7 @@ impl SaveSelect {
 					self.data.borrow_mut().user = Some(self.savefile_list.items[selected as usize].clone());
 				}
 
-				utils::object(&mut self.tier, input, &self.menu, menus::Menu::Main,
+				utils::object(&mut self.tier, input, &self.menu, menus::Menu::UserSelect,
 				(-7, 3), (-7, 3), 1, out);
 			},
 			
