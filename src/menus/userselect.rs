@@ -24,35 +24,74 @@ use crate::{
 pub struct UserSelect {
 	users : list::List,
 	decoration : textbox::Box,
-	create : label::Label,
-	rename : inputfield::InputField,
-	delete : inputfield::InputField,
+	
+	create_button : label::Label,
+	create_submenu : Create,
+	rename_button : label::Label,
+	rename_submenu : Rename,
+	delete_button : label::Label,
+	delete_submenu : Delete,
+
 	tier : textbox::Box,
 	menu : Rc<RefCell<menus::Menu>>,
+}
+
+pub struct Create {
+	decoration : textbox::Box,
+	message : label::Label,
+	input : inputfield::InputField,
+	message_fail : label::Label
+}
+
+pub struct Rename {
+	decoration : textbox::Box,
+	message : label::Label,
+	input : inputfield::InputField,
+	message_fail : label::Label
+}
+
+pub struct Delete {
+	decoration : textbox::Box,
+	message : label::Label,
+	input : inputfield::InputField,
+	message_fail : label::Label
 }
 
 impl menu_traits::Menu for UserSelect {
 	fn init(menu_ref : Rc<RefCell<menus::Menu>>) -> Self {
 		let mut user_list : list::List = list::List::new(3, 1, 5, 5);
-		let deco_box : textbox::Box = textbox::Box::new(3, 1, 5, 5);
-		let tier_label : textbox::Box = textbox::Box::new(15, 3, 5, 3);
-
-		let create_label : label::Label = label::Label::new(8, " Create");
-		
-		let create_if : inputfield::InputField = inputfield::InputField::new(0, 0, 10);
-		let rename_if : inputfield::InputField = inputfield::InputField::new(0, 0, 10);
-		let delete_if : inputfield::InputField = inputfield::InputField::new(0, 0, 10);
-
 		user_list.items = crate::abt::fs::users::list();
 		
 		
 		Self {
 			users : user_list,
-			decoration : deco_box,
-			create : create_label,
-			rename : rename_if,
-			delete : delete_if,
-			tier : tier_label,
+			decoration : textbox::Box::new(3, 1, 5, 5),
+			
+			create_button : label::Label::new(8, " Create"),
+			create_submenu : Create {
+				decoration : textbox::Box::new(3, 1, 5, 5),
+				message : label::Label::new(19, " Create a new user"),
+				input : inputfield::InputField::new(0, 0, 15),
+				message_fail : label::Label::new(26, "Couldn't create new user"),
+			},
+
+			rename_button : label::Label::new(8, " Rename"),
+			rename_submenu : Rename {
+				decoration : textbox::Box::new(3, 1, 5, 5),
+				message : label::Label::new(19, " Rename a the user"),
+				input : inputfield::InputField::new(0, 0, 15),
+				message_fail : label::Label::new(26, "Couldn't rename the user"),
+			},
+
+			delete_button : label::Label::new(8, " Delete"),
+			delete_submenu : Delete {
+				decoration : textbox::Box::new(3, 1, 5, 5),
+				message : label::Label::new(21, " Delete selected user"),
+				input : inputfield::InputField::new(0, 0, 15),
+				message_fail : label::Label::new(26, "Couldn't delete the user"),
+			},
+			
+			tier : textbox::Box::new(15, 3, 5, 3),
 			menu : menu_ref,
 		}
 	}
@@ -64,7 +103,7 @@ impl menu_traits::Menu for UserSelect {
 
 		traits::UserInterface::draw(&self.users, out);
 		traits::UserInterface::draw(&self.decoration, out);
-		traits::UserInterface::draw(&self.create, out);
+		traits::UserInterface::draw(&self.create_button, out);
 		traits::UserInterface::draw(&self.tier, out);
 	}
 
@@ -88,7 +127,7 @@ impl UserSelect {
 		utils::object(&mut self.users, input, &self.menu, menus::Menu::UserSelect,
 		(4, 2), (4, 2), 0, out);
 
-		utils::object(&mut self.create, input, &self.menu, menus::Menu::UserSelect,
+		utils::object(&mut self.create_button, input, &self.menu, menus::Menu::UserSelect,
 		(-10, 10), (-10, 10), 1, out);
 
 		utils::object(&mut self.tier, input, &self.menu, menus::Menu::Main,
