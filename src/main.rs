@@ -1,30 +1,21 @@
-use std::{
-	io,
-	time::{
-		Duration,
-		Instant,
-	},
-	thread::{
-		sleep
-	},
-	io::{
-		stdout,
-		Write
-	},
-};
-use crossterm::{
-	execute,
-	terminal::{self, ClearType},
-};
-use std::rc::Rc;
+use std::io;
+use std::io::stdout;
+use std::io::Write;
+use std::time::Duration;
+use std::time::Instant;
+use std::thread::sleep;
 use std::cell::RefCell;
+use std::rc::Rc;
+use crossterm::execute;
+use crossterm::terminal;
+use crossterm::terminal::ClearType;
+
+use crate::menus::menu_traits::Menu;
 
 pub mod interface;
 pub mod helpers;
 pub mod menus;
 pub mod abt;
-
-use crate::menus::menu_traits::Menu;
 
 const TARGET_FPS : f64 = 30.0;
 
@@ -37,15 +28,18 @@ fn main() -> io::Result<()> {
 
 	// initialize variables that persist between menus
 	let mut out = stdout();
-	let menu : Rc<RefCell<abt::menus::Menu>> = Rc::new(RefCell::new(abt::menus::Menu::Main));
+	let menu : Rc<RefCell<abt::menus::Menu>> =
+		Rc::new(RefCell::new(abt::menus::Menu::Main));
 	let data : Rc<RefCell<abt::data::Data>> =
-		Rc::new(RefCell::new(abt::data::Data { user : None, savefile : None, lobby : None, map : None }));
-	let mut mainmenu = menus::mainmenu::MainMenu::init(Rc::clone(&menu), Rc::clone(&data));
-	let mut userselect = menus::userselect::UserSelect::init(Rc::clone(&menu), Rc::clone(&data));
+		Rc::new(RefCell::new(abt::data::Data {
+			user : None, savefile : None, lobby : None, map : None }));
+	let mut mainmenu =
+		menus::mainmenu::MainMenu::init(Rc::clone(&menu), Rc::clone(&data));
+	let mut userselect =
+		menus::userselect::UserSelect::init(Rc::clone(&menu), Rc::clone(&data));
 	mainmenu.redraw(&input, &mut out);
 	let mut new_menu : abt::menus::Menu;
 
-	
 	// the actual program
 	loop {
 		// setup for the frame
