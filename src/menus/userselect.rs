@@ -24,6 +24,7 @@ use crate::{
 pub struct UserSelect {
 	users : list::List,
 	decoration : textbox::Box,
+	submenu : Option<u8>,
 	
 	create_button : label::Label,
 	create_submenu : Create,
@@ -31,6 +32,7 @@ pub struct UserSelect {
 	rename_submenu : Rename,
 	delete_button : label::Label,
 	delete_submenu : Delete,
+	open_button : label::Label,
 
 	tier : textbox::Box,
 	menu : Rc<RefCell<menus::Menu>>,
@@ -53,7 +55,8 @@ pub struct Rename {
 pub struct Delete {
 	decoration : textbox::Box,
 	message : label::Label,
-	input : inputfield::InputField,
+	yes_option : label::Label,
+	no_option : label::Label,
 	message_fail : label::Label
 }
 
@@ -66,6 +69,7 @@ impl menu_traits::Menu for UserSelect {
 		Self {
 			users : user_list,
 			decoration : textbox::Box::new(3, 1, 5, 5),
+			submenu : None,
 			
 			create_button : label::Label::new(8, " Create"),
 			create_submenu : Create {
@@ -86,10 +90,13 @@ impl menu_traits::Menu for UserSelect {
 			delete_button : label::Label::new(8, " Delete"),
 			delete_submenu : Delete {
 				decoration : textbox::Box::new(3, 1, 5, 5),
-				message : label::Label::new(21, " Delete selected user"),
-				input : inputfield::InputField::new(0, 0, 15),
-				message_fail : label::Label::new(26, "Couldn't delete the user"),
+				message : label::Label::new(16, " Are you sure?"),
+				yes_option : label::Label::new(5, " Yes"),
+				no_option : label::Label::new(5, " No"),
+				message_fail : label::Label::new(26, "Couldn't rename the user"),
 			},
+			
+			open_button : label::Label::new(8, "  Open"),
 			
 			tier : textbox::Box::new(15, 3, 5, 3),
 			menu : menu_ref,
@@ -123,12 +130,38 @@ impl UserSelect {
 		self.decoration.height = input.window.height -2;
 		self.users.width = input.window.width -14 -2;
 		self.users.height = input.window.height -2 -2;
+
+		let selected_prev : bool = self.users.selected.is_some();
 		
 		utils::object(&mut self.users, input, &self.menu, menus::Menu::UserSelect,
 		(4, 2), (4, 2), 0, out);
 
 		utils::object(&mut self.create_button, input, &self.menu, menus::Menu::UserSelect,
 		(-10, 10), (-10, 10), 1, out);
+
+		if self.users.selected.is_some() != selected_prev {
+			if self.users.selected.is_some() {
+
+				utils::object(&mut self.rename_button, input, &self.menu, menus::Menu::UserSelect,
+				(-10, 12), (-10, 12), 1, out);
+
+				utils::object(&mut self.delete_button, input, &self.menu, menus::Menu::UserSelect,
+				(-10, 14), (-10, 14), 1, out);
+
+				utils::object(&mut self.open_button, input, &self.menu, menus::Menu::UserSelect,
+				(-10, 16), (-10, 16), 1, out);
+
+				traits::UserInterface::draw(&self.rename_button, out);
+				traits::UserInterface::draw(&self.delete_button, out);
+				traits::UserInterface::draw(&self.open_button, out);
+			}
+			else {
+				traits::UserInterface::clear(&self.rename_button, out);
+				traits::UserInterface::clear(&self.delete_button, out);
+				traits::UserInterface::clear(&self.open_button, out);
+			}
+		}
+
 
 		utils::object(&mut self.tier, input, &self.menu, menus::Menu::Main,
 		(-7, 3), (-7, 3), 1, out);
