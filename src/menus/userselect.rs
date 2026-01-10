@@ -266,7 +266,6 @@ impl UserSelect {
 			},
 
 			Some(1) => {
-				println!("AAAAAAAAAAAAAAAAAA");
 				utils::object(&mut self.rename_submenu.decoration, input, &self.menu, menus::Menu::UserSelect,
 				(0, 0), (0, 0), 4, out);
 				
