@@ -186,6 +186,9 @@ impl UserSelect {
 				if self.create_button.clicked {
 					self.submenu = Some(0);
 				}
+				if self.rename_button.clicked {
+					self.submenu = Some(1);
+				}
 
 				if self.users.selected.is_some() != selected_prev {
 					if self.users.selected.is_some() {
@@ -234,11 +237,49 @@ impl UserSelect {
 				(4, input.window.height as i16-1), (4, input.window.height as i16-1), 0, out);
 				
 				if self.create_submenu.confirm.clicked {
-					if let Err(v) = crate::abt::fs::users::create(&self.create_submenu.input.output) {
-						self.create_submenu.message_fail.text = v.to_string();
+					if let Err(e) = crate::abt::fs::users::create(&self.create_submenu.input.output) {
+						self.create_submenu.message_fail.text = e.to_string();
 					}
 					self.message_timer = 100;
 					self.create_submenu.input.reset();
+					update_userlist(&mut self.users);
+					self.submenu = None;
+				}
+				
+				if self.create_submenu.cancel.clicked {
+					self.create_submenu.input.reset();
+					self.submenu = None;
+				}
+			},
+
+			Some(1) => {
+				utils::object(&mut self.rename_submenu.decoration, input, &self.menu, menus::Menu::UserSelect,
+				(0, 0), (0, 0), 4, out);
+				
+				utils::object(&mut self.rename_submenu.message, input, &self.menu, menus::Menu::UserSelect,
+				(0, -2), (0, -2), 4, out);
+
+				utils::object(&mut self.rename_submenu.input, input, &self.menu, menus::Menu::UserSelect,
+				(0, 0), (0, 0), 4, out);
+
+				utils::object(&mut self.rename_submenu.confirm, input, &self.menu, menus::Menu::UserSelect,
+				(-4, 2), (-4, 2), 4, out);
+
+				utils::object(&mut self.rename_submenu.cancel, input, &self.menu, menus::Menu::UserSelect,
+				(5, 2), (5, 2), 4, out);
+
+				utils::object(&mut self.rename_submenu.message_fail, input, &self.menu, menus::Menu::UserSelect,
+				(4, input.window.height as i16-1), (4, input.window.height as i16-1), 0, out);
+				
+				if self.rename_submenu.confirm.clicked {
+					if let Some(selected) = self.users.selected &&
+						let Err(e) = crate::abt::fs::users::rename(
+						&self.users.items[selected as usize], &self.rename_submenu.input.output)
+					{
+						self.rename_submenu.message_fail.text = e.to_string();
+					}
+					self.message_timer = 100;
+					self.rename_submenu.input.reset();
 					update_userlist(&mut self.users);
 					self.submenu = None;
 				}

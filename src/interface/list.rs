@@ -81,6 +81,9 @@ impl traits::UserInterface for List {
 				else {
 					self.selected = Some(input.mouse.y + self.index - self.y);
 				}
+				if let Some(v) = self.selected && v >= self.items.len() as u16 {
+					self.selected = None;
+				}
 			}
 		}
 		else {
