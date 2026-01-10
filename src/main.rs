@@ -37,6 +37,8 @@ fn main() -> io::Result<()> {
 		menus::mainmenu::MainMenu::init(Rc::clone(&menu), Rc::clone(&data));
 	let mut userselect =
 		menus::userselect::UserSelect::init(Rc::clone(&menu), Rc::clone(&data));
+	let mut sfselect =
+		menus::sfselect::SaveSelect::init(Rc::clone(&menu), Rc::clone(&data));
 	mainmenu.redraw(&input, &mut out);
 	let mut new_menu : abt::menus::Menu;
 
@@ -58,6 +60,7 @@ fn main() -> io::Result<()> {
 		match cmenu {
 			abt::menus::Menu::Main => mainmenu.tick(&input, &mut out),
 			abt::menus::Menu::UserSelect => userselect.tick(&input, &mut out),
+			abt::menus::Menu::SavefileSelect => sfselect.tick(&input, &mut out),
 			_ => break,
 		}
 		new_menu = *menu.borrow();
@@ -66,6 +69,7 @@ fn main() -> io::Result<()> {
 			match new_menu {
 				abt::menus::Menu::Main => mainmenu.redraw(&input, &mut out),
 				abt::menus::Menu::UserSelect => userselect.redraw(&input, &mut out),
+				abt::menus::Menu::SavefileSelect => userselect.redraw(&input, &mut out),
 				_ => break,
 			}
 		}

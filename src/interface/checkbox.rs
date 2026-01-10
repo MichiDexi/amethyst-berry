@@ -23,7 +23,8 @@ pub struct CheckBox {
 
 	// Event polling
 	pub hovered : bool,
-	pub checked : bool
+	pub checked : bool,
+	pub checked_prev : bool,
 }
 
 
@@ -64,12 +65,13 @@ impl traits::UserInterface for CheckBox {
 		);
 
 		if self.hovered && (input.mouse.lclick || input.actions.confirm) {
+			self.checked_prev = self.checked;
 			self.checked = !self.checked;
 		}
 	}
 
 	fn redraw_requested(&mut self) -> bool {
-		self.hovered
+		self.checked_prev ^ self.checked
 	}
 
 	fn set_position(&mut self, x : i16, y : i16, anchor : u8, size : (u16, u16)) {
@@ -88,7 +90,7 @@ impl traits::UserInterface for CheckBox {
 }
 
 impl CheckBox {
-	fn new(nx : u16, ny : u16) -> Self {
+	pub fn new(nx : u16, ny : u16) -> Self {
 		CheckBox {
 			x : nx,
 			y : ny,
@@ -120,7 +122,8 @@ impl CheckBox {
 			charset : ['[', 'X', ' ', ']'],
 			
 			hovered : false,
-			checked : false
+			checked : false,
+			checked_prev : false,
 		}
 	}
 }

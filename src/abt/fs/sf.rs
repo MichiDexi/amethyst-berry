@@ -137,3 +137,19 @@ pub fn is_lobby_based(user : &str, name : &str) -> Result<bool, Error> {
 
 	Ok(false)
 }
+
+pub fn list(user : &str) -> Vec<String> {
+	let mut output : Vec<String> = Vec::new();
+	if let Some(mut path) = dirs::savedata_dir() &&
+		let Ok(entries) = fs::read_dir(&path)
+	{
+		path.push(user);
+		for entry in entries.flatten() {
+			let path = entry.path();
+			if path.is_dir() && let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+				output.push(name.to_string());
+			}
+		}
+	}
+	output
+}
