@@ -119,7 +119,6 @@ impl menu_traits::Menu for UserSelect {
 				traits::UserInterface::draw(&self.create_submenu.decoration, out);
 				traits::UserInterface::draw(&self.create_submenu.message, out);
 				traits::UserInterface::draw(&self.create_submenu.input, out);
-				
 			},
 			Some(_) => {
 				self.submenu = None;
@@ -144,6 +143,8 @@ impl UserSelect {
 		self.decoration.height = input.window.height -2;
 		self.users.width = input.window.width -14 -2;
 		self.users.height = input.window.height -2 -2;
+
+		let submenu_prev = self.submenu;
 
 		match self.submenu {
 			None => {
@@ -191,6 +192,10 @@ impl UserSelect {
 			_ => {
 				self.submenu = None;
 			}
+		}
+
+		if self.submenu != submenu_prev {
+			menu_traits::Menu::redraw(self, input, out);
 		}
 	}
 }
