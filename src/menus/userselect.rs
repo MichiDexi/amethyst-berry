@@ -125,6 +125,7 @@ impl menu_traits::Menu for UserSelect {
 				traits::UserInterface::draw(&self.create_submenu.decoration, out);
 				traits::UserInterface::draw(&self.create_submenu.message, out);
 				traits::UserInterface::draw(&self.create_submenu.input, out);
+				traits::UserInterface::draw(&self.create_submenu.out, out);
 			},
 			Some(_) => {
 				self.submenu = None;
@@ -202,7 +203,7 @@ impl UserSelect {
 				(6, 7), (6, 7), 0, out);
 
 				utils::object(&mut self.create_submenu.input, input, &self.menu, menus::Menu::UserSelect,
-				(-10, 12), (-10, 12), 0, out);
+				(8, 12), (8, 12), 0, out);
 
 				utils::object(&mut self.create_submenu.out, input, &self.menu, menus::Menu::UserSelect,
 				(10, 10), (10, 10), 0, out);
