@@ -1,25 +1,18 @@
-use std::{
-	io::{
-		Write,
-		Stdout,
-	},
-	rc::Rc,
-	cell::RefCell,
-};
-use crate::{
-	interface::{
-		label,
-		list,
-		textbox,
-		traits,
-		inputfield
-	},
-	helpers::input,
-	helpers::utils,
-	abt::menus,
-	abt::data,
-	menus::menu_traits,
-};
+use std::io::Write;
+use std::io::Stdout;
+use std::rc::Rc;
+use std::cell::RefCell;
+
+use crate::interface::label;
+use crate::interface::list;
+use crate::interface::textbox;
+use crate::interface::traits;
+use crate::interface::inputfield;
+use crate::helpers::input;
+use crate::helpers::utils;
+use crate::abt::menus;
+use crate::abt::data;
+use crate::menus::menu_traits;
 
 
 pub struct UserSelect {
@@ -38,6 +31,7 @@ pub struct UserSelect {
 	tier : textbox::Box,
 	menu : Rc<RefCell<menus::Menu>>,
 	data : Rc<RefCell<data::Data>>,
+	message_timer : u8,
 }
 
 pub struct Create {
@@ -81,7 +75,7 @@ impl menu_traits::Menu for UserSelect {
 				decoration : textbox::Box::new(10, 10, 25, 9),
 				message : label::Label::new(19, " Create a new user"),
 				input : inputfield::InputField::new(0, 0, 15),
-				message_fail : label::Label::new(26, "Couldn't create new user"),
+				message_fail : label::Label::new(26, ""),
 				confirm : label::Label::new(9, " Confirm"),
 				cancel : label::Label::new(8, " Cancel"),
 			},
@@ -110,6 +104,7 @@ impl menu_traits::Menu for UserSelect {
 			tier : textbox::Box::new(15, 3, 5, 3),
 			menu : menu_ref,
 			data : data_ref,
+			message_timer : 0,
 		}
 	}
 
@@ -122,7 +117,6 @@ impl menu_traits::Menu for UserSelect {
 		traits::UserInterface::draw(&self.decoration, out);
 		traits::UserInterface::draw(&self.create_button, out);
 		traits::UserInterface::draw(&self.tier, out);
-		traits::UserInterface::draw(&self.create_submenu.message_fail, out);
 
 		match self.submenu {
 			Some(0) => {
@@ -145,6 +139,27 @@ impl menu_traits::Menu for UserSelect {
 			self.redraw(input, out);
 		}
 
+		if self.message_timer != 0 {
+			self.message_timer -= 1;
+			if !self.create_submenu.message_fail.text.is_empty() {
+				traits::UserInterface::draw(&self.create_submenu.message_fail, out);
+			}
+			else if !self.rename_submenu.message_fail.text.is_empty() {
+				traits::UserInterface::draw(&self.rename_submenu.message_fail, out);
+			}
+			else if !self.delete_submenu.message_fail.text.is_empty() {
+				traits::UserInterface::draw(&self.delete_submenu.message_fail, out);
+			}
+			else {
+				self.message_timer = 0;
+			}
+		}
+		else {
+			traits::UserInterface::clear(&self.create_submenu.message_fail, out);
+			traits::UserInterface::clear(&self.rename_submenu.message_fail, out);
+			traits::UserInterface::clear(&self.delete_submenu.message_fail, out);
+		}
+
 		self.update(input, out);
 	}
 }
@@ -155,6 +170,7 @@ impl UserSelect {
 		self.decoration.height = input.window.height -2;
 		self.users.width = input.window.width -14 -2;
 		self.users.height = input.window.height -2 -2;
+		self.create_submenu.message_fail.size = input.window.width -8;
 
 		let submenu_prev = self.submenu;
 
@@ -196,8 +212,6 @@ impl UserSelect {
 
 				utils::object(&mut self.tier, input, &self.menu, menus::Menu::Main,
 				(-7, 3), (-7, 3), 1, out);
-
-				self.create_submenu.input.reset();
 			},
 			
 			Some(0) => {
@@ -215,12 +229,22 @@ impl UserSelect {
 
 				utils::object(&mut self.create_submenu.cancel, input, &self.menu, menus::Menu::UserSelect,
 				(5, 2), (5, 2), 4, out);
+
+				utils::object(&mut self.create_submenu.message_fail, input, &self.menu, menus::Menu::UserSelect,
+				(5, input.window.height as i16-2), (5, input.window.height as i16-2), 4, out);
 				
 				if self.create_submenu.confirm.clicked {
+					if let Err(v) = crate::abt::fs::users::create(&self.create_submenu.input.output) {
+						self.create_submenu.message_fail.text = v.to_string();
+					}
+					self.message_timer = 100;
+					self.create_submenu.input.reset();
+					update_userlist(&mut self.users);
 					self.submenu = None;
 				}
 				
 				if self.create_submenu.cancel.clicked {
+					self.create_submenu.input.reset();
 					self.submenu = None;
 				}
 			},
