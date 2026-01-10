@@ -3,9 +3,6 @@ use std::io::Stdout;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use crossterm::terminal::enable_raw_mode;
-use crossterm::terminal::disable_raw_mode;
-
 use crate::interface::label;
 use crate::interface::list;
 use crate::interface::textbox;
@@ -136,6 +133,12 @@ impl menu_traits::Menu for UserSelect {
 				traits::UserInterface::draw(&self.rename_submenu.confirm, out);
 				traits::UserInterface::draw(&self.rename_submenu.cancel, out);
 			},
+			Some(2) => {
+				traits::UserInterface::draw(&self.delete_submenu.decoration, out);
+				traits::UserInterface::draw(&self.delete_submenu.message, out);
+				traits::UserInterface::draw(&self.delete_submenu.confirm, out);
+				traits::UserInterface::draw(&self.delete_submenu.cancel, out);
+			},
 			Some(_) => {
 				self.submenu = None;
 			}
@@ -200,7 +203,7 @@ impl UserSelect {
 				utils::object(&mut self.delete_button, input, &self.menu, menus::Menu::UserSelect,
 				(-10, 14), (-10, 14), 1, out);
 
-				utils::object(&mut self.open_button, input, &self.menu, menus::Menu::UserSelect,
+				utils::object(&mut self.open_button, input, &self.menu, menus::Menu::SavefileSelect,
 				(-10, 16), (-10, 16), 1, out);
 					
 				if self.users.selected.is_some() {
@@ -224,6 +227,9 @@ impl UserSelect {
 				}
 				if self.delete_button.clicked {
 					self.submenu = Some(2);
+				}
+				if let Some(selected) = self.users.selected && self.open_button.clicked {
+					self.data.borrow_mut().user = Some(self.users.items[selected as usize].clone());
 				}
 
 				utils::object(&mut self.tier, input, &self.menu, menus::Menu::Main,
@@ -297,8 +303,8 @@ impl UserSelect {
 					self.submenu = None;
 				}
 				
-				if self.create_submenu.cancel.clicked {
-					self.create_submenu.input.reset();
+				if self.rename_submenu.cancel.clicked {
+					self.rename_submenu.input.reset();
 					self.submenu = None;
 				}
 			},
@@ -316,24 +322,22 @@ impl UserSelect {
 				utils::object(&mut self.delete_submenu.cancel, input, &self.menu, menus::Menu::UserSelect,
 				(5, 1), (5, 1), 4, out);
 
-				utils::object(&mut self.rename_submenu.message_fail, input, &self.menu, menus::Menu::UserSelect,
+				utils::object(&mut self.delete_submenu.message_fail, input, &self.menu, menus::Menu::UserSelect,
 				(4, input.window.height as i16-1), (4, input.window.height as i16-1), 0, out);
 				
-				if self.rename_submenu.confirm.clicked {
+				if self.delete_submenu.confirm.clicked {
 					if let Some(selected) = self.users.selected &&
-						let Err(e) = crate::abt::fs::users::rename(
-						&self.users.items[selected as usize], &self.rename_submenu.input.output)
+						let Err(e) = crate::abt::fs::users::delete(
+						&self.users.items[selected as usize])
 					{
-						self.rename_submenu.message_fail.text = e.to_string();
+						self.delete_submenu.message_fail.text = e.to_string();
 					}
 					self.message_timer = 100;
-					self.rename_submenu.input.reset();
 					update_userlist(&mut self.users);
 					self.submenu = None;
 				}
 				
-				if self.create_submenu.cancel.clicked {
-					self.create_submenu.input.reset();
+				if self.delete_submenu.cancel.clicked {
 					self.submenu = None;
 				}
 			},
