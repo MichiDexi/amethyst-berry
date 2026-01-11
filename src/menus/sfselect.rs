@@ -64,10 +64,7 @@ pub struct Delete {
 
 impl menu_traits::Menu for SaveSelect {
 	fn init(menu_ref : Rc<RefCell<menus::Menu>>, data_ref : Rc<RefCell<data::Data>>) -> Self {
-		let mut savelist : list::List = list::List::new(3, 1, 5, 5);
-		if let Some(user) = data_ref.borrow().user.clone() {
-			update_savelist(&mut savelist, &user);
-		}
+		let savelist : list::List = list::List::new(3, 1, 5, 5);
 
 		Self {
 			savefile_list : savelist,
@@ -77,7 +74,7 @@ impl menu_traits::Menu for SaveSelect {
 			create_button : label::Label::new(8, " Create"),
 			create_submenu : Create {
 				decoration : textbox::Box::new(10, 10, 25, 9),
-				message : label::Label::new(19, " Create a new user"),
+				message : label::Label::new(19, " Create a new save"),
 				input : inputfield::InputField::new(0, 0, 15),
 				lobby_based : checkbox::CheckBox::new(0, 0),
 				message_fail : label::Label::new(26, ""),
@@ -88,7 +85,7 @@ impl menu_traits::Menu for SaveSelect {
 			rename_button : label::Label::new(8, " Rename"),
 			rename_submenu : Rename {
 				decoration : textbox::Box::new(10, 10, 25, 9),
-				message : label::Label::new(19, " Rename the user"),
+				message : label::Label::new(19, " Rename the save"),
 				input : inputfield::InputField::new(0, 0, 15),
 				message_fail : label::Label::new(26, ""),
 				confirm : label::Label::new(9, " Confirm"),
@@ -116,6 +113,10 @@ impl menu_traits::Menu for SaveSelect {
 	fn redraw(&mut self, input : &input::InputHandler, out : &mut Stdout) {
 		write!(out, "\x1b[2J").unwrap();
 
+		if let Some(user) = self.data.borrow().user.clone() {
+			update_savelist(&mut self.savefile_list, &user);
+		}
+
 		self.update(input, out);
 
 		traits::UserInterface::draw(&self.savefile_list, out);
@@ -128,6 +129,7 @@ impl menu_traits::Menu for SaveSelect {
 				traits::UserInterface::draw(&self.create_submenu.decoration, out);
 				traits::UserInterface::draw(&self.create_submenu.message, out);
 				traits::UserInterface::draw(&self.create_submenu.input, out);
+				traits::UserInterface::draw(&self.create_submenu.lobby_based, out);
 				traits::UserInterface::draw(&self.create_submenu.confirm, out);
 				traits::UserInterface::draw(&self.create_submenu.cancel, out);
 			},
