@@ -112,11 +112,6 @@ impl menu_traits::Menu for SaveSelect {
 
 	fn redraw(&mut self, input : &input::InputHandler, out : &mut Stdout) {
 		write!(out, "\x1b[2J").unwrap();
-
-		if let Some(user) = self.data.borrow().user.clone() {
-			update_savelist(&mut self.savefile_list, &user);
-		}
-
 		self.update(input, out);
 
 		traits::UserInterface::draw(&self.savefile_list, out);
@@ -154,6 +149,11 @@ impl menu_traits::Menu for SaveSelect {
 	}
 
 	fn tick(&mut self, input : &input::InputHandler, out : &mut Stdout) {
+
+		if let Some(user) = self.data.borrow().user.clone() {
+			update_savelist(&mut self.savefile_list, &user);
+		}
+		self.savefile_list.selected = None;
 
 		if input.window.request_full_redraw {
 			self.redraw(input, out);
@@ -212,18 +212,19 @@ impl SaveSelect {
 
 				utils::object(&mut self.open_button, input, &self.menu, menus::Menu::LobbySelect,
 				(-10, 16), (-10, 16), 1, out);
-					
-				if self.savefile_list.selected.is_some() {
-					if self.savefile_list.selected.is_some() != selected_prev {
+
+
+				if self.savefile_list.selected.is_some() != selected_prev {
+					if self.savefile_list.selected.is_some() {
 						traits::UserInterface::draw(&self.rename_button, out);
 						traits::UserInterface::draw(&self.delete_button, out);
 						traits::UserInterface::draw(&self.open_button, out);
 					}
-				}
-				else if self.savefile_list.selected.is_some() != selected_prev {
-					traits::UserInterface::clear(&self.rename_button, out);
-					traits::UserInterface::clear(&self.delete_button, out);
-					traits::UserInterface::clear(&self.open_button, out);
+					else {
+						traits::UserInterface::clear(&self.rename_button, out);
+						traits::UserInterface::clear(&self.delete_button, out);
+						traits::UserInterface::clear(&self.open_button, out);
+					}
 				}
 
 				if self.create_button.clicked {

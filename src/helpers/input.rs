@@ -9,7 +9,6 @@ use std::{
 use crossterm::{
 	event::{
 		Event,
-		KeyEventKind,
 		KeyEvent,
 		KeyCode,
 		MouseEvent,
@@ -254,7 +253,7 @@ pub fn init() -> io::Result<()> {
 	execute!(stdout, crossterm::event::EnableBracketedPaste).unwrap();
 	execute!(stdout, crossterm::event::EnableFocusChange).unwrap();
 	execute!(stdout, crossterm::event::EnableMouseCapture).unwrap();
-	execute!(stdout, SetTitle("Amethyst berry tool"))?;
+	execute!(stdout, SetTitle("Amethyst berry"))?;
 	enable_raw_mode()?;
 	Ok(())
 }
